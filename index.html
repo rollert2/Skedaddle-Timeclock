@@ -34,7 +34,7 @@
         const { useState, useEffect, useRef } = React;
         const { 
             Clock, LogIn, LogOut, Calendar, AlertCircle, 
-            CheckCircle2, History, Settings, UserCheck, Loader2
+            CheckCircle2, History, Settings, UserCheck, Loader2, ShieldCheck
         } = lucide;
 
         const App = () => {
@@ -55,32 +55,36 @@
             const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYRKBrGDq_i73Js7YbuihuQEBBIUAS66NQC0sfkYndyZOX41muVxniVB30R1rxQoNoBw/exec";
             // -------------------------
 
+            // Handle Script Loading and Initial Config
             useEffect(() => {
                 const initializeGoogleAuth = () => {
-                    try {
-                        google.accounts.id.initialize({
-                            client_id: CLIENT_ID,
-                            callback: handleGoogleResponse,
-                        });
-
-                        // Only render button if not logged in and ref is available
-                        if (!user && googleBtnRef.current) {
-                            google.accounts.id.renderButton(googleBtnRef.current, {
-                                type: "standard",
-                                shape: "pill",
-                                theme: "outline",
-                                text: "signin_with",
-                                size: "large",
-                                logo_alignment: "left",
-                                width: 250
+                    if (window.google) {
+                        try {
+                            window.google.accounts.id.initialize({
+                                client_id: CLIENT_ID,
+                                callback: handleGoogleResponse,
+                                auto_select: false,
+                                cancel_on_tap_outside: true,
                             });
+                            
+                            // Only render if we don't have a user yet
+                            if (!user && googleBtnRef.current) {
+                                window.google.accounts.id.renderButton(googleBtnRef.current, {
+                                    type: "standard",
+                                    shape: "pill",
+                                    theme: "filled_blue",
+                                    text: "signin_with",
+                                    size: "large",
+                                    logo_alignment: "left",
+                                    width: 280
+                                });
+                            }
+                            
+                            setIsInitializing(false);
+                        } catch (err) {
+                            console.error("Google Auth init failed", err);
+                            setIsInitializing(false);
                         }
-
-                        google.accounts.id.prompt();
-                        setIsInitializing(false);
-                    } catch (err) {
-                        console.error("Google Auth failed", err);
-                        setIsInitializing(false);
                     }
                 };
 
@@ -96,28 +100,33 @@
                 } else {
                     initializeGoogleAuth();
                 }
-            }, [user]);
+            }, [user === null]); // Only re-run if user is cleared
 
             const handleGoogleResponse = (response) => {
-                const base64Url = response.credential.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
+                try {
+                    const base64Url = response.credential.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
 
-                const profile = JSON.parse(jsonPayload);
-                setUser({
-                    email: profile.email,
-                    name: profile.name,
-                    picture: profile.picture
-                });
-                setError(null);
+                    const profile = JSON.parse(jsonPayload);
+                    setUser({
+                        email: profile.email,
+                        name: profile.name,
+                        picture: profile.picture
+                    });
+                    setError(null);
+                    setIsInitializing(false);
+                } catch (e) {
+                    console.error("Failed to parse Google response", e);
+                    setError("Login failed. Please try again.");
+                }
             };
 
             const sendToGoogleSheet = async (type) => {
                 setIsSyncing(true);
                 try {
-                    // Google Apps Script Web Apps require 'no-cors' for simple redirects
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -135,7 +144,7 @@
                 } catch (err) {
                     console.error("Sync failed", err);
                     setIsSyncing(false);
-                    setError("Communication with payroll sheet failed. Please check your connection.");
+                    setError("Communication with payroll sheet failed. Check connection.");
                     return false;
                 }
             };
@@ -144,6 +153,7 @@
                 setUser(null);
                 setLogs([]);
                 setStatus('idle');
+                // Allow the button to re-render in the next cycle
             };
 
             const handleClockIn = async () => {
@@ -165,7 +175,6 @@
                 const today = now.toLocaleDateString();
                 const hasClockInToday = logs.some(log => log.type === 'IN' && log.date === today);
 
-                // Send request anyway to trigger potential logic in backend
                 const success = await sendToGoogleSheet('OUT');
                 
                 if (!hasClockInToday) {
@@ -184,153 +193,183 @@
                 setError(null);
             };
 
+            // Loading View
             if (isInitializing) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center">
+                    <div className="min-h-screen flex items-center justify-center bg-white">
                         <div className="flex flex-col items-center">
-                            <img src={LOGO_URL} alt="Skedaddle" className="h-16 mb-4 opacity-50" />
-                            <div className="h-1 w-32 bg-slate-200 rounded-full overflow-hidden">
-                                <div className="h-full bg-orange-500 w-1/2 animate-shimmer"></div>
+                            <img src={LOGO_URL} alt="Skedaddle" className="h-20 mb-6 opacity-80" />
+                            <div className="flex items-center gap-2 text-slate-400 font-medium animate-pulse">
+                                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                Securely Connecting...
                             </div>
                         </div>
                     </div>
                 );
             }
 
+            // Login View
             if (!user) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center p-4">
-                        <div className="max-w-md w-full bg-white rounded-[2rem] shadow-2xl p-10 border border-slate-200">
-                            <div className="flex flex-col items-center mb-10 text-center">
-                                <img src={LOGO_URL} alt="Skedaddle" className="h-20 mb-8" />
-                                <h1 className="text-2xl font-black text-slate-800 tracking-tight">Technician Portal</h1>
-                                <p className="text-slate-500 text-sm mt-2">Sign in with your work email to continue.</p>
-                            </div>
-                            
-                            <div className="flex flex-col items-center gap-6">
-                                <div ref={googleBtnRef}></div>
-                                <div className="mt-8 text-center grayscale opacity-20">
-                                     <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">Proprietary System</p>
+                    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100">
+                        <div className="max-w-md w-full">
+                            <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 border border-slate-200 text-center flex flex-col items-center">
+                                <img src={LOGO_URL} alt="Skedaddle" className="h-24 mb-10" />
+                                
+                                <h1 className="text-3xl font-black text-slate-800 tracking-tight mb-2 uppercase">Technician Portal</h1>
+                                <p className="text-slate-500 font-medium mb-10 max-w-[240px] leading-relaxed">
+                                    Access your secure clock-in system with your company credentials.
+                                </p>
+                                
+                                <div className="w-full flex justify-center py-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 mb-8 relative group">
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 rounded-full">
+                                        Secure Login
+                                    </div>
+                                    <div ref={googleBtnRef} className="min-h-[44px]"></div>
+                                </div>
+
+                                <div className="flex items-center justify-center gap-2 text-slate-400">
+                                    <ShieldCheck className="w-4 h-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Verified Secure Access</span>
                                 </div>
                             </div>
+                            
+                            <p className="mt-8 text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] leading-relaxed">
+                                Proprietary System &copy; 2025<br/>Skedaddle Wildlife Control Inc.
+                            </p>
                         </div>
                     </div>
                 );
             }
 
+            // Main Dashboard View
             return (
-                <div className="min-h-screen p-4 md:p-8">
+                <div className="min-h-screen p-4 md:p-8 bg-slate-50">
                     <div className="max-w-2xl mx-auto">
                         {/* Profile Header */}
-                        <div className="flex items-center justify-between mb-8 bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+                        <div className="flex items-center justify-between mb-8 bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100">
                             <div className="flex items-center gap-4">
-                                <img src={user.picture} className="w-12 h-12 rounded-2xl border-2 border-orange-100" referrerPolicy="no-referrer" />
+                                <div className="relative">
+                                    <img src={user.picture} className="w-14 h-14 rounded-2xl border-2 border-orange-100 shadow-sm" referrerPolicy="no-referrer" alt="User" />
+                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                                </div>
                                 <div>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Active Technician</p>
-                                    <p className="text-sm font-bold text-slate-800 leading-tight">{user.name}</p>
-                                    <p className="text-xs text-slate-500">{user.email}</p>
+                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-0.5 text-orange-500">Online</p>
+                                    <p className="text-base font-black text-slate-800 leading-none">{user.name}</p>
+                                    <p className="text-xs text-slate-500 mt-1 font-medium">{user.email}</p>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="p-3 text-slate-400 hover:text-red-500 transition-colors">
-                                <LogOut className="w-5 h-5" />
+                            <button onClick={handleLogout} className="p-4 hover:bg-red-50 rounded-2xl transition-all text-slate-300 hover:text-red-500 group">
+                                <LogOut className="w-6 h-6 group-active:scale-90 transition-transform" />
                             </button>
                         </div>
 
                         {/* Control Card */}
                         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden mb-6">
                             <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between gap-6">
-                                <div className="flex items-start gap-4">
-                                    <div className={`p-3 rounded-2xl ${status === 'clocked_in' ? 'bg-green-500 shadow-lg shadow-green-900/40' : 'bg-slate-800'}`}>
-                                        <UserCheck className="w-6 h-6" />
+                                <div className="flex items-start gap-5">
+                                    <div className={`p-4 rounded-2xl ${status === 'clocked_in' ? 'bg-green-500 shadow-lg shadow-green-900/40' : 'bg-slate-800'}`}>
+                                        <UserCheck className="w-7 h-7" />
                                     </div>
                                     <div>
-                                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Payroll Period</p>
-                                        <p className="text-lg font-bold text-orange-400">{currentPeriod}</p>
+                                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Current Period</p>
+                                        <p className="text-xl font-black text-orange-400 tracking-tight">{currentPeriod}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col md:items-end">
-                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Shift Status</p>
-                                    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-black text-xs ${status === 'clocked_in' ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-400'}`}>
-                                        <div className={`w-2 h-2 rounded-full animate-pulse ${status === 'clocked_in' ? 'bg-green-400' : 'bg-slate-600'}`}></div>
-                                        {status === 'clocked_in' ? 'RECORDING TIME' : 'OFF DUTY'}
+                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-right">Duty Status</p>
+                                    <div className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-xs tracking-widest ${status === 'clocked_in' ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-400'}`}>
+                                        <div className={`w-2 h-2 rounded-full ${status === 'clocked_in' ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`}></div>
+                                        {status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-8">
+                            <div className="p-10">
                                 {isSyncing && (
-                                    <div className="flex items-center justify-center gap-2 mb-6 text-orange-600 font-bold text-sm bg-orange-50 py-2 rounded-xl">
+                                    <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-3 rounded-2xl border border-orange-100 animate-in fade-in zoom-in-95">
                                         <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-                                        Syncing with Spreadsheet...
+                                        SYNCING PAYROLL DATA...
                                     </div>
                                 )}
                                 
                                 {error && (
-                                    <div className="mb-8 p-5 bg-red-50 border-l-4 border-red-500 rounded-2xl flex items-start gap-4 shadow-sm">
-                                        <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                                    <div className="mb-8 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl flex items-start gap-5 shadow-sm animate-in slide-in-from-top-2">
+                                        <AlertCircle className="w-8 h-8 text-red-500 flex-shrink-0" />
                                         <div className="flex-1">
-                                            <p className="text-red-900 font-bold text-sm">Action Flagged</p>
-                                            <p className="text-red-700 text-xs mt-0.5 leading-relaxed font-medium">{error}</p>
+                                            <p className="text-red-900 font-black text-sm uppercase tracking-tight">System Flag</p>
+                                            <p className="text-red-700 text-xs mt-1 leading-relaxed font-bold">{error}</p>
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                     <button 
                                         disabled={status === 'clocked_in' || isSyncing} 
                                         onClick={handleClockIn} 
-                                        className={`group p-10 rounded-3xl border-2 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-40 grayscale cursor-not-allowed' : 'bg-white border-slate-100 hover:border-green-500 hover:shadow-xl hover:shadow-green-50'}`}
+                                        className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-green-500 hover:shadow-2xl hover:shadow-green-100 active:scale-95'}`}
                                     >
-                                        <div className={`p-5 rounded-3xl mb-4 transition-colors ${status === 'clocked_in' ? 'bg-slate-100 text-slate-400' : 'bg-green-50 text-green-600 group-hover:bg-green-500 group-hover:text-white'}`}>
-                                            <LogIn className="w-10 h-10" />
+                                        <div className={`p-6 rounded-3xl mb-5 transition-all ${status === 'clocked_in' ? 'bg-slate-100 text-slate-400' : 'bg-green-50 text-green-600 group-hover:bg-green-500 group-hover:text-white group-hover:rotate-3'}`}>
+                                            <LogIn className="w-12 h-12" />
                                         </div>
-                                        <span className="font-black text-slate-800 tracking-tight">Clock In</span>
-                                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">Start Shift</span>
+                                        <span className="font-black text-slate-800 text-lg tracking-tight uppercase">Clock In</span>
+                                        <span className="text-[10px] text-slate-400 mt-2 font-black uppercase tracking-[0.2em]">Start Daily Shift</span>
                                     </button>
 
                                     <button 
                                         disabled={(status === 'idle' && logs.length === 0) || isSyncing} 
                                         onClick={handleClockOut} 
-                                        className={`group p-10 rounded-3xl border-2 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0) || isSyncing ? 'opacity-40 grayscale cursor-not-allowed' : 'bg-white border-slate-100 hover:border-red-500 hover:shadow-xl hover:shadow-red-50'}`}
+                                        className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0) || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl hover:shadow-red-100 active:scale-95'}`}
                                     >
-                                        <div className={`p-5 rounded-3xl mb-4 transition-colors ${(status === 'idle' && logs.length === 0) ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white'}`}>
-                                            <LogOut className="w-10 h-10" />
+                                        <div className={`p-6 rounded-3xl mb-5 transition-all ${(status === 'idle' && logs.length === 0) ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:-rotate-3'}`}>
+                                            <LogOut className="w-12 h-12" />
                                         </div>
-                                        <span className="font-black text-slate-800 tracking-tight">Clock Out</span>
-                                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">End Shift</span>
+                                        <span className="font-black text-slate-800 text-lg tracking-tight uppercase">Clock Out</span>
+                                        <span className="text-[10px] text-slate-400 mt-2 font-black uppercase tracking-[0.2em]">End Daily Shift</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Activity Log */}
-                        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                            <button onClick={() => setShowHistory(!showHistory)} className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                                <div className="flex items-center gap-3 font-black text-slate-700 uppercase text-xs tracking-wider">
-                                    <History className="w-5 h-5 text-orange-500" />
-                                    Current Session Log
+                        {/* Session Activity */}
+                        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden transition-all">
+                            <button onClick={() => setShowHistory(!showHistory)} className="w-full p-8 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                                <div className="flex items-center gap-4 font-black text-slate-800 uppercase text-xs tracking-[0.1em]">
+                                    <div className="p-2 bg-orange-100 rounded-xl">
+                                        <History className="w-5 h-5 text-orange-600" />
+                                    </div>
+                                    Live Session Records
                                 </div>
-                                <span className="text-[10px] text-slate-400 bg-slate-100 px-3 py-1 rounded-full font-black uppercase tracking-widest">
-                                    {logs.length} entries
-                                </span>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl font-black uppercase tracking-widest">
+                                        {logs.length} entries recorded
+                                    </span>
+                                    <Settings className={`w-5 h-5 text-slate-300 transition-transform duration-500 ${showHistory ? 'rotate-180' : ''}`} />
+                                </div>
                             </button>
                             {showHistory && (
-                                <div className="p-6 border-t border-slate-100 space-y-4 bg-slate-50/50">
+                                <div className="p-8 border-t border-slate-100 space-y-5 bg-slate-50/50">
                                     {logs.length === 0 ? (
-                                        <p className="text-center py-6 text-slate-400 text-xs font-bold uppercase tracking-widest">No activity recorded yet.</p>
+                                        <div className="text-center py-12 flex flex-col items-center">
+                                            <Clock className="w-12 h-12 text-slate-200 mb-4" />
+                                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest leading-loose">No shift activity found<br/>for current connection</p>
+                                        </div>
                                     ) : (
                                         logs.map((log, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-                                                <div className="flex items-center gap-4">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                        {log.type === 'IN' ? <CheckCircle2 className="w-5 h-5" /> : <LogOut className="w-5 h-5" />}
+                                            <div key={idx} className="flex items-center justify-between p-5 rounded-3xl bg-white border border-slate-100 shadow-sm animate-in slide-in-from-bottom-2">
+                                                <div className="flex items-center gap-5">
+                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                        {log.type === 'IN' ? <CheckCircle2 className="w-6 h-6" /> : <LogOut className="w-6 h-6" />}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Clocked {log.type}</p>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{log.date}</p>
+                                                        <p className="text-base font-black text-slate-800 uppercase tracking-tight">Shift {log.type === 'IN' ? 'Started' : 'Ended'}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.date}</p>
                                                     </div>
                                                 </div>
-                                                <p className="text-lg font-black text-slate-800 tracking-tighter tabular-nums">{log.time}</p>
+                                                <div className="text-right">
+                                                    <p className="text-xl font-black text-slate-800 tracking-tighter tabular-nums leading-none">{log.time}</p>
+                                                    <p className="text-[9px] font-black text-slate-300 uppercase mt-1 tracking-widest">Recorded</p>
+                                                </div>
                                             </div>
                                         ))
                                     )}
@@ -338,10 +377,14 @@
                             )}
                         </div>
 
-                        {/* Footer Branding */}
-                        <div className="mt-12 mb-8 text-center grayscale opacity-40">
-                             <img src={LOGO_URL} alt="Skedaddle" className="h-8 mx-auto mb-2" />
-                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">Skedaddle Wildlife Control Inc.</p>
+                        {/* Footer */}
+                        <div className="mt-16 mb-12 text-center grayscale opacity-30 hover:opacity-80 transition-opacity duration-700 cursor-default">
+                             <img src={LOGO_URL} alt="Skedaddle" className="h-10 mx-auto mb-4" />
+                             <div className="flex items-center justify-center gap-4">
+                                <div className="h-px w-8 bg-slate-300"></div>
+                                <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em]">Official Technician Interface</p>
+                                <div className="h-px w-8 bg-slate-300"></div>
+                             </div>
                         </div>
                     </div>
                 </div>
