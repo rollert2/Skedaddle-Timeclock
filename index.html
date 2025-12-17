@@ -36,7 +36,8 @@
 
         // --- API CONFIGURATION ---
         const CLIENT_ID = "826145031424-e5rd2jbbnreu8am7re4m6qpc6m9aqpgl.apps.googleusercontent.com"; 
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1yatRFnLXaUKhGUrxr4pQM8erv3UOjssFFaASg2vQUXWYtOKYgl4AO4-jOtN_kZkoEA/exec";
+        // Updated Web App URL
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const TEST_RECIPIENT = "magicbran@gmail.com";
         // -------------------------
@@ -88,6 +89,27 @@
                 const [hours, minutes] = timeStr.split(':').map(Number);
                 const decimal = hours + (minutes / 60);
                 return decimal.toFixed(2);
+            };
+
+            // Fetch user status from Google Sheet on login
+            useEffect(() => {
+                if (user) {
+                    checkUserStatus();
+                }
+            }, [user]);
+
+            const checkUserStatus = async () => {
+                setIsSyncing(true);
+                try {
+                    const response = await fetch(`${APPS_SCRIPT_URL}?email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}`);
+                    const data = await response.json();
+                    if (data.status) {
+                        setStatus(data.status);
+                    }
+                } catch (err) {
+                    console.error("Status check failed:", err);
+                }
+                setIsSyncing(false);
             };
 
             useEffect(() => {
@@ -212,7 +234,7 @@
             const handleClockOutValidation = () => {
                 const now = new Date();
                 const today = now.toLocaleDateString();
-                const hasClockInToday = logs.some(log => log.type === 'IN' && log.date === today);
+                const hasClockInToday = logs.some(log => log.type === 'IN' && log.date === today) || status === 'clocked_in';
                 
                 if (!hasClockInToday) {
                     setError(`CRITICAL: No clock-in found for today. Admin has been notified.`);
@@ -379,8 +401,8 @@
                                     <span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock In</span>
                                 </button>
 
-                                <button disabled={(status === 'idle' && logs.length === 0) || isSyncing} onClick={handleClockOutValidation} className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0) || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl active:scale-95'}`}>
-                                    <div className={`p-6 rounded-3xl mb-5 transition-all ${(status === 'idle' && logs.length === 0) ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:-rotate-3'}`}>
+                                <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={handleClockOutValidation} className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl active:scale-95'}`}>
+                                    <div className={`p-6 rounded-3xl mb-5 transition-all ${(status === 'idle' && logs.length === 0 && status !== 'clocked_in') ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:-rotate-3'}`}>
                                         <SafeIcon name="LogOut" className="w-12 h-12" />
                                     </div>
                                     <span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock Out</span>
