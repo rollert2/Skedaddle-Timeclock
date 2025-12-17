@@ -11,16 +11,27 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide React Icons -->
-    <script src="https://unpkg.com/lucide-react"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Inter:wght@400;700;900&display=swap');
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background: radial-gradient(circle at center, #1a472a 0%, #0a2e1a 100%);
+            background: #0a2e1a;
             margin: 0; 
             overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .xmas-bg {
+            background: radial-gradient(circle at center, #1a472a 0%, #0a2e1a 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
         .xmas-font { font-family: 'Mountains of Christmas', cursive; }
@@ -28,7 +39,7 @@
         /* Snowflake & Logo Animation */
         .snowflake {
             position: fixed;
-            top: -5vh;
+            top: -10vh;
             user-select: none;
             z-index: 1000;
             pointer-events: none;
@@ -36,7 +47,7 @@
         }
 
         @keyframes fall {
-            to { transform: translateY(105vh) rotate(360deg); }
+            to { transform: translateY(110vh) rotate(360deg); }
         }
 
         .snow-overlay {
@@ -46,17 +57,25 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 50;
+            z-index: 9999;
         }
 
         .festive-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border: 4px solid #c41e3a; /* Christmas Red */
+            border: 4px solid #c41e3a;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(196, 30, 58, 0.3);
+        }
+
+        #root {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
         }
     </style>
 </head>
 <body>
+    <div class="xmas-bg"></div>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -68,24 +87,23 @@
         const XMAS_LOGO = "https://i.imgur.com/zdJfkpg.png";
         // -------------------------
 
-        // Snowflake Component
         const Snowfall = () => {
             const [flakes, setFlakes] = useState([]);
 
             useEffect(() => {
                 const createFlake = () => {
-                    const isLogo = Math.random() > 0.85; // 15% chance for logo
+                    const isLogo = Math.random() > 0.90; 
                     const id = Math.random().toString(36).substr(2, 9);
                     const left = Math.random() * 100;
-                    const duration = 5 + Math.random() * 10;
-                    const size = isLogo ? (20 + Math.random() * 30) : (10 + Math.random() * 20);
-                    const opacity = 0.4 + Math.random() * 0.6;
+                    const duration = 8 + Math.random() * 12;
+                    const size = isLogo ? (30 + Math.random() * 30) : (10 + Math.random() * 20);
+                    const opacity = 0.5 + Math.random() * 0.5;
 
                     const newFlake = { id, left, duration, size, isLogo, opacity };
-                    setFlakes(prev => [...prev.slice(-40), newFlake]); // Keep last 40 flakes
+                    setFlakes(prev => [...prev.slice(-30), newFlake]);
                 };
 
-                const interval = setInterval(createFlake, 400);
+                const interval = setInterval(createFlake, 800);
                 return () => clearInterval(interval);
             }, []);
 
@@ -116,8 +134,9 @@
 
         const SafeIcon = ({ name, className = "w-5 h-5" }) => {
             try {
-                const IconComp = window.LucideReact ? window.LucideReact[name] : null;
-                return IconComp ? <IconComp className={className} /> : <div className={className}></div>;
+                const IconComp = window.lucide ? window.lucide[name] : null;
+                if (!IconComp) return <div className={className}></div>;
+                return <IconComp className={className} />;
             } catch (e) { return <div className={className}></div>; }
         };
 
@@ -125,6 +144,7 @@
             const [user, setUser] = useState(null);
             const [status, setStatus] = useState('idle');
             const [logs, setLogs] = useState([]);
+            const [isInitializing, setIsInitializing] = useState(true);
             const [isSyncing, setIsSyncing] = useState(false);
             const [showTimePicker, setShowTimePicker] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
@@ -138,18 +158,21 @@
                 return parts[0].padStart(2, '0') + '.' + parts[1];
             };
 
-            useEffect(() => {
-                if (user) checkUserStatus();
-            }, [user]);
+            const getPayrollPeriod = () => {
+                const now = new Date();
+                const day = now.getDate();
+                const month = now.toLocaleString('default', { month: 'short' });
+                return day <= 15 ? `${month} 1 - 15, 2025` : `${month} 16 - End, 2025`;
+            };
 
-            const checkUserStatus = async () => {
+            const checkUserStatus = async (userObj) => {
                 setIsSyncing(true);
                 try {
-                    const response = await fetch(`${APPS_SCRIPT_URL}?email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}`);
+                    const response = await fetch(`${APPS_SCRIPT_URL}?email=${encodeURIComponent(userObj.email)}&name=${encodeURIComponent(userObj.name)}`);
                     const data = await response.json();
                     if (data.status) setStatus(data.status);
                     if (data.logs) setLogs(data.logs);
-                } catch (err) { console.error(err); }
+                } catch (err) { console.error("Status error:", err); }
                 setIsSyncing(false);
             };
 
@@ -159,14 +182,28 @@
                 script.async = true;
                 script.onload = () => {
                     window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleResponse });
-                    if (!user) window.google.accounts.id.renderButton(googleBtnRef.current, { type: "standard", theme: "filled_blue", size: "large" });
+                    setIsInitializing(false);
                 };
                 document.head.appendChild(script);
-            }, [user]);
+            }, []);
+
+            useEffect(() => {
+                if (!isInitializing && !user && googleBtnRef.current && window.google) {
+                    window.google.accounts.id.renderButton(googleBtnRef.current, { 
+                        type: "standard", theme: "filled_blue", size: "large", width: 280 
+                    });
+                }
+            }, [isInitializing, user]);
 
             const handleResponse = (response) => {
-                const profile = JSON.parse(atob(response.credential.split('.')[1]));
-                setUser({ email: profile.email, name: profile.name, picture: profile.picture });
+                try {
+                    const profile = JSON.parse(atob(response.credential.split('.')[1]));
+                    const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
+                    setUser(newUser);
+                    checkUserStatus(newUser);
+                } catch (e) {
+                    console.error("Auth error:", e);
+                }
             };
 
             const confirmClockAction = async () => {
@@ -180,19 +217,26 @@
                         body: JSON.stringify({ email: user.email, name: user.name, type: pendingAction, decimalTime: decimalValue })
                     });
                     setStatus(pendingAction === 'IN' ? 'clocked_in' : 'clocked_out');
-                    checkUserStatus();
+                    checkUserStatus(user);
                 } catch (err) { alert("Sync failed!"); }
                 setIsSyncing(false);
             };
+
+            if (isInitializing) {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center">
+                        <img src={XMAS_LOGO} className="h-20 mb-4 animate-bounce" />
+                        <p className="text-white xmas-font text-2xl tracking-widest">Loading Sleigh...</p>
+                    </div>
+                );
+            }
 
             if (!user) return (
                 <div className="min-h-screen flex items-center justify-center p-6">
                     <Snowfall />
                     <div className="bg-white rounded-[3rem] shadow-2xl p-12 text-center max-w-sm w-full relative z-50 festive-card">
-                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24">
-                            <img src={XMAS_LOGO} className="w-full h-full object-contain drop-shadow-lg" />
-                        </div>
-                        <h1 className="text-4xl font-black text-red-700 xmas-font mt-6 mb-2">Holiday Portal</h1>
+                        <img src={XMAS_LOGO} className="h-24 mx-auto mb-6 drop-shadow-xl" />
+                        <h1 className="text-4xl font-black text-red-700 xmas-font mb-2">Holiday Portal</h1>
                         <p className="text-slate-500 text-sm font-medium mb-10 italic">Checking the shift list twice...</p>
                         <div className="flex justify-center" ref={googleBtnRef}></div>
                     </div>
@@ -200,28 +244,28 @@
             );
 
             return (
-                <div className="min-h-screen p-4 md:p-10 max-w-2xl mx-auto w-full relative">
+                <div className="p-4 md:p-10 max-w-2xl mx-auto w-full relative">
                     <Snowfall />
                     {showTimePicker && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-green-900/80 backdrop-blur-sm p-4">
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-green-900/90 backdrop-blur-md p-4">
                             <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-8 border-4 border-red-600">
                                 <h2 className="text-2xl font-black text-red-700 xmas-font text-center uppercase mb-6">Confirm {pendingAction} Time</h2>
                                 <div className="flex justify-center gap-4 mb-8">
-                                    <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100">
+                                    <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
                                         {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
                                     </select>
-                                    <div className="text-2xl font-black mt-4">:</div>
-                                    <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100">
+                                    <div className="text-2xl font-black mt-4 text-slate-300">:</div>
+                                    <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
                                         {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                     </select>
                                 </div>
-                                <button onClick={confirmClockAction} className={`w-full py-4 rounded-2xl font-black text-white ${pendingAction === 'IN' ? 'bg-green-600' : 'bg-red-600'}`}>CONFIRM</button>
-                                <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400">Cancel</button>
+                                <button onClick={confirmClockAction} className={`w-full py-4 rounded-2xl font-black text-white shadow-lg ${pendingAction === 'IN' ? 'bg-green-600 shadow-green-200' : 'bg-red-600 shadow-red-200'}`}>CONFIRM</button>
+                                <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400 uppercase text-xs mt-2">Cancel</button>
                             </div>
                         </div>
                     )}
 
-                    <div className="flex items-center justify-between mb-8 bg-white/95 p-5 rounded-[2rem] shadow-sm border-2 border-red-100">
+                    <div className="flex items-center justify-between mb-8 bg-white/95 p-5 rounded-[2rem] shadow-lg border-2 border-red-100">
                         <div className="flex items-center gap-4">
                             <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-red-200" referrerPolicy="no-referrer" />
                             <div>
@@ -229,53 +273,70 @@
                                 <p className="text-[10px] text-green-700 font-bold uppercase mt-1">Festive Mode Active 🎄</p>
                             </div>
                         </div>
-                        <button onClick={() => setUser(null)} className="p-3 text-slate-300 hover:text-red-500"><SafeIcon name="LogOut" /></button>
+                        <button onClick={() => setUser(null)} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><SafeIcon name="LogOut" /></button>
                     </div>
 
-                    <div className="bg-white/95 rounded-[2.5rem] shadow-xl border-4 border-red-600 overflow-hidden mb-8">
+                    <div className="bg-white/95 rounded-[2.5rem] shadow-2xl border-4 border-red-600 overflow-hidden mb-8">
                         <div className="bg-red-700 p-8 text-white flex justify-between items-center">
                             <div className="flex items-center gap-4">
                                 <div className={`p-3 rounded-xl ${status === 'clocked_in' ? 'bg-green-500' : 'bg-red-900'}`}><SafeIcon name="UserCheck" /></div>
                                 <div><p className="text-red-200 text-[10px] font-bold uppercase mb-1">Shift Status</p><p className="text-xl font-black xmas-font tracking-wider">{status === 'clocked_in' ? 'Working Hard!' : 'At the North Pole'}</p></div>
                             </div>
+                            <div className="text-right">
+                                <p className="text-red-200 text-[10px] font-bold uppercase mb-1">Period</p>
+                                <p className="text-xs font-black">{getPayrollPeriod()}</p>
+                            </div>
                         </div>
                         <div className="p-10">
-                            {isSyncing && <div className="flex items-center justify-center gap-2 mb-8 text-green-700 font-black text-xs animate-pulse">SYNCING WITH SANTA'S LOG...</div>}
+                            {isSyncing && <div className="flex items-center justify-center gap-2 mb-8 text-green-700 font-black text-xs animate-pulse uppercase tracking-widest"><SafeIcon name="Loader2" className="animate-spin" />Syncing with Santa...</div>}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                <button disabled={status === 'clocked_in' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className="p-12 rounded-[2rem] border-4 border-green-100 hover:border-green-600 transition-all flex flex-col items-center bg-white group disabled:opacity-30">
+                                <button disabled={status === 'clocked_in' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className="p-12 rounded-[2rem] border-4 border-green-50 hover:border-green-600 transition-all flex flex-col items-center bg-white group disabled:opacity-30 active:scale-95">
                                     <div className="p-5 bg-green-50 text-green-600 rounded-3xl mb-4 group-hover:bg-green-600 group-hover:text-white transition-colors"><SafeIcon name="LogIn" className="w-10 h-10" /></div>
-                                    <span className="font-black text-slate-800 xmas-font text-2xl">Clock In</span>
+                                    <span className="font-black text-slate-800 xmas-font text-2xl uppercase">Clock In</span>
                                 </button>
-                                <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className="p-12 rounded-[2rem] border-4 border-red-100 hover:border-red-600 transition-all flex flex-col items-center bg-white group disabled:opacity-30">
+                                <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className="p-12 rounded-[2rem] border-4 border-red-50 hover:border-red-600 transition-all flex flex-col items-center bg-white group disabled:opacity-30 active:scale-95">
                                     <div className="p-5 bg-red-50 text-red-600 rounded-3xl mb-4 group-hover:bg-red-600 group-hover:text-white transition-colors"><SafeIcon name="LogOut" className="w-10 h-10" /></div>
-                                    <span className="font-black text-slate-800 xmas-font text-2xl">Clock Out</span>
+                                    <span className="font-black text-slate-800 xmas-font text-2xl uppercase">Clock Out</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white/95 rounded-[2rem] border-2 border-green-600 shadow-sm overflow-hidden mb-12">
-                        <button onClick={() => setShowHistory(!showHistory)} className="w-full p-8 flex items-center justify-between font-black text-green-800 uppercase text-xs">
-                            <div className="flex items-center gap-3"><SafeIcon name="History" className="text-red-600" />Recent Gift Wraps</div>
-                            <SafeIcon name="ChevronDown" className={`transition-transform ${showHistory ? 'rotate-180' : ''}`} />
-                        </button>
-                        {showHistory && (
-                            <div className="p-8 border-t border-slate-100 space-y-4 bg-green-50/30">
-                                {logs.map((log, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-red-100 shadow-sm">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}><SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} /></div>
-                                            <div><p className="text-sm font-black text-slate-800 uppercase leading-none">{log.type === 'IN' ? 'Shift Started' : 'Shift Ended'}</p><p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{log.date} @ {log.time}</p></div>
-                                        </div>
-                                        <div className="text-right"><p className="text-lg font-black text-slate-800 leading-none">{log.decimal}</p><p className="text-[9px] font-black text-red-300 uppercase mt-1">HR</p></div>
-                                    </div>
-                                ))}
+                    <div className="bg-white/95 rounded-[2rem] border-2 border-green-600 shadow-lg overflow-hidden mb-12">
+                        <div className="p-6 bg-green-50/50 border-b border-green-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3 font-black text-green-800 uppercase text-xs tracking-widest">
+                                <SafeIcon name="History" className="text-red-600" />
+                                Recent Gift Wraps
                             </div>
-                        )}
+                            <span className="text-[10px] font-black text-green-600 bg-green-100 px-2 py-1 rounded-lg">{logs.length} Entries</span>
+                        </div>
+                        <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto no-scrollbar">
+                            {logs.length === 0 ? (
+                                <p className="text-center text-slate-400 font-bold text-[10px] uppercase py-8 tracking-widest">No activity found in the workshop</p>
+                            ) : logs.map((log, idx) => (
+                                <div key={idx} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-red-50 shadow-sm animate-in slide-in-from-bottom-2">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                            <SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-slate-800 uppercase leading-none">{log.type === 'IN' ? 'Shift Started' : 'Shift Ended'}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{log.date} @ {log.time}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-lg font-black text-slate-800 leading-none">{log.decimal}</p>
+                                        <p className="text-[9px] font-black text-red-300 uppercase mt-1">HR</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="text-center pb-8 opacity-60 grayscale hover:grayscale-0 transition-all">
-                        <img src={XMAS_LOGO} className="h-12 mx-auto mb-2" />
-                        <p className="text-white text-[10px] font-bold tracking-widest xmas-font text-lg">Merry Christmas Brandon!</p>
+
+                    <div className="text-center pb-12 opacity-80">
+                        <img src={XMAS_LOGO} className="h-16 mx-auto mb-4 drop-shadow-lg" />
+                        <p className="text-white xmas-font text-3xl tracking-wider">Merry Christmas Brandon!</p>
+                        <p className="text-green-300 text-[10px] font-black uppercase tracking-[0.5em] mt-2">Skedaddle Holiday Operations</p>
                     </div>
                 </div>
             );
