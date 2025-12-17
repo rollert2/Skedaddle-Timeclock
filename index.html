@@ -36,7 +36,7 @@
 
         // --- API CONFIGURATION ---
         const CLIENT_ID = "826145031424-e5rd2jbbnreu8am7re4m6qpc6m9aqpgl.apps.googleusercontent.com"; 
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYRKBrGDq_i73Js7YbuihuQEBBIUAS66NQC0sfkYndyZOX41muVxniVB30R1rxQoNoBw/exec";
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1yatRFnLXaUKhGUrxr4pQM8erv3UOjssFFaASg2vQUXWYtOKYgl4AO4-jOtN_kZkoEA/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const TEST_RECIPIENT = "magicbran@gmail.com";
         // -------------------------
@@ -62,7 +62,7 @@
             const [isSyncing, setIsSyncing] = useState(false);
             const [googleReady, setGoogleReady] = useState(false);
             const [showTimePicker, setShowTimePicker] = useState(false);
-            const [pendingAction, setPendingAction] = useState(null); // 'IN' or 'OUT'
+            const [pendingAction, setPendingAction] = useState(null); 
             const [selectedTime, setSelectedTime] = useState("");
             
             const googleBtnRef = useRef(null);
@@ -71,21 +71,18 @@
             const month = new Date().toLocaleString('default', { month: 'short' });
             const currentPeriod = day <= 15 ? `${month} 1 - 15, 2025` : `${month} 16 - End, 2025`;
 
-            // Helper to get current time rounded to nearest 15 mins for input default
             const getRoundedCurrentTime = () => {
                 const now = new Date();
                 const minutes = now.getMinutes();
                 const roundedMinutes = Math.round(minutes / 15) * 15;
                 now.setMinutes(roundedMinutes);
                 now.setSeconds(0);
-                return now.toTimeString().slice(0, 5); // HH:mm
+                return now.toTimeString().slice(0, 5); 
             };
 
-            // Helper to calculate decimal time from string HH:mm
             const calculateDecimalTime = (timeStr) => {
                 const [hours, minutes] = timeStr.split(':').map(Number);
                 const roundedMinutes = Math.round(minutes / 15) * 15;
-                // Handle 60 minute wrap around
                 let finalHours = hours;
                 let finalMinutes = roundedMinutes;
                 if (finalMinutes === 60) {
@@ -222,7 +219,6 @@
                 
                 if (!hasClockInToday) {
                     setError(`CRITICAL: No clock-in found for today. Admin has been notified.`);
-                    // We still send the 'OUT' request to the script so it can trigger the email alert
                     initiateClockAction('OUT');
                 } else {
                     initiateClockAction('OUT');
