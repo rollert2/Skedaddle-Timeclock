@@ -34,7 +34,7 @@
         const { useState, useEffect } = React;
         const { 
             Clock, LogIn, LogOut, Calendar, AlertCircle, 
-            CheckCircle2, History, Settings, UserCheck 
+            CheckCircle2, History, Settings, UserCheck, Loader2
         } = lucide;
 
         const App = () => {
@@ -44,10 +44,16 @@
             const [error, setError] = useState(null);
             const [showHistory, setShowHistory] = useState(false);
             const [isInitializing, setIsInitializing] = useState(true);
+            const [isSyncing, setIsSyncing] = useState(false);
 
             const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
             const currentPeriod = "Dec 16 - Dec 31, 2025";
-            const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; // REPLACE THIS
+            
+            // --- API CONFIGURATION ---
+            // REPLACE 'YOUR_GOOGLE_CLIENT_ID' with the ID from Google Cloud Console
+            const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; 
+            const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYRKBrGDq_i73Js7YbuihuQEBBIUAS66NQC0sfkYndyZOX41muVxniVB30R1rxQoNoBw/exec";
+            // -------------------------
 
             useEffect(() => {
                 const initializeGoogleAuth = () => {
@@ -88,13 +94,49 @@
                 setError(null);
             };
 
+            const sendToGoogleSheet = async (type) => {
+                if (CLIENT_ID.includes("YOUR_GOOGLE_CLIENT_ID")) {
+                    console.warn("API not configured - simulate local success");
+                    return true;
+                }
+                
+                setIsSyncing(true);
+                try {
+                    // Note: Google Apps Script Web Apps require 'no-cors' for simple redirects 
+                    // or handle the redirect manually if using a full backend.
+                    // For static sites, 'no-cors' is common but doesn't allow reading the response body.
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        cache: 'no-cache',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: user.email,
+                            name: user.name,
+                            type: type,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                    setIsSyncing(false);
+                    return true;
+                } catch (err) {
+                    console.error("Sync failed", err);
+                    setIsSyncing(false);
+                    setError("Communication with payroll sheet failed. Please check your connection.");
+                    return false;
+                }
+            };
+
             const handleLogout = () => {
                 setUser(null);
                 setLogs([]);
                 setStatus('idle');
             };
 
-            const handleClockIn = () => {
+            const handleClockIn = async () => {
+                const success = await sendToGoogleSheet('IN');
+                if (!success) return;
+
                 const now = new Date();
                 setLogs([{
                     type: 'IN',
@@ -105,15 +147,21 @@
                 setError(null);
             };
 
-            const handleClockOut = () => {
+            const handleClockOut = async () => {
                 const now = new Date();
                 const today = now.toLocaleDateString();
                 const hasClockInToday = logs.some(log => log.type === 'IN' && log.date === today);
 
+                // We send the 'OUT' event anyway so the backend can log the attempt 
+                // and potentially trigger the alert email if it's an orphan event.
+                const success = await sendToGoogleSheet('OUT');
+                
                 if (!hasClockInToday) {
                     setError(`CRITICAL ALERT: No clock-in found for today. Automated report sent to Management regarding ${user.email}.`);
                     return;
                 }
+
+                if (!success) return;
 
                 setLogs([{
                     type: 'OUT',
@@ -143,8 +191,8 @@
                         <div className="max-w-md w-full bg-white rounded-[2rem] shadow-2xl p-10 border border-slate-200">
                             <div className="flex flex-col items-center mb-10 text-center">
                                 <img src={LOGO_URL} alt="Skedaddle" className="h-20 mb-8" />
-                                <h1 className="text-2xl font-black text-slate-800">Technician Portal</h1>
-                                <p className="text-slate-500 text-sm mt-2">Sign in with your work email.</p>
+                                <h1 className="text-2xl font-black text-slate-800 tracking-tight">Technician Portal</h1>
+                                <p className="text-slate-500 text-sm mt-2">Sign in with your work email to continue.</p>
                             </div>
                             <div className="flex justify-center">
                                 <div className="g_id_signin" data-type="standard" data-shape="pill" data-size="large"></div>
@@ -157,31 +205,35 @@
             return (
                 <div className="min-h-screen p-4 md:p-8">
                     <div className="max-w-2xl mx-auto">
+                        {/* Profile Header */}
                         <div className="flex items-center justify-between mb-8 bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
                             <div className="flex items-center gap-4">
-                                <img src={user.picture} className="w-12 h-12 rounded-2xl border-2 border-orange-100" />
+                                <img src={user.picture} className="w-12 h-12 rounded-2xl border-2 border-orange-100" referrerPolicy="no-referrer" />
                                 <div>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Technician</p>
-                                    <p className="text-sm font-bold text-slate-800">{user.name}</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Active Technician</p>
+                                    <p className="text-sm font-bold text-slate-800 leading-tight">{user.name}</p>
                                     <p className="text-xs text-slate-500">{user.email}</p>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="p-3 text-slate-400 hover:text-red-500"><LogOut className="w-5 h-5" /></button>
+                            <button onClick={handleLogout} className="p-3 text-slate-400 hover:text-red-500 transition-colors">
+                                <LogOut className="w-5 h-5" />
+                            </button>
                         </div>
 
+                        {/* Control Card */}
                         <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden mb-6">
-                            <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between gap-4">
+                            <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between gap-6">
                                 <div className="flex items-start gap-4">
                                     <div className={`p-3 rounded-2xl ${status === 'clocked_in' ? 'bg-green-500 shadow-lg shadow-green-900/40' : 'bg-slate-800'}`}>
                                         <UserCheck className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Payroll Period</p>
+                                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Payroll Period</p>
                                         <p className="text-lg font-bold text-orange-400">{currentPeriod}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col md:items-end">
-                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Shift Status</p>
+                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Shift Status</p>
                                     <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-black text-xs ${status === 'clocked_in' ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-400'}`}>
                                         <div className={`w-2 h-2 rounded-full animate-pulse ${status === 'clocked_in' ? 'bg-green-400' : 'bg-slate-600'}`}></div>
                                         {status === 'clocked_in' ? 'RECORDING TIME' : 'OFF DUTY'}
@@ -190,48 +242,90 @@
                             </div>
 
                             <div className="p-8">
-                                {error && (
-                                    <div className="mb-8 p-5 bg-red-50 border-l-4 border-red-500 rounded-2xl flex items-start gap-4">
-                                        <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
-                                        <div className="flex-1 text-red-900 font-medium text-sm">{error}</div>
+                                {isSyncing && (
+                                    <div className="flex items-center justify-center gap-2 mb-6 text-orange-600 font-bold text-sm bg-orange-50 py-2 rounded-xl">
+                                        <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+                                        Syncing with Spreadsheet...
                                     </div>
                                 )}
+                                
+                                {error && (
+                                    <div className="mb-8 p-5 bg-red-50 border-l-4 border-red-500 rounded-2xl flex items-start gap-4 shadow-sm">
+                                        <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                                        <div className="flex-1">
+                                            <p className="text-red-900 font-bold text-sm">Action Flagged</p>
+                                            <p className="text-red-700 text-xs mt-0.5 leading-relaxed font-medium">{error}</p>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <button disabled={status === 'clocked_in'} onClick={handleClockIn} className={`p-10 rounded-3xl border-2 transition-all flex flex-col items-center ${status === 'clocked_in' ? 'opacity-40 grayscale' : 'hover:border-green-500 hover:shadow-xl'}`}>
-                                        <div className="p-5 rounded-3xl bg-green-50 text-green-600 mb-4"><LogIn className="w-10 h-10" /></div>
-                                        <span className="font-black text-slate-800">Clock In</span>
+                                    <button 
+                                        disabled={status === 'clocked_in' || isSyncing} 
+                                        onClick={handleClockIn} 
+                                        className={`group p-10 rounded-3xl border-2 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-40 grayscale cursor-not-allowed' : 'bg-white border-slate-100 hover:border-green-500 hover:shadow-xl hover:shadow-green-50'}`}
+                                    >
+                                        <div className={`p-5 rounded-3xl mb-4 transition-colors ${status === 'clocked_in' ? 'bg-slate-100 text-slate-400' : 'bg-green-50 text-green-600 group-hover:bg-green-500 group-hover:text-white'}`}>
+                                            <LogIn className="w-10 h-10" />
+                                        </div>
+                                        <span className="font-black text-slate-800 tracking-tight">Clock In</span>
+                                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">Start Shift</span>
                                     </button>
-                                    <button disabled={status === 'idle' && logs.length === 0} onClick={handleClockOut} className={`p-10 rounded-3xl border-2 transition-all flex flex-col items-center ${status === 'idle' && logs.length === 0 ? 'opacity-40 grayscale' : 'hover:border-red-500 hover:shadow-xl'}`}>
-                                        <div className="p-5 rounded-3xl bg-red-50 text-red-600 mb-4"><LogOut className="w-10 h-10" /></div>
-                                        <span className="font-black text-slate-800">Clock Out</span>
+
+                                    <button 
+                                        disabled={(status === 'idle' && logs.length === 0) || isSyncing} 
+                                        onClick={handleClockOut} 
+                                        className={`group p-10 rounded-3xl border-2 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0) || isSyncing ? 'opacity-40 grayscale cursor-not-allowed' : 'bg-white border-slate-100 hover:border-red-500 hover:shadow-xl hover:shadow-red-50'}`}
+                                    >
+                                        <div className={`p-5 rounded-3xl mb-4 transition-colors ${(status === 'idle' && logs.length === 0) ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white'}`}>
+                                            <LogOut className="w-10 h-10" />
+                                        </div>
+                                        <span className="font-black text-slate-800 tracking-tight">Clock Out</span>
+                                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">End Shift</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
+                        {/* Activity Log */}
                         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                            <button onClick={() => setShowHistory(!showHistory)} className="w-full p-6 flex items-center justify-between font-black text-slate-700 uppercase text-sm tracking-tighter">
-                                <div className="flex items-center gap-3"><History className="w-5 h-5 text-orange-500" />Session Log</div>
-                                <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">{logs.length} ENTRIES</span>
+                            <button onClick={() => setShowHistory(!showHistory)} className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                                <div className="flex items-center gap-3 font-black text-slate-700 uppercase text-xs tracking-wider">
+                                    <History className="w-5 h-5 text-orange-500" />
+                                    Current Session Log
+                                </div>
+                                <span className="text-[10px] text-slate-400 bg-slate-100 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+                                    {logs.length} entries
+                                </span>
                             </button>
                             {showHistory && (
                                 <div className="p-6 border-t border-slate-100 space-y-4 bg-slate-50/50">
-                                    {logs.map((log, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
-                                            <div className="flex items-center gap-4">
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                    {log.type === 'IN' ? <CheckCircle2 className="w-5 h-5" /> : <LogOut className="w-5 h-5" />}
+                                    {logs.length === 0 ? (
+                                        <p className="text-center py-6 text-slate-400 text-xs font-bold uppercase tracking-widest">No activity recorded yet.</p>
+                                    ) : (
+                                        logs.map((log, idx) => (
+                                            <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                        {log.type === 'IN' ? <CheckCircle2 className="w-5 h-5" /> : <LogOut className="w-5 h-5" />}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Clocked {log.type}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{log.date}</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-sm font-black text-slate-800 uppercase">Clocked {log.type}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">{log.date}</p>
-                                                </div>
+                                                <p className="text-lg font-black text-slate-800 tracking-tighter tabular-nums">{log.time}</p>
                                             </div>
-                                            <p className="text-lg font-black text-slate-800 tracking-tighter tabular-nums">{log.time}</p>
-                                        </div>
-                                    ))}
+                                        ))
+                                    )}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Footer Branding */}
+                        <div className="mt-12 mb-8 text-center grayscale opacity-40">
+                             <img src={LOGO_URL} alt="Skedaddle" className="h-8 mx-auto mb-2" />
+                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">Proprietary Payroll Interface</p>
                         </div>
                     </div>
                 </div>
