@@ -15,7 +15,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
         .animate-shimmer {
             background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
             background-size: 200% 100%;
@@ -25,6 +30,12 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+        /* Fix for potential white screen/height issues */
+        #root {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -32,10 +43,12 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-        const { 
-            Clock, LogIn, LogOut, Calendar, AlertCircle, 
-            CheckCircle2, History, Settings, UserCheck, Loader2, ShieldCheck
-        } = lucide;
+        
+        // Safety wrapper for icons to prevent crashes if library names change
+        const Icon = ({ name, className = "w-5 h-5" }) => {
+            const LucideIcon = lucide[name] || lucide.AlertCircle;
+            return <LucideIcon className={className} />;
+        };
 
         const App = () => {
             const [user, setUser] = useState(null);
@@ -55,52 +68,50 @@
             const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYRKBrGDq_i73Js7YbuihuQEBBIUAS66NQC0sfkYndyZOX41muVxniVB30R1rxQoNoBw/exec";
             // -------------------------
 
-            // Handle Script Loading and Initial Config
+            // 1. Initial Script Loading
             useEffect(() => {
-                const initializeGoogleAuth = () => {
-                    if (window.google) {
-                        try {
-                            window.google.accounts.id.initialize({
-                                client_id: CLIENT_ID,
-                                callback: handleGoogleResponse,
-                                auto_select: false,
-                                cancel_on_tap_outside: true,
-                            });
-                            
-                            // Only render if we don't have a user yet
-                            if (!user && googleBtnRef.current) {
-                                window.google.accounts.id.renderButton(googleBtnRef.current, {
-                                    type: "standard",
-                                    shape: "pill",
-                                    theme: "filled_blue",
-                                    text: "signin_with",
-                                    size: "large",
-                                    logo_alignment: "left",
-                                    width: 280
-                                });
-                            }
-                            
-                            setIsInitializing(false);
-                        } catch (err) {
-                            console.error("Google Auth init failed", err);
-                            setIsInitializing(false);
-                        }
-                    }
-                };
-
                 const script = document.createElement('script');
                 script.id = 'google-jssdk';
                 script.src = "https://accounts.google.com/gsi/client";
                 script.async = true;
                 script.defer = true;
-                script.onload = initializeGoogleAuth;
+                script.onload = () => {
+                    if (window.google) {
+                        window.google.accounts.id.initialize({
+                            client_id: CLIENT_ID,
+                            callback: handleGoogleResponse,
+                            auto_select: false,
+                        });
+                        setIsInitializing(false);
+                    }
+                };
+                script.onerror = () => {
+                    setError("Failed to load Google Identity services. Check your internet connection.");
+                    setIsInitializing(false);
+                };
                 
                 if (!document.getElementById('google-jssdk')) {
                     document.head.appendChild(script);
                 } else {
-                    initializeGoogleAuth();
+                    // Script already exists
+                    setIsInitializing(false);
                 }
-            }, [user === null]); // Only re-run if user is cleared
+            }, []);
+
+            // 2. Render Google Button once DOM is ready and user is null
+            useEffect(() => {
+                if (!isInitializing && !user && googleBtnRef.current && window.google) {
+                    window.google.accounts.id.renderButton(googleBtnRef.current, {
+                        type: "standard",
+                        shape: "pill",
+                        theme: "filled_blue",
+                        text: "continue_with",
+                        size: "large",
+                        logo_alignment: "left",
+                        width: "300"
+                    });
+                }
+            }, [isInitializing, user]);
 
             const handleGoogleResponse = (response) => {
                 try {
@@ -117,10 +128,9 @@
                         picture: profile.picture
                     });
                     setError(null);
-                    setIsInitializing(false);
                 } catch (e) {
-                    console.error("Failed to parse Google response", e);
-                    setError("Login failed. Please try again.");
+                    console.error("Auth parsing error", e);
+                    setError("Google authentication failed. Please refresh and try again.");
                 }
             };
 
@@ -144,16 +154,9 @@
                 } catch (err) {
                     console.error("Sync failed", err);
                     setIsSyncing(false);
-                    setError("Communication with payroll sheet failed. Check connection.");
+                    setError("Failed to sync with payroll. Check your data connection.");
                     return false;
                 }
-            };
-
-            const handleLogout = () => {
-                setUser(null);
-                setLogs([]);
-                setStatus('idle');
-                // Allow the button to re-render in the next cycle
             };
 
             const handleClockIn = async () => {
@@ -175,14 +178,12 @@
                 const today = now.toLocaleDateString();
                 const hasClockInToday = logs.some(log => log.type === 'IN' && log.date === today);
 
-                const success = await sendToGoogleSheet('OUT');
+                await sendToGoogleSheet('OUT');
                 
                 if (!hasClockInToday) {
-                    setError(`CRITICAL ALERT: No clock-in found for today. Automated report sent to Management regarding ${user.email}.`);
+                    setError(`CRITICAL: No clock-in for today. Admin has been notified via email.`);
                     return;
                 }
-
-                if (!success) return;
 
                 setLogs([{
                     type: 'OUT',
@@ -193,112 +194,107 @@
                 setError(null);
             };
 
-            // Loading View
+            // LOADING SPLASH
             if (isInitializing) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center bg-white">
-                        <div className="flex flex-col items-center">
-                            <img src={LOGO_URL} alt="Skedaddle" className="h-20 mb-6 opacity-80" />
-                            <div className="flex items-center gap-2 text-slate-400 font-medium animate-pulse">
-                                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                                Securely Connecting...
-                            </div>
+                    <div className="flex-1 flex flex-col items-center justify-center bg-white">
+                        <img src={LOGO_URL} alt="Skedaddle" className="h-16 mb-6 opacity-40 grayscale" />
+                        <div className="flex items-center gap-3 text-slate-400 font-bold text-xs uppercase tracking-widest animate-pulse">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
+                            Securely Initializing...
                         </div>
                     </div>
                 );
             }
 
-            // Login View
+            // LOGIN PORTAL (POPUP STYLE)
             if (!user) {
                 return (
-                    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-100">
-                        <div className="max-w-md w-full">
-                            <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 border border-slate-200 text-center flex flex-col items-center">
-                                <img src={LOGO_URL} alt="Skedaddle" className="h-24 mb-10" />
+                    <div className="flex-1 flex items-center justify-center bg-slate-900 px-6 relative overflow-hidden">
+                        {/* Background Decor */}
+                        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500 rounded-full blur-[120px]"></div>
+                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500 rounded-full blur-[120px]"></div>
+                        </div>
+
+                        <div className="max-w-md w-full relative z-10">
+                            <div className="bg-white rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] p-12 text-center border border-white/20">
+                                <img src={LOGO_URL} alt="Skedaddle" className="h-24 mx-auto mb-10" />
                                 
-                                <h1 className="text-3xl font-black text-slate-800 tracking-tight mb-2 uppercase">Technician Portal</h1>
-                                <p className="text-slate-500 font-medium mb-10 max-w-[240px] leading-relaxed">
-                                    Access your secure clock-in system with your company credentials.
+                                <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase mb-2">Technician Portal</h1>
+                                <p className="text-slate-500 font-semibold mb-10 leading-relaxed text-sm">
+                                    Verify your identity to access the<br/>Skedaddle Payroll System.
                                 </p>
                                 
-                                <div className="w-full flex justify-center py-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 mb-8 relative group">
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 rounded-full">
-                                        Secure Login
-                                    </div>
-                                    <div ref={googleBtnRef} className="min-h-[44px]"></div>
+                                <div className="p-1.5 bg-slate-100 rounded-full inline-flex flex-col items-center justify-center w-full mb-8">
+                                    <div ref={googleBtnRef} className="min-h-[44px] w-full flex justify-center"></div>
                                 </div>
 
                                 <div className="flex items-center justify-center gap-2 text-slate-400">
-                                    <ShieldCheck className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Verified Secure Access</span>
+                                    <Icon name="ShieldCheck" className="w-4 h-4 text-green-500" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">End-to-End Encrypted Access</span>
                                 </div>
                             </div>
                             
-                            <p className="mt-8 text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] leading-relaxed">
-                                Proprietary System &copy; 2025<br/>Skedaddle Wildlife Control Inc.
+                            <p className="mt-10 text-center text-[10px] text-slate-500 font-black uppercase tracking-[0.4em]">
+                                Skedaddle Wildlife Control Inc.
                             </p>
                         </div>
                     </div>
                 );
             }
 
-            // Main Dashboard View
+            // MAIN DASHBOARD
             return (
-                <div className="min-h-screen p-4 md:p-8 bg-slate-50">
+                <div className="flex-1 p-4 md:p-10">
                     <div className="max-w-2xl mx-auto">
-                        {/* Profile Header */}
-                        <div className="flex items-center justify-between mb-8 bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100">
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-8 bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100">
                             <div className="flex items-center gap-4">
-                                <div className="relative">
-                                    <img src={user.picture} className="w-14 h-14 rounded-2xl border-2 border-orange-100 shadow-sm" referrerPolicy="no-referrer" alt="User" />
-                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                                </div>
+                                <img src={user.picture} className="w-14 h-14 rounded-2xl border-2 border-orange-100 shadow-sm" referrerPolicy="no-referrer" alt="User" />
                                 <div>
-                                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-0.5 text-orange-500">Online</p>
+                                    <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mb-0.5">Technician Active</p>
                                     <p className="text-base font-black text-slate-800 leading-none">{user.name}</p>
                                     <p className="text-xs text-slate-500 mt-1 font-medium">{user.email}</p>
                                 </div>
                             </div>
-                            <button onClick={handleLogout} className="p-4 hover:bg-red-50 rounded-2xl transition-all text-slate-300 hover:text-red-500 group">
-                                <LogOut className="w-6 h-6 group-active:scale-90 transition-transform" />
+                            <button onClick={() => setUser(null)} className="p-4 hover:bg-red-50 rounded-2xl transition-all text-slate-300 hover:text-red-500">
+                                <Icon name="LogOut" className="w-6 h-6" />
                             </button>
                         </div>
 
-                        {/* Control Card */}
-                        <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden mb-6">
-                            <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between gap-6">
-                                <div className="flex items-start gap-5">
+                        {/* Status Card */}
+                        <div className="bg-white rounded-[3rem] shadow-xl border border-slate-100 overflow-hidden mb-8">
+                            <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-6">
+                                <div className="flex items-center gap-5">
                                     <div className={`p-4 rounded-2xl ${status === 'clocked_in' ? 'bg-green-500 shadow-lg shadow-green-900/40' : 'bg-slate-800'}`}>
-                                        <UserCheck className="w-7 h-7" />
+                                        <Icon name="UserCheck" className="w-7 h-7" />
                                     </div>
                                     <div>
-                                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Current Period</p>
+                                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Payroll Period</p>
                                         <p className="text-xl font-black text-orange-400 tracking-tight">{currentPeriod}</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col md:items-end">
-                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-right">Duty Status</p>
-                                    <div className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-xs tracking-widest ${status === 'clocked_in' ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-400'}`}>
-                                        <div className={`w-2 h-2 rounded-full ${status === 'clocked_in' ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`}></div>
-                                        {status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}
-                                    </div>
+                                <div className={`flex items-center gap-2 px-6 py-2 rounded-full font-black text-xs tracking-widest ${status === 'clocked_in' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-slate-800 text-slate-400'}`}>
+                                    <div className={`w-2 h-2 rounded-full ${status === 'clocked_in' ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`}></div>
+                                    {status === 'clocked_in' ? 'SHIFT ONGOING' : 'SHIFT INACTIVE'}
                                 </div>
                             </div>
 
                             <div className="p-10">
                                 {isSyncing && (
-                                    <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-3 rounded-2xl border border-orange-100 animate-in fade-in zoom-in-95">
-                                        <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-                                        SYNCING PAYROLL DATA...
+                                    <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-4 rounded-2xl border border-orange-100">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        SYNCING WITH MASTER LOG...
                                     </div>
                                 )}
                                 
                                 {error && (
-                                    <div className="mb-8 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl flex items-start gap-5 shadow-sm animate-in slide-in-from-top-2">
-                                        <AlertCircle className="w-8 h-8 text-red-500 flex-shrink-0" />
-                                        <div className="flex-1">
-                                            <p className="text-red-900 font-black text-sm uppercase tracking-tight">System Flag</p>
-                                            <p className="text-red-700 text-xs mt-1 leading-relaxed font-bold">{error}</p>
+                                    <div className="mb-8 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl flex items-start gap-5 shadow-sm">
+                                        <Icon name="AlertCircle" className="w-8 h-8 text-red-500" />
+                                        <div>
+                                            <p className="text-red-900 font-black text-sm uppercase tracking-tight">Access Flag</p>
+                                            <p className="text-red-700 text-xs mt-1 font-bold">{error}</p>
                                         </div>
                                     </div>
                                 )}
@@ -307,84 +303,59 @@
                                     <button 
                                         disabled={status === 'clocked_in' || isSyncing} 
                                         onClick={handleClockIn} 
-                                        className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-green-500 hover:shadow-2xl hover:shadow-green-100 active:scale-95'}`}
+                                        className={`group p-10 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-green-500 hover:shadow-2xl hover:shadow-green-100 active:scale-95'}`}
                                     >
                                         <div className={`p-6 rounded-3xl mb-5 transition-all ${status === 'clocked_in' ? 'bg-slate-100 text-slate-400' : 'bg-green-50 text-green-600 group-hover:bg-green-500 group-hover:text-white group-hover:rotate-3'}`}>
-                                            <LogIn className="w-12 h-12" />
+                                            <Icon name="LogIn" className="w-12 h-12" />
                                         </div>
-                                        <span className="font-black text-slate-800 text-lg tracking-tight uppercase">Clock In</span>
-                                        <span className="text-[10px] text-slate-400 mt-2 font-black uppercase tracking-[0.2em]">Start Daily Shift</span>
+                                        <span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock In</span>
                                     </button>
 
                                     <button 
                                         disabled={(status === 'idle' && logs.length === 0) || isSyncing} 
                                         onClick={handleClockOut} 
-                                        className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0) || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl hover:shadow-red-100 active:scale-95'}`}
+                                        className={`group p-10 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0) || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl hover:shadow-red-100 active:scale-95'}`}
                                     >
                                         <div className={`p-6 rounded-3xl mb-5 transition-all ${(status === 'idle' && logs.length === 0) ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:-rotate-3'}`}>
-                                            <LogOut className="w-12 h-12" />
+                                            <Icon name="LogOut" className="w-12 h-12" />
                                         </div>
-                                        <span className="font-black text-slate-800 text-lg tracking-tight uppercase">Clock Out</span>
-                                        <span className="text-[10px] text-slate-400 mt-2 font-black uppercase tracking-[0.2em]">End Daily Shift</span>
+                                        <span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock Out</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Session Activity */}
-                        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden transition-all">
+                        {/* Recent History */}
+                        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
                             <button onClick={() => setShowHistory(!showHistory)} className="w-full p-8 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                                <div className="flex items-center gap-4 font-black text-slate-800 uppercase text-xs tracking-[0.1em]">
-                                    <div className="p-2 bg-orange-100 rounded-xl">
-                                        <History className="w-5 h-5 text-orange-600" />
-                                    </div>
-                                    Live Session Records
+                                <div className="flex items-center gap-4 font-black text-slate-800 uppercase text-xs tracking-widest">
+                                    <Icon name="History" className="text-orange-500" />
+                                    Session Records
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <span className="text-[10px] text-slate-400 bg-slate-100 px-3 py-1.5 rounded-xl font-black uppercase tracking-widest">
-                                        {logs.length} entries recorded
-                                    </span>
-                                    <Settings className={`w-5 h-5 text-slate-300 transition-transform duration-500 ${showHistory ? 'rotate-180' : ''}`} />
-                                </div>
+                                <Icon name="Settings" className={`w-5 h-5 text-slate-300 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
                             </button>
                             {showHistory && (
                                 <div className="p-8 border-t border-slate-100 space-y-5 bg-slate-50/50">
                                     {logs.length === 0 ? (
-                                        <div className="text-center py-12 flex flex-col items-center">
-                                            <Clock className="w-12 h-12 text-slate-200 mb-4" />
-                                            <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest leading-loose">No shift activity found<br/>for current connection</p>
-                                        </div>
+                                        <p className="text-center py-8 text-slate-400 text-xs font-black uppercase tracking-widest">No local records available</p>
                                     ) : (
                                         logs.map((log, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-5 rounded-3xl bg-white border border-slate-100 shadow-sm animate-in slide-in-from-bottom-2">
+                                            <div key={idx} className="flex items-center justify-between p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
                                                 <div className="flex items-center gap-5">
                                                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                        {log.type === 'IN' ? <CheckCircle2 className="w-6 h-6" /> : <LogOut className="w-6 h-6" />}
+                                                        <Icon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} />
                                                     </div>
                                                     <div>
-                                                        <p className="text-base font-black text-slate-800 uppercase tracking-tight">Shift {log.type === 'IN' ? 'Started' : 'Ended'}</p>
+                                                        <p className="text-base font-black text-slate-800 tracking-tight">Shift {log.type === 'IN' ? 'Started' : 'Ended'}</p>
                                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.date}</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-xl font-black text-slate-800 tracking-tighter tabular-nums leading-none">{log.time}</p>
-                                                    <p className="text-[9px] font-black text-slate-300 uppercase mt-1 tracking-widest">Recorded</p>
-                                                </div>
+                                                <p className="text-xl font-black text-slate-800 tracking-tighter tabular-nums">{log.time}</p>
                                             </div>
                                         ))
                                     )}
                                 </div>
                             )}
-                        </div>
-
-                        {/* Footer */}
-                        <div className="mt-16 mb-12 text-center grayscale opacity-30 hover:opacity-80 transition-opacity duration-700 cursor-default">
-                             <img src={LOGO_URL} alt="Skedaddle" className="h-10 mx-auto mb-4" />
-                             <div className="flex items-center justify-center gap-4">
-                                <div className="h-px w-8 bg-slate-300"></div>
-                                <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em]">Official Technician Interface</p>
-                                <div className="h-px w-8 bg-slate-300"></div>
-                             </div>
                         </div>
                     </div>
                 </div>
