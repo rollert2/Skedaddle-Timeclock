@@ -36,13 +36,11 @@
 
         // --- API CONFIGURATION ---
         const CLIENT_ID = "826145031424-e5rd2jbbnreu8am7re4m6qpc6m9aqpgl.apps.googleusercontent.com"; 
-        // Updated Web App URL
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const TEST_RECIPIENT = "magicbran@gmail.com";
         // -------------------------
 
-        // Safe Icon component using LucideReact
         const SafeIcon = ({ name, className = "w-5 h-5" }) => {
             try {
                 const IconComp = window.LucideReact ? window.LucideReact[name] : null;
@@ -86,12 +84,20 @@
             };
 
             const calculateDecimalTime = (timeStr) => {
+                if (!timeStr) return "00.00";
                 const [hours, minutes] = timeStr.split(':').map(Number);
                 const decimal = hours + (minutes / 60);
-                return decimal.toFixed(2);
+                // Ensure 00.00 format (padded)
+                const parts = decimal.toFixed(2).split('.');
+                return parts[0].padStart(2, '0') + '.' + parts[1];
             };
 
-            // Fetch user status from Google Sheet on login
+            const isTimeValid = (timeStr) => {
+                if (!timeStr) return false;
+                const minutes = parseInt(timeStr.split(':')[1]);
+                return [0, 15, 30, 45].includes(minutes);
+            };
+
             useEffect(() => {
                 if (user) {
                     checkUserStatus();
@@ -103,9 +109,8 @@
                 try {
                     const response = await fetch(`${APPS_SCRIPT_URL}?email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}`);
                     const data = await response.json();
-                    if (data.status) {
-                        setStatus(data.status);
-                    }
+                    if (data.status) setStatus(data.status);
+                    if (data.logs) setLogs(data.logs);
                 } catch (err) {
                     console.error("Status check failed:", err);
                 }
@@ -120,15 +125,11 @@
                 script.defer = true;
                 script.onload = () => {
                     if (window.google && window.google.accounts) {
-                        try {
-                            window.google.accounts.id.initialize({
-                                client_id: CLIENT_ID,
-                                callback: handleGoogleResponse,
-                            });
-                            setGoogleReady(true);
-                        } catch (err) {
-                            console.error("Google Init Error:", err);
-                        }
+                        window.google.accounts.id.initialize({
+                            client_id: CLIENT_ID,
+                            callback: handleGoogleResponse,
+                        });
+                        setGoogleReady(true);
                     }
                     setTimeout(() => setIsInitializing(false), 1200);
                 };
@@ -143,18 +144,10 @@
                 if (!isInitializing && !user && googleBtnRef.current && window.google && window.google.accounts) {
                     try {
                         window.google.accounts.id.renderButton(googleBtnRef.current, {
-                            type: "standard",
-                            shape: "pill",
-                            theme: "filled_blue",
-                            text: "signin_with",
-                            size: "large",
-                            logo_alignment: "left",
-                            width: 280
+                            type: "standard", shape: "pill", theme: "filled_blue", text: "signin_with", size: "large", logo_alignment: "left", width: 280
                         });
                         try { window.google.accounts.id.prompt(); } catch(e) {}
-                    } catch (err) {
-                        console.error("Button Render Error:", err);
-                    }
+                    } catch (err) { console.error("Button Render Error:", err); }
                 }
             }, [isInitializing, user, googleReady]);
 
@@ -164,16 +157,9 @@
                     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                     const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                     const profile = JSON.parse(jsonPayload);
-                    
-                    setUser({
-                        email: profile.email,
-                        name: profile.name,
-                        picture: profile.picture
-                    });
+                    setUser({ email: profile.email, name: profile.name, picture: profile.picture });
                     setError(null);
-                } catch (err) {
-                    setError("Identity verification failed.");
-                }
+                } catch (err) { setError("Identity verification failed."); }
             };
 
             const initiateClockAction = (type) => {
@@ -183,6 +169,8 @@
             };
 
             const confirmClockAction = async () => {
+                if (!isTimeValid(selectedTime)) return;
+
                 const decimalValue = calculateDecimalTime(selectedTime);
                 setShowTimePicker(false);
                 
@@ -197,11 +185,7 @@
                     date: now.toLocaleDateString() 
                 }, ...logs]);
                 
-                if (pendingAction === 'IN') {
-                    setStatus('clocked_in');
-                } else {
-                    setStatus('clocked_out');
-                }
+                setStatus(pendingAction === 'IN' ? 'clocked_in' : 'clocked_out');
                 setError(null);
             };
 
@@ -264,24 +248,19 @@
                         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-orange-600 rounded-full blur-[150px]"></div>
                         </div>
-
                         <div className="max-w-md w-full relative z-10">
                             <div className="bg-white rounded-[3rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] p-12 text-center border border-white/20">
                                 <img src={LOGO_URL} alt="Skedaddle" className="h-24 mx-auto mb-10" />
                                 <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase mb-3 leading-tight">Technician<br/>Access Portal</h1>
                                 <p className="text-slate-500 font-semibold mb-10 leading-relaxed text-sm">Please sign in with your work email to begin your daily shift.</p>
-                                
                                 <div className="w-full flex justify-center py-10 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 mb-8 min-h-[140px] items-center">
-                                    {googleReady ? (
-                                        <div ref={googleBtnRef}></div>
-                                    ) : (
+                                    {googleReady ? ( <div ref={googleBtnRef}></div> ) : (
                                         <div className="flex flex-col items-center gap-2 text-center">
                                             <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
                                             <span className="text-[10px] font-bold text-slate-400">CONNECTING...</span>
                                         </div>
                                     )}
                                 </div>
-
                                 <div className="flex items-center justify-center gap-2 text-slate-400">
                                     <SafeIcon name="ShieldCheck" className="w-4 h-4 text-green-500" />
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">Authorized Access Only</span>
@@ -294,7 +273,6 @@
 
             return (
                 <div className="flex-1 p-4 md:p-10 max-w-2xl mx-auto w-full">
-                    {/* Time Picker Modal */}
                     {showTimePicker && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
                             <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-8 border border-slate-100 animate-in zoom-in-95 duration-200">
@@ -305,148 +283,89 @@
                                 </div>
                                 <h2 className="text-xl font-black text-slate-800 text-center uppercase tracking-tight mb-2">Verify Time</h2>
                                 <p className="text-slate-500 text-xs text-center font-medium mb-8 leading-relaxed">
-                                    Please confirm your {pendingAction === 'IN' ? 'start' : 'end'} time. 
-                                    Minutes will be rounded to the nearest 15.
+                                    Select time in 15-minute intervals only.
                                 </p>
-                                
                                 <div className="mb-8">
-                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Set Clock Time</label>
                                     <input 
                                         type="time" 
+                                        step="900"
                                         value={selectedTime}
                                         onChange={(e) => setSelectedTime(e.target.value)}
-                                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center text-3xl font-black text-slate-800 focus:border-orange-500 outline-none transition-all"
+                                        className={`w-full bg-slate-50 border-2 rounded-2xl p-4 text-center text-3xl font-black focus:border-orange-500 outline-none transition-all ${isTimeValid(selectedTime) ? 'border-slate-100 text-slate-800' : 'border-red-300 text-red-500'}`}
                                     />
+                                    {!isTimeValid(selectedTime) && (
+                                        <p className="text-red-500 text-[10px] font-bold uppercase mt-2 text-center tracking-widest">Must be 00, 15, 30, or 45</p>
+                                    )}
                                     <div className="mt-3 text-center">
                                         <span className="text-[10px] font-black text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest">
-                                            Payroll Value: {calculateDecimalTime(selectedTime)}
+                                            Payroll Decimal: {calculateDecimalTime(selectedTime)}
                                         </span>
                                     </div>
                                 </div>
-
                                 <div className="flex flex-col gap-3">
                                     <button 
+                                        disabled={!isTimeValid(selectedTime)}
                                         onClick={confirmClockAction}
-                                        className={`w-full py-4 rounded-2xl font-black text-white shadow-lg transition-all active:scale-95 ${pendingAction === 'IN' ? 'bg-green-500 shadow-green-200' : 'bg-red-500 shadow-red-200'}`}
+                                        className={`w-full py-4 rounded-2xl font-black text-white shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${pendingAction === 'IN' ? 'bg-green-500 shadow-green-200' : 'bg-red-500 shadow-red-200'}`}
                                     >
                                         CONFIRM CLOCK {pendingAction}
                                     </button>
-                                    <button 
-                                        onClick={() => setShowTimePicker(false)}
-                                        className="w-full py-4 rounded-2xl font-black text-slate-400 hover:bg-slate-50 transition-all"
-                                    >
-                                        CANCEL
-                                    </button>
+                                    <button onClick={() => setShowTimePicker(false)} className="w-full py-4 rounded-2xl font-black text-slate-400 hover:bg-slate-50 transition-all">CANCEL</button>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* Profile Header */}
                     <div className="flex items-center justify-between mb-8 bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100">
                         <div className="flex items-center gap-4">
                             <img src={user.picture} className="w-14 h-14 rounded-2xl border-2 border-orange-100 shadow-sm" referrerPolicy="no-referrer" alt="Profile" />
-                            <div>
-                                <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mb-0.5">Verified Technician</p>
-                                <p className="text-base font-black text-slate-800 leading-none">{user.name}</p>
-                                <p className="text-xs text-slate-500 mt-1">{user.email}</p>
-                            </div>
+                            <div><p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mb-0.5">Verified Technician</p><p className="text-base font-black text-slate-800 leading-none">{user.name}</p><p className="text-xs text-slate-500 mt-1">{user.email}</p></div>
                         </div>
-                        <button onClick={() => setUser(null)} className="p-4 hover:bg-red-50 rounded-2xl transition-all text-slate-300 hover:text-red-500">
-                            <SafeIcon name="LogOut" className="w-6 h-6" />
-                        </button>
+                        <button onClick={() => setUser(null)} className="p-4 hover:bg-red-50 rounded-2xl transition-all text-slate-300 hover:text-red-500"><SafeIcon name="LogOut" className="w-6 h-6" /></button>
                     </div>
 
-                    {/* Status Card */}
                     <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden mb-8">
                         <div className="bg-slate-900 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="flex items-center gap-5">
-                                <div className={`p-4 rounded-2xl ${status === 'clocked_in' ? 'bg-green-500 shadow-lg shadow-green-900/40' : 'bg-slate-800'}`}>
-                                    <SafeIcon name="UserCheck" className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-left">Period</p>
-                                    <p className="text-xl font-black text-orange-400 tracking-tight">{currentPeriod}</p>
-                                </div>
+                                <div className={`p-4 rounded-2xl ${status === 'clocked_in' ? 'bg-green-500 shadow-lg shadow-green-900/40' : 'bg-slate-800'}`}><SafeIcon name="UserCheck" className="w-7 h-7" /></div>
+                                <div><p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-left">Period</p><p className="text-xl font-black text-orange-400 tracking-tight">{currentPeriod}</p></div>
                             </div>
                             <div className={`flex items-center gap-2 px-5 py-2 rounded-full font-black text-xs tracking-widest ${status === 'clocked_in' ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-400'}`}>
                                 <div className={`w-2 h-2 rounded-full ${status === 'clocked_in' ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`}></div>
                                 {status === 'clocked_in' ? 'SHIFT ACTIVE' : 'SHIFT INACTIVE'}
                             </div>
                         </div>
-
                         <div className="p-10">
-                            {isSyncing && (
-                                <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-4 rounded-2xl border border-orange-100 animate-pulse text-center uppercase tracking-widest">
-                                    <SafeIcon name="Loader2" className="w-4 h-4 animate-spin" />
-                                    Synchronizing...
-                                </div>
-                            )}
-                            
-                            {error && (
-                                <div className="mb-8 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl flex items-start gap-5 shadow-sm">
-                                    <SafeIcon name="AlertCircle" className="w-8 h-8 text-red-500 flex-shrink-0" />
-                                    <div>
-                                        <p className="text-red-900 font-black text-sm uppercase">Notice</p>
-                                        <p className="text-red-700 text-xs mt-1 font-bold leading-relaxed">{error}</p>
-                                    </div>
-                                </div>
-                            )}
-
+                            {isSyncing && <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-4 rounded-2xl border border-orange-100 animate-pulse text-center uppercase tracking-widest"><SafeIcon name="Loader2" className="w-4 h-4 animate-spin" />Synchronizing...</div>}
+                            {error && <div className="mb-8 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl flex items-start gap-5 shadow-sm"><SafeIcon name="AlertCircle" className="w-8 h-8 text-red-500 flex-shrink-0" /><div><p className="text-red-900 font-black text-sm uppercase">Notice</p><p className="text-red-700 text-xs mt-1 font-bold leading-relaxed">{error}</p></div></div>}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                <button disabled={status === 'clocked_in' || isSyncing} onClick={() => initiateClockAction('IN')} className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-green-500 hover:shadow-2xl active:scale-95'}`}>
-                                    <div className={`p-6 rounded-3xl mb-5 transition-all ${status === 'clocked_in' ? 'bg-slate-100 text-slate-400' : 'bg-green-50 text-green-600 group-hover:bg-green-500 group-hover:text-white group-hover:rotate-3'}`}>
-                                        <SafeIcon name="LogIn" className="w-12 h-12" />
-                                    </div>
-                                    <span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock In</span>
-                                </button>
-
-                                <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={handleClockOutValidation} className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl active:scale-95'}`}>
-                                    <div className={`p-6 rounded-3xl mb-5 transition-all ${(status === 'idle' && logs.length === 0 && status !== 'clocked_in') ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:-rotate-3'}`}>
-                                        <SafeIcon name="LogOut" className="w-12 h-12" />
-                                    </div>
-                                    <span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock Out</span>
-                                </button>
+                                <button disabled={status === 'clocked_in' || isSyncing} onClick={() => initiateClockAction('IN')} className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${status === 'clocked_in' || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-green-500 hover:shadow-2xl active:scale-95'}`}><div className={`p-6 rounded-3xl mb-5 transition-all ${status === 'clocked_in' ? 'bg-slate-100 text-slate-400' : 'bg-green-50 text-green-600 group-hover:bg-green-500 group-hover:text-white group-hover:rotate-3'}`}><SafeIcon name="LogIn" className="w-12 h-12" /></div><span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock In</span></button>
+                                <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={handleClockOutValidation} className={`group relative p-12 rounded-[2.5rem] border-4 transition-all flex flex-col items-center ${(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing ? 'opacity-30 grayscale cursor-not-allowed border-slate-50' : 'bg-white border-slate-50 hover:border-red-500 hover:shadow-2xl active:scale-95'}`}><div className={`p-6 rounded-3xl mb-5 transition-all ${(status === 'idle' && logs.length === 0 && status !== 'clocked_in') ? 'bg-slate-100 text-slate-400' : 'bg-red-50 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:-rotate-3'}`}><SafeIcon name="LogOut" className="w-12 h-12" /></div><span className="font-black text-slate-800 text-lg uppercase tracking-tight">Clock Out</span></button>
                             </div>
                         </div>
                     </div>
 
-                    {/* Activity Feed */}
                     <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden mb-12">
                         <button onClick={() => setShowHistory(!showHistory)} className="w-full p-8 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                            <div className="flex items-center gap-4 font-black text-slate-800 uppercase text-xs tracking-widest">
-                                <SafeIcon name="History" className="text-orange-500" />
-                                Recent Activity
-                            </div>
+                            <div className="flex items-center gap-4 font-black text-slate-800 uppercase text-xs tracking-widest"><SafeIcon name="History" className="text-orange-500" />Session History</div>
                             <SafeIcon name="Settings" className={`w-5 h-5 text-slate-300 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
                         </button>
                         {showHistory && (
                             <div className="p-8 border-t border-slate-100 space-y-5 bg-slate-50/50">
-                                {logs.length === 0 ? <p className="text-center text-slate-400 text-[10px] font-black uppercase py-4">No activity found.</p> : logs.map((log, idx) => (
+                                {logs.length === 0 ? <p className="text-center text-slate-400 text-[10px] font-black uppercase py-4">No payroll records found.</p> : logs.map((log, idx) => (
                                     <div key={idx} className="flex items-center justify-between p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
                                         <div className="flex items-center gap-5">
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                                <SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} />
-                                            </div>
-                                            <div>
-                                                <p className="text-base font-black text-slate-800 uppercase tracking-tight">Shift {log.type === 'IN' ? 'Started' : 'Ended'}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.date} @ {log.time}</p>
-                                            </div>
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}><SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} /></div>
+                                            <div><p className="text-base font-black text-slate-800 uppercase tracking-tight">{log.type === 'IN' ? 'Started' : 'Ended'}</p><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.date} @ {log.time}</p></div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xl font-black text-slate-800 tracking-tighter tabular-nums leading-none">{log.decimal}</p>
-                                            <p className="text-[9px] font-black text-slate-300 uppercase mt-1 tracking-widest">Decimal HR</p>
+                                            <p className="text-[9px] font-black text-slate-300 uppercase mt-1 tracking-widest">DEC HR</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="mt-12 mb-8 text-center grayscale opacity-40">
-                         <img src={LOGO_URL} alt="Skedaddle" className="h-8 mx-auto mb-2" />
-                         <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">Skedaddle Wildlife Control Inc.</p>
                     </div>
                 </div>
             );
