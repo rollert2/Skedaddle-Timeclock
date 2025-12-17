@@ -77,19 +77,16 @@
                 const roundedMinutes = Math.round(minutes / 15) * 15;
                 now.setMinutes(roundedMinutes);
                 now.setSeconds(0);
+                if (roundedMinutes === 60) {
+                    now.setHours(now.getHours() + 1);
+                    now.setMinutes(0);
+                }
                 return now.toTimeString().slice(0, 5); 
             };
 
             const calculateDecimalTime = (timeStr) => {
                 const [hours, minutes] = timeStr.split(':').map(Number);
-                const roundedMinutes = Math.round(minutes / 15) * 15;
-                let finalHours = hours;
-                let finalMinutes = roundedMinutes;
-                if (finalMinutes === 60) {
-                    finalHours = (finalHours + 1) % 24;
-                    finalMinutes = 0;
-                }
-                const decimal = finalHours + (finalMinutes / 60);
+                const decimal = hours + (minutes / 60);
                 return decimal.toFixed(2);
             };
 
