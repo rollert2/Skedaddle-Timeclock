@@ -11,8 +11,8 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide React Icons -->
+    <script src="https://unpkg.com/lucide-react"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; }
@@ -40,10 +40,11 @@
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         // -------------------------
 
-        // Safe Icon component to prevent crashes if Lucide isn't ready
+        // Safe Icon component using LucideReact
         const SafeIcon = ({ name, className = "w-5 h-5" }) => {
             try {
-                const IconComp = window.lucide ? window.lucide[name] : null;
+                // LucideReact is the global for unpkg/lucide-react
+                const IconComp = window.LucideReact ? window.LucideReact[name] : null;
                 if (!IconComp) return <div className={`${className} bg-slate-200 rounded animate-pulse`}></div>;
                 return <IconComp className={className} />;
             } catch (e) {
@@ -66,7 +67,7 @@
             const month = new Date().toLocaleString('default', { month: 'short' });
             const currentPeriod = day <= 15 ? `${month} 1 - 15, 2025` : `${month} 16 - End, 2025`;
 
-            // Step 1: Load Script Once
+            // Step 1: Load Google Identity Script Once
             useEffect(() => {
                 const script = document.createElement('script');
                 script.id = 'google-jssdk';
@@ -85,17 +86,17 @@
                             console.error("Google Init Error:", err);
                         }
                     }
-                    // Give it a tiny bit of time to settle before hiding splash
-                    setTimeout(() => setIsInitializing(false), 800);
+                    // Show splash for at least 1 second
+                    setTimeout(() => setIsInitializing(false), 1200);
                 };
                 script.onerror = () => {
                     setIsInitializing(false);
-                    setError("Google Identity services could not be loaded. Please check your internet or ad-blocker.");
+                    setError("Google services unavailable.");
                 };
                 document.head.appendChild(script);
             }, []);
 
-            // Step 2: Render Button when needed
+            // Step 2: Render Button when Login View is active
             useEffect(() => {
                 if (!isInitializing && !user && googleBtnRef.current && window.google && window.google.accounts) {
                     try {
@@ -108,7 +109,7 @@
                             logo_alignment: "left",
                             width: 280
                         });
-                        window.google.accounts.id.prompt();
+                        try { window.google.accounts.id.prompt(); } catch(e) {}
                     } catch (err) {
                         console.error("Button Render Error:", err);
                     }
@@ -129,8 +130,7 @@
                     });
                     setError(null);
                 } catch (err) {
-                    console.error("Auth error", err);
-                    setError("Failed to verify Google account.");
+                    setError("Identity verification failed.");
                 }
             };
 
@@ -141,7 +141,6 @@
                         method: 'POST',
                         mode: 'no-cors',
                         cache: 'no-cache',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             email: user.email,
                             name: user.name,
@@ -153,7 +152,7 @@
                     return true;
                 } catch (err) {
                     setIsSyncing(false);
-                    setError("Payroll sync failed. Check connection.");
+                    setError("Sync failed. Check connection.");
                     return false;
                 }
             };
@@ -171,20 +170,17 @@
                 const now = new Date();
                 const today = now.toLocaleDateString();
                 const hasClockInToday = logs.some(log => log.type === 'IN' && log.date === today);
-                
                 await sendToGoogleSheet('OUT');
-                
                 if (!hasClockInToday) {
-                    setError(`CRITICAL: No clock-in found for today. Admin has been notified via email.`);
+                    setError(`CRITICAL: No clock-in for today. Admin has been notified.`);
                     return;
                 }
-                
                 setLogs([{ type: 'OUT', time: now.toLocaleTimeString(), date: today }, ...logs]);
                 setStatus('clocked_out');
                 setError(null);
             };
 
-            // Preferred Splash Page Style
+            // Splascreen View
             if (isInitializing) {
                 return (
                     <div className="flex-1 flex items-center justify-center bg-white">
@@ -199,15 +195,15 @@
                 );
             }
 
+            // Login View
             if (!user) {
                 return (
                     <div className="flex-1 flex items-center justify-center p-6 bg-slate-900 relative overflow-hidden">
-                        {/* Background Decor */}
                         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-orange-600 rounded-full blur-[150px]"></div>
                         </div>
 
-                        <div className="max-w-md w-full relative z-10 animate-in fade-in zoom-in-95 duration-500">
+                        <div className="max-w-md w-full relative z-10">
                             <div className="bg-white rounded-[3rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] p-12 text-center border border-white/20">
                                 <img src={LOGO_URL} alt="Skedaddle" className="h-24 mx-auto mb-10" />
                                 <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase mb-3 leading-tight">Technician<br/>Access Portal</h1>
@@ -217,9 +213,9 @@
                                     {googleReady ? (
                                         <div ref={googleBtnRef}></div>
                                     ) : (
-                                        <div className="flex flex-col items-center gap-2">
+                                        <div className="flex flex-col items-center gap-2 text-center">
                                             <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                                            <span className="text-[10px] font-bold text-slate-400">CONNECTING TO GOOGLE...</span>
+                                            <span className="text-[10px] font-bold text-slate-400">CONNECTING...</span>
                                         </div>
                                     )}
                                 </div>
@@ -234,6 +230,7 @@
                 );
             }
 
+            // Dashboard View
             return (
                 <div className="flex-1 p-4 md:p-10 max-w-2xl mx-auto w-full">
                     {/* Profile Header */}
@@ -241,7 +238,7 @@
                         <div className="flex items-center gap-4">
                             <img src={user.picture} className="w-14 h-14 rounded-2xl border-2 border-orange-100 shadow-sm" referrerPolicy="no-referrer" alt="Profile" />
                             <div>
-                                <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mb-0.5">Verified User</p>
+                                <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mb-0.5">Verified Technician</p>
                                 <p className="text-base font-black text-slate-800 leading-none">{user.name}</p>
                                 <p className="text-xs text-slate-500 mt-1">{user.email}</p>
                             </div>
@@ -259,7 +256,7 @@
                                     <SafeIcon name="UserCheck" className="w-7 h-7" />
                                 </div>
                                 <div>
-                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-left">Current Period</p>
+                                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-left">Period</p>
                                     <p className="text-xl font-black text-orange-400 tracking-tight">{currentPeriod}</p>
                                 </div>
                             </div>
@@ -271,9 +268,9 @@
 
                         <div className="p-10">
                             {isSyncing && (
-                                <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-4 rounded-2xl border border-orange-100 animate-pulse">
+                                <div className="flex items-center justify-center gap-3 mb-8 text-orange-600 font-black text-xs bg-orange-50 py-4 rounded-2xl border border-orange-100 animate-pulse text-center uppercase tracking-widest">
                                     <SafeIcon name="Loader2" className="w-4 h-4 animate-spin" />
-                                    SYNCING WITH PAYROLL...
+                                    Synchronizing...
                                 </div>
                             )}
                             
@@ -281,7 +278,7 @@
                                 <div className="mb-8 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl flex items-start gap-5 shadow-sm">
                                     <SafeIcon name="AlertCircle" className="w-8 h-8 text-red-500 flex-shrink-0" />
                                     <div>
-                                        <p className="text-red-900 font-black text-sm uppercase">System Flag</p>
+                                        <p className="text-red-900 font-black text-sm uppercase">Notice</p>
                                         <p className="text-red-700 text-xs mt-1 font-bold leading-relaxed">{error}</p>
                                     </div>
                                 </div>
@@ -310,14 +307,14 @@
                         <button onClick={() => setShowHistory(!showHistory)} className="w-full p-8 flex items-center justify-between hover:bg-slate-50 transition-colors">
                             <div className="flex items-center gap-4 font-black text-slate-800 uppercase text-xs tracking-widest">
                                 <SafeIcon name="History" className="text-orange-500" />
-                                Session Records
+                                Recent Activity
                             </div>
                             <SafeIcon name="Settings" className={`w-5 h-5 text-slate-300 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
                         </button>
                         {showHistory && (
                             <div className="p-8 border-t border-slate-100 space-y-5 bg-slate-50/50">
-                                {logs.length === 0 ? <p className="text-center text-slate-400 text-[10px] font-black uppercase py-4 tracking-widest leading-loose">No shift activity found<br/>for current connection</p> : logs.map((log, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-6 rounded-3xl bg-white border border-slate-100 shadow-sm animate-in slide-in-from-bottom-2">
+                                {logs.length === 0 ? <p className="text-center text-slate-400 text-[10px] font-black uppercase py-4">No activity found.</p> : logs.map((log, idx) => (
+                                    <div key={idx} className="flex items-center justify-between p-6 rounded-3xl bg-white border border-slate-100 shadow-sm">
                                         <div className="flex items-center gap-5">
                                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                                                 <SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} />
@@ -328,8 +325,7 @@
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xl font-black text-slate-800 tracking-tighter tabular-nums leading-none">{log.time}</p>
-                                            <p className="text-[9px] font-black text-slate-300 uppercase mt-1 tracking-widest">Recorded</p>
+                                            <p className="text-xl font-black text-slate-800 tabular-nums">{log.time}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -337,7 +333,7 @@
                         )}
                     </div>
 
-                    {/* Footer Branding */}
+                    {/* Footer */}
                     <div className="mt-12 mb-8 text-center grayscale opacity-40">
                          <img src={LOGO_URL} alt="Skedaddle" className="h-8 mx-auto mb-2" />
                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em]">Skedaddle Wildlife Control Inc.</p>
