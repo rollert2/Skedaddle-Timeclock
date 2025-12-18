@@ -336,11 +336,11 @@
                                     <div className={`bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-8 border-4 ${isXmas ? 'border-red-600' : 'border-slate-100'}`}>
                                         <h2 className={`text-2xl font-black text-center uppercase mb-6 ${isXmas ? 'text-red-700 xmas-font' : 'text-slate-800'}`}>Confirm {pendingAction}</h2>
                                         <div className="flex justify-center gap-4 mb-4">
-                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-200 outline-none">
+                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
                                                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
                                             </select>
                                             <div className="text-2xl font-black mt-4 text-slate-300">:</div>
-                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-200 outline-none">
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
                                                 {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                             </select>
                                         </div>
@@ -349,7 +349,7 @@
                                             <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder={`Add a note for this specific ${pendingAction}...`} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm focus:border-orange-500 outline-none min-h-[80px]" />
                                         </div>
                                         {!isTimeValid && (
-                                            <p className="text-red-500 text-[10px] font-bold uppercase mb-4 text-center">Error: End time cannot bbe before clock-in time.</p>
+                                            <p className="text-red-500 text-[10px] font-bold uppercase mb-4 text-center">Error: End time cannot be before clock-in time.</p>
                                         )}
                                         <button 
                                             disabled={!isTimeValid}
@@ -412,7 +412,7 @@
                                     <div className="pt-8 border-t border-slate-100">
                                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 ml-1 tracking-[0.2em]">Reason for no hours / General notes</p>
                                         <div className="flex flex-col gap-3">
-                                            <textarea value={generalNote} onChange={e => setGeneralNote(e.target.value)} placeholder="Enter details to bbe saved in the sheet..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-orange-500 outline-none min-h-[120px]" />
+                                            <textarea value={generalNote} onChange={e => setGeneralNote(e.target.value)} placeholder="Enter details to be saved in the sheet..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-orange-500 outline-none min-h-[120px]" />
                                             <button onClick={syncGeneralNote} disabled={isSyncing || !generalNote.trim()} className={`py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${isXmas ? 'bg-green-600 text-white' : 'bg-slate-800 text-white'} disabled:opacity-30`}>Save Shift Note</button>
                                         </div>
                                     </div>
