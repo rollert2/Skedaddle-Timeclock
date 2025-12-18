@@ -112,6 +112,7 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_NORMAL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const LOGO_XMAS = "https://i.imgur.com/zdJfkpg.png";
+        const SUPERVISOR_EMAIL = "magicbran@gmail.com";
 
         const SnowBurst = ({ onComplete }) => {
             const particles = useMemo(() => Array.from({ length: 40 }).map((_, i) => ({
@@ -203,7 +204,15 @@
                     const response = await fetch(`${APPS_SCRIPT_URL}?name=${encodeURIComponent(userObj.name)}`);
                     const data = await response.json();
                     if (data.status) setStatus(data.status);
-                    if (data.logs) setLogs(data.logs);
+                    if (data.logs) {
+                        setLogs(data.logs);
+                        // Find today's note and populate generalNote if present
+                        const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+                        const todayLog = data.logs.find(l => l.date === todayStr);
+                        if (todayLog && todayLog.notes) {
+                            setGeneralNote(todayLog.notes);
+                        }
+                    }
                 } catch (err) { console.error("Status error:", err); }
                 setIsSyncing(false);
             };
@@ -239,6 +248,19 @@
                 } catch (e) { console.error("Auth error:", e); }
             };
 
+            const openTimePicker = (action) => {
+                setPendingAction(action);
+                const now = new Date();
+                let h = now.getHours();
+                let m = Math.round(now.getMinutes() / 15) * 15;
+                if (m === 60) { h++; m = 0; }
+                if (h === 24) h = 0;
+                
+                setSelHour(h);
+                setSelMin(m);
+                setShowTimePicker(true);
+            };
+
             const confirmClockAction = async () => {
                 const decimalValue = calculateDecimalTime(selHour, selMin);
                 setShowTimePicker(false);
@@ -256,7 +278,6 @@
                         })
                     });
                     setActionNote(""); 
-                    // Wait for Sheets and then refresh
                     setTimeout(() => checkUserStatus(user), 2500);
                 } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
             };
@@ -270,10 +291,21 @@
                         mode: 'no-cors',
                         body: JSON.stringify({ email: user.email, name: user.name, type: 'GENERAL_NOTE', note: generalNote })
                     });
-                    setGeneralNote("");
                     setTimeout(() => checkUserStatus(user), 2500);
                 } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
             };
+
+            // Validation logic for Clock Out time
+            const isTimeValid = useMemo(() => {
+                if (pendingAction !== 'OUT') return true;
+                const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+                const todayLog = logs.find(l => l.date === todayStr);
+                if (!todayLog || !todayLog.start) return true;
+                
+                const selectedDecimal = parseFloat(calculateDecimalTime(selHour, selMin));
+                const clockInDecimal = parseFloat(todayLog.start);
+                return selectedDecimal > clockInDecimal;
+            }, [pendingAction, selHour, selMin, logs]);
 
             if (isInitializing) return (
                 <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -316,7 +348,16 @@
                                             <p className="text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">{pendingAction} Specific Note</p>
                                             <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder={`Add a note for this specific ${pendingAction}...`} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm focus:border-orange-500 outline-none min-h-[80px]" />
                                         </div>
-                                        <button onClick={confirmClockAction} className={`w-full py-4 rounded-2xl font-black text-white shadow-lg ${pendingAction === 'IN' ? (isXmas ? 'bg-green-600' : 'bg-green-500') : (isXmas ? 'bg-red-600' : 'bg-red-500')}`}>CONFIRM</button>
+                                        {!isTimeValid && (
+                                            <p className="text-red-500 text-[10px] font-bold uppercase mb-4 text-center">Error: End time cannot bbe before clock-in time.</p>
+                                        )}
+                                        <button 
+                                            disabled={!isTimeValid}
+                                            onClick={confirmClockAction} 
+                                            className={`w-full py-4 rounded-2xl font-black text-white shadow-lg disabled:opacity-30 ${pendingAction === 'IN' ? (isXmas ? 'bg-green-600' : 'bg-green-500') : (isXmas ? 'bg-red-600' : 'bg-red-500')}`}
+                                        >
+                                            CONFIRM
+                                        </button>
                                         <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400 uppercase text-xs mt-2">Cancel</button>
                                     </div>
                                 </div>
@@ -357,11 +398,11 @@
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
-                                            <button disabled={status !== 'idle' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-green-50 hover:border-green-600' : 'border-slate-50 hover:border-green-500'}`}>
+                                            <button disabled={status !== 'idle' || isSyncing} onClick={() => {openTimePicker('IN');}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-green-50 hover:border-green-600' : 'border-slate-50 hover:border-green-500'}`}>
                                                 <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-green-50 text-green-600 group-hover:bg-green-600' : 'bg-green-50 text-green-600 group-hover:bg-green-500'}`}><SafeIcon name="LogIn" className="w-10 h-10" /></div>
                                                 <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock In</span>
                                             </button>
-                                            <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-red-500'}`}>
+                                            <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {openTimePicker('OUT');}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-red-500'}`}>
                                                 <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-red-50 text-red-600 group-hover:bg-red-600' : 'bg-red-50 text-red-600 group-hover:bg-red-500'}`}><SafeIcon name="LogOut" className="w-10 h-10" /></div>
                                                 <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock Out</span>
                                             </button>
@@ -369,10 +410,10 @@
                                     )}
 
                                     <div className="pt-8 border-t border-slate-100">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 ml-1 tracking-[0.2em]">Reason for no hours / General notes (Column G)</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 ml-1 tracking-[0.2em]">Reason for no hours / General notes</p>
                                         <div className="flex flex-col gap-3">
-                                            <textarea value={generalNote} onChange={e => setGeneralNote(e.target.value)} placeholder="Enter details to be saved in Column G..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-orange-500 outline-none min-h-[120px]" />
-                                            <button onClick={syncGeneralNote} disabled={isSyncing || !generalNote.trim()} className={`py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${isXmas ? 'bg-green-600 text-white' : 'bg-slate-800 text-white'} disabled:opacity-30`}>Save Shift Note (Col G)</button>
+                                            <textarea value={generalNote} onChange={e => setGeneralNote(e.target.value)} placeholder="Enter details to bbe saved in the sheet..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-orange-500 outline-none min-h-[120px]" />
+                                            <button onClick={syncGeneralNote} disabled={isSyncing || !generalNote.trim()} className={`py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${isXmas ? 'bg-green-600 text-white' : 'bg-slate-800 text-white'} disabled:opacity-30`}>Save Shift Note</button>
                                         </div>
                                     </div>
                                 </div>
