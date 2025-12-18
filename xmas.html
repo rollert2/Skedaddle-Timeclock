@@ -11,8 +11,8 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide React Icons -->
+    <script src="https://unpkg.com/lucide-react"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Inter:wght@400;700;900&display=swap');
         
@@ -22,6 +22,7 @@
             overflow-x: hidden;
             min-height: 100vh;
             transition: background 0.5s ease;
+            background-color: #f8fafc;
         }
 
         .xmas-font { font-family: 'Mountains of Christmas', cursive; }
@@ -97,13 +98,6 @@
 
         .logo-back {
             transform: rotateY(180deg);
-        }
-
-        .festive-card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border: 4px solid #c41e3a;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -215,8 +209,10 @@
 
         const SafeIcon = ({ name, className = "w-5 h-5" }) => {
             try {
-                const IconComp = window.lucide ? window.lucide[name] : null;
-                return IconComp ? <IconComp className={className} /> : <div className={className}></div>;
+                // Ensure we use LucideReact global
+                const IconComp = window.LucideReact ? window.LucideReact[name] : null;
+                if (!IconComp) return <div className={className}></div>;
+                return <IconComp className={className} />;
             } catch (e) { return <div className={className}></div>; }
         };
 
@@ -249,6 +245,7 @@
             };
 
             const checkUserStatus = async (userObj) => {
+                if (!userObj) return;
                 setIsSyncing(true);
                 try {
                     const response = await fetch(`${APPS_SCRIPT_URL}?email=${encodeURIComponent(userObj.email)}&name=${encodeURIComponent(userObj.name)}`);
@@ -263,9 +260,16 @@
                 const script = document.createElement('script');
                 script.src = "https://accounts.google.com/gsi/client";
                 script.async = true;
+                script.defer = true;
                 script.onload = () => {
-                    window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleResponse });
-                    setIsInitializing(false);
+                    if (window.google) {
+                        window.google.accounts.id.initialize({ 
+                            client_id: CLIENT_ID, 
+                            callback: handleResponse,
+                            auto_select: false
+                        });
+                        setIsInitializing(false);
+                    }
                 };
                 document.head.appendChild(script);
             }, []);
@@ -279,10 +283,19 @@
             }, [isInitializing, user]);
 
             const handleResponse = (response) => {
-                const profile = JSON.parse(atob(response.credential.split('.')[1]));
-                const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
-                setUser(newUser);
-                checkUserStatus(newUser);
+                try {
+                    // Robust base64 decoding for URL-safe credentials
+                    const base64Url = response.credential.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    
+                    const profile = JSON.parse(jsonPayload);
+                    const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
+                    setUser(newUser);
+                    checkUserStatus(newUser);
+                } catch (e) { console.error("Auth error:", e); }
             };
 
             const confirmClockAction = async () => {
@@ -304,8 +317,8 @@
             if (isInitializing) {
                 return (
                     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-                        <img src={LOGO_NORMAL} className="h-20 mb-4 animate-pulse" />
-                        <p className="text-slate-400 font-black text-xs uppercase tracking-[0.3em]">Connecting securely...</p>
+                        <div className="h-20 w-20 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-slate-400 font-black text-xs uppercase tracking-[0.3em] mt-8">Securely Initializing...</p>
                     </div>
                 );
             }
@@ -417,10 +430,18 @@
                                     {logs.length === 0 ? <p className="text-center text-slate-400 font-bold text-[10px] uppercase py-8 tracking-widest">No activity found</p> : logs.map((log, idx) => (
                                         <div key={idx} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-slate-100 shadow-sm">
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}><SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} /></div>
-                                                <div><p className="text-sm font-black text-slate-800 uppercase leading-none">{log.type === 'IN' ? 'Shift Started' : 'Shift Ended'}</p><p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{log.date} @ {log.time}</p></div>
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                                    <SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-slate-800 uppercase leading-none">{log.type === 'IN' ? 'Shift Started' : 'Shift Ended'}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{log.date} @ {log.time}</p>
+                                                </div>
                                             </div>
-                                            <div className="text-right"><p className="text-lg font-black text-slate-800 leading-none">{log.decimal}</p><p className="text-[9px] font-black text-slate-300 uppercase mt-1">HR</p></div>
+                                            <div className="text-right">
+                                                <p className="text-lg font-black text-slate-800 leading-none">{log.decimal}</p>
+                                                <p className="text-[9px] font-black text-slate-300 uppercase mt-1">HR</p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
