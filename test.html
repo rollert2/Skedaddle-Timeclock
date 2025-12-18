@@ -377,7 +377,7 @@
                             <div className={`rounded-[2.5rem] shadow-2xl border-4 overflow-hidden mb-8 transition-all ${isXmas ? 'bg-white/95 border-red-600' : 'bg-white border-slate-100'}`}>
                                 <div className={`p-8 text-white flex justify-between items-center transition-colors ${isXmas ? 'bg-red-700' : 'bg-slate-900'}`}>
                                     <div className="flex items-center gap-4">
-                                        <div className={`p-3 rounded-xl ${status === 'clocked_in' ? 'bg-green-500' : (isXmas ? 'bg-red-900' : 'bg-slate-800')}`}><SafeIcon name="UserCheck" /></div>
+                                        <div className={`p-3 rounded-xl ${status === 'clocked_in' ? 'bg-green-50' : (isXmas ? 'bg-red-900' : 'bg-slate-800')}`}><SafeIcon name="UserCheck" /></div>
                                         <div><p className="text-slate-300 text-[10px] font-bold uppercase mb-1">Shift Status</p><p className={`text-xl font-black tracking-wider ${isXmas ? 'xmas-font' : ''}`}>{status === 'clocked_in' ? (isXmas ? 'Working Hard!' : 'SHIFT ACTIVE') : (isXmas ? 'At the North Pole' : 'OFF DUTY')}</p></div>
                                     </div>
                                     <div className="text-right">
@@ -402,7 +402,7 @@
                                                 <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-green-50 text-green-600 group-hover:bg-green-600' : 'bg-green-50 text-green-600 group-hover:bg-green-500'}`}><SafeIcon name="LogIn" className="w-10 h-10" /></div>
                                                 <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock In</span>
                                             </button>
-                                            <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {openTimePicker('OUT');}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-red-500'}`}>
+                                            <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {openTimePicker('OUT');}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-green-500'}`}>
                                                 <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-red-50 text-red-600 group-hover:bg-red-600' : 'bg-red-50 text-red-600 group-hover:bg-red-500'}`}><SafeIcon name="LogOut" className="w-10 h-10" /></div>
                                                 <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock Out</span>
                                             </button>
