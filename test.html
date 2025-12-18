@@ -120,7 +120,6 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_NORMAL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const LOGO_XMAS = "https://i.imgur.com/zdJfkpg.png";
-        const SUPERVISOR_EMAIL = "magicbran@gmail.com";
 
         const SnowBurst = ({ onComplete }) => {
             const particles = useMemo(() => Array.from({ length: 40 }).map((_, i) => ({
@@ -198,7 +197,8 @@
             const [pendingAction, setPendingAction] = useState(null);
             const [selHour, setSelHour] = useState(new Date().getHours());
             const [selMin, setSelMin] = useState(0);
-            const [note, setNote] = useState("");
+            const [actionNote, setActionNote] = useState("");
+            const [generalNote, setGeneralNote] = useState("");
             const googleBtnRef = useRef(null);
 
             const calculateDecimalTime = (h, m) => {
@@ -254,7 +254,7 @@
                 setShowTimePicker(false);
                 setIsSyncing(true);
                 try {
-                    const response = await fetch(APPS_SCRIPT_URL, {
+                    await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         body: JSON.stringify({ 
@@ -262,11 +262,29 @@
                             name: user.name, 
                             type: pendingAction, 
                             decimalTime: decimalValue,
-                            note: note
+                            note: actionNote
                         })
                     });
-                    setNote(""); 
-                    // Important: Allow time for Sheets to update before refreshing local data
+                    setActionNote(""); 
+                    setTimeout(() => checkUserStatus(user), 1500);
+                } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
+            };
+
+            const syncGeneralNote = async () => {
+                if (!generalNote.trim()) return;
+                setIsSyncing(true);
+                try {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ 
+                            email: user.email, 
+                            name: user.name, 
+                            type: 'GENERAL_NOTE', 
+                            note: generalNote
+                        })
+                    });
+                    setGeneralNote("");
                     setTimeout(() => checkUserStatus(user), 1500);
                 } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
             };
@@ -309,8 +327,8 @@
                                             </select>
                                         </div>
                                         <div className="mb-6">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Optional Note</p>
-                                            <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Add a shift note or adjustment reason..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm focus:border-orange-500 outline-none min-h-[80px]" />
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">{pendingAction} Notes</p>
+                                            <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder={`Add a note specifically for this ${pendingAction}...`} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm focus:border-orange-500 outline-none min-h-[80px]" />
                                         </div>
                                         <button onClick={confirmClockAction} className={`w-full py-4 rounded-2xl font-black text-white shadow-lg ${pendingAction === 'IN' ? (isXmas ? 'bg-green-600' : 'bg-green-500') : (isXmas ? 'bg-red-600' : 'bg-red-500')}`}>CONFIRM</button>
                                         <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400 uppercase text-xs mt-2">Cancel</button>
@@ -318,17 +336,11 @@
                                 </div>
                             )}
 
-                            {status === 'clocked_out' && (
-                                <div className="mb-6 p-6 bg-red-50 border-l-8 border-red-500 rounded-3xl animate-in slide-in-from-top-4">
-                                    <div className="flex items-center gap-4 mb-2"><SafeIcon name="AlertTriangle" className="text-red-600 w-8 h-8" /><p className="text-red-900 font-black uppercase text-sm">Supervisor Alert</p></div>
-                                    <p className="text-red-700 text-xs font-bold leading-relaxed">Shift complete for today. Contact <span className="underline font-black">{SUPERVISOR_EMAIL}</span> for manual changes.</p>
-                                </div>
-                            )}
-
+                            {/* Header */}
                             <div className={`flex items-center justify-between mb-8 p-5 rounded-[2rem] shadow-lg border-2 transition-all ${isXmas ? 'bg-white/95 border-red-100' : 'bg-white border-slate-100'}`}>
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className={`w-12 h-12 rounded-xl border-2 ${isXmas ? 'border-red-200' : 'border-slate-100'}`} referrerPolicy="no-referrer" />
-                                    <div><p className="text-sm font-black text-slate-800 leading-none">{user.name}</p><p className={`text-[10px] font-bold uppercase mt-1 ${isXmas ? 'text-green-700' : 'text-orange-600'}`}>{isXmas ? 'Festive Mode 🎄' : 'Verified Technician'}</p></div>
+                                    <div><p className="text-sm font-black text-slate-800 leading-none">{user.name}</p><p className={`text-[10px] font-bold uppercase mt-1 ${isXmas ? 'text-green-700' : 'text-orange-600'}`}>{isXmas ? 'Festive Mode Active 🎄' : 'Verified Technician'}</p></div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-12 h-8 scale-50"><LogoFlip isXmas={isXmas} onClick={() => { setIsXmas(!isXmas); if (!isXmas) setIsBursting(true); }} sizeClass="h-full w-full" /></div>
@@ -348,15 +360,47 @@
                                 </div>
                                 <div className="p-10">
                                     {isSyncing && <div className="flex items-center justify-center gap-2 mb-8 text-orange-500 font-black text-[10px] uppercase animate-pulse"><SafeIcon name="Loader2" className="animate-spin" />Cloud Synchronizing...</div>}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                        <button disabled={status !== 'idle' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-green-50 hover:border-green-600' : 'border-slate-50 hover:border-green-500'}`}>
-                                            <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-green-50 text-green-600 group-hover:bg-green-600' : 'bg-green-50 text-green-600 group-hover:bg-green-500'}`}><SafeIcon name="LogIn" className="w-10 h-10" /></div>
-                                            <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock In</span>
-                                        </button>
-                                        <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-red-500'}`}>
-                                            <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-red-50 text-red-600 group-hover:bg-red-600' : 'bg-red-50 text-red-600 group-hover:bg-red-500'}`}><SafeIcon name="LogOut" className="w-10 h-10" /></div>
-                                            <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock Out</span>
-                                        </button>
+                                    
+                                    {status === 'clocked_out' ? (
+                                        <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[2rem] text-center mb-6">
+                                            <SafeIcon name="AlertTriangle" className="text-red-500 w-12 h-12 mx-auto mb-4" />
+                                            <h3 className="text-red-900 font-black uppercase text-lg mb-2">Shift Complete</h3>
+                                            <p className="text-red-700 text-sm font-medium leading-relaxed">
+                                                You have already clocked in and out for today.<br/>
+                                                <span className="font-black">Please email your supervisor to request any shift adjustments.</span>
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                                            <button disabled={status !== 'idle' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-green-50 hover:border-green-600' : 'border-slate-50 hover:border-green-500'}`}>
+                                                <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-green-50 text-green-600 group-hover:bg-green-600' : 'bg-green-50 text-green-600 group-hover:bg-green-500'}`}><SafeIcon name="LogIn" className="w-10 h-10" /></div>
+                                                <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock In</span>
+                                            </button>
+                                            <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-red-500'}`}>
+                                                <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-red-50 text-red-600 group-hover:bg-red-600' : 'bg-red-50 text-red-600 group-hover:bg-red-500'}`}><SafeIcon name="LogOut" className="w-10 h-10" /></div>
+                                                <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock Out</span>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* General Reason for No Hours / Notes Section */}
+                                    <div className="pt-8 border-t border-slate-100">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 ml-1 tracking-[0.2em]">Shift Notes / Reason for No Hours</p>
+                                        <div className="flex flex-col gap-3">
+                                            <textarea 
+                                                value={generalNote} 
+                                                onChange={e => setGeneralNote(e.target.value)} 
+                                                placeholder="Enter any general notes for today's record or reasons for missing hours..." 
+                                                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-orange-500 outline-none min-h-[100px] transition-all" 
+                                            />
+                                            <button 
+                                                onClick={syncGeneralNote} 
+                                                disabled={isSyncing || !generalNote.trim()}
+                                                className={`py-3 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${isXmas ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-slate-800 text-white hover:bg-slate-900'} disabled:opacity-30`}
+                                            >
+                                                Sync Shift Note
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
