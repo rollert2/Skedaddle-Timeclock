@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skedaddle Xmas Portal 🎄</title>
+    <title>Skedaddle Technician Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React and ReactDOM -->
@@ -18,25 +18,15 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #0a2e1a;
             margin: 0; 
             overflow-x: hidden;
             min-height: 100vh;
-        }
-
-        .xmas-bg {
-            background: radial-gradient(circle at center, #1a472a 0%, #0a2e1a 100%);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            transition: background 0.5s ease;
         }
 
         .xmas-font { font-family: 'Mountains of Christmas', cursive; }
 
-        /* Snowflake & Logo Animation */
+        /* Snowflake Animation */
         .snowflake {
             position: fixed;
             top: -10vh;
@@ -50,32 +40,76 @@
             to { transform: translateY(110vh) rotate(360deg); }
         }
 
-        .snow-overlay {
+        /* Burst Animation */
+        .snow-burst {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        .burst-particle {
+            position: absolute;
+            animation: burst 1.5s ease-out forwards;
+            color: white;
+            font-size: 24px;
+        }
+
+        @keyframes burst {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(var(--tw-x), var(--tw-y)) scale(1.5); opacity: 0; }
+        }
+
+        /* Logo Flip Animation */
+        .logo-container {
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .logo-container:hover { transform: scale(1.05); }
+        .logo-container:active { transform: scale(0.95); }
+
+        .logo-flip-inner {
+            position: relative;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 9999;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .logo-container.is-flipped .logo-flip-inner {
+            transform: rotateY(180deg);
+        }
+
+        .logo-front, .logo-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-back {
+            transform: rotateY(180deg);
         }
 
         .festive-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border: 4px solid #c41e3a;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(196, 30, 58, 0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
         }
 
-        #root {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
-    <div class="xmas-bg"></div>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -84,31 +118,65 @@
         // --- CONFIGURATION ---
         const CLIENT_ID = "826145031424-e5rd2jbbnreu8am7re4m6qpc6m9aqpgl.apps.googleusercontent.com"; 
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
-        const XMAS_LOGO = "https://i.imgur.com/zdJfkpg.png";
+        const LOGO_NORMAL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
+        const LOGO_XMAS = "https://i.imgur.com/zdJfkpg.png";
         // -------------------------
+
+        const SnowBurst = ({ onComplete }) => {
+            const particles = Array.from({ length: 40 }).map((_, i) => ({
+                id: i,
+                x: (Math.random() - 0.5) * 1000,
+                y: (Math.random() - 0.5) * 1000,
+                icon: i % 5 === 0 ? "❄️" : "✨",
+                delay: Math.random() * 0.2
+            }));
+
+            useEffect(() => {
+                const timer = setTimeout(onComplete, 1600);
+                return () => clearTimeout(timer);
+            }, []);
+
+            return (
+                <div className="snow-burst">
+                    {particles.map(p => (
+                        <div 
+                            key={p.id}
+                            className="burst-particle"
+                            style={{ 
+                                '--tw-x': `${p.x}px`, 
+                                '--tw-y': `${p.y}px`,
+                                animationDelay: `${p.delay}s`
+                            }}
+                        >
+                            {p.icon}
+                        </div>
+                    ))}
+                </div>
+            );
+        };
 
         const Snowfall = () => {
             const [flakes, setFlakes] = useState([]);
 
             useEffect(() => {
                 const createFlake = () => {
-                    const isLogo = Math.random() > 0.90; 
+                    const isLogo = Math.random() > 0.92; 
                     const id = Math.random().toString(36).substr(2, 9);
                     const left = Math.random() * 100;
-                    const duration = 8 + Math.random() * 12;
-                    const size = isLogo ? (30 + Math.random() * 30) : (10 + Math.random() * 20);
-                    const opacity = 0.5 + Math.random() * 0.5;
+                    const duration = 7 + Math.random() * 10;
+                    const size = isLogo ? (35 + Math.random() * 25) : (10 + Math.random() * 20);
+                    const opacity = 0.4 + Math.random() * 0.5;
 
                     const newFlake = { id, left, duration, size, isLogo, opacity };
-                    setFlakes(prev => [...prev.slice(-30), newFlake]);
+                    setFlakes(prev => [...prev.slice(-35), newFlake]);
                 };
 
-                const interval = setInterval(createFlake, 800);
+                const interval = setInterval(createFlake, 600);
                 return () => clearInterval(interval);
             }, []);
 
             return (
-                <div className="snow-overlay">
+                <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[9999]">
                     {flakes.map(flake => (
                         <div 
                             key={flake.id}
@@ -122,7 +190,7 @@
                             }}
                         >
                             {flake.isLogo ? (
-                                <img src={XMAS_LOGO} className="w-full h-full object-contain" />
+                                <img src={LOGO_XMAS} className="w-full h-full object-contain" />
                             ) : (
                                 <div className="text-white text-xl">❄</div>
                             )}
@@ -132,11 +200,23 @@
             );
         };
 
+        const LogoFlip = ({ isXmas, onClick, sizeClass = "h-24 w-48" }) => (
+            <div className={`logo-container mx-auto ${sizeClass} ${isXmas ? 'is-flipped' : ''}`} onClick={onClick}>
+                <div className="logo-flip-inner h-full w-full">
+                    <div className="logo-front">
+                        <img src={LOGO_NORMAL} className="h-full w-full object-contain" alt="Normal Logo" />
+                    </div>
+                    <div className="logo-back">
+                        <img src={LOGO_XMAS} className="h-full w-full object-contain" alt="Xmas Logo" />
+                    </div>
+                </div>
+            </div>
+        );
+
         const SafeIcon = ({ name, className = "w-5 h-5" }) => {
             try {
                 const IconComp = window.lucide ? window.lucide[name] : null;
-                if (!IconComp) return <div className={className}></div>;
-                return <IconComp className={className} />;
+                return IconComp ? <IconComp className={className} /> : <div className={className}></div>;
             } catch (e) { return <div className={className}></div>; }
         };
 
@@ -146,23 +226,26 @@
             const [logs, setLogs] = useState([]);
             const [isInitializing, setIsInitializing] = useState(true);
             const [isSyncing, setIsSyncing] = useState(false);
+            const [isXmas, setIsXmas] = useState(false);
+            const [isBursting, setIsBursting] = useState(false);
+            
             const [showTimePicker, setShowTimePicker] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
             const [selHour, setSelHour] = useState(new Date().getHours());
             const [selMin, setSelMin] = useState(0);
             const googleBtnRef = useRef(null);
 
-            const calculateDecimalTime = (h, m) => {
-                const decimal = h + (m / 60);
-                const parts = decimal.toFixed(2).split('.');
-                return parts[0].padStart(2, '0') + '.' + parts[1];
+            const toggleTheme = () => {
+                const nextMode = !isXmas;
+                setIsXmas(nextMode);
+                if (nextMode) {
+                    setIsBursting(true);
+                }
             };
 
-            const getPayrollPeriod = () => {
-                const now = new Date();
-                const day = now.getDate();
-                const month = now.toLocaleString('default', { month: 'short' });
-                return day <= 15 ? `${month} 1 - 15, 2025` : `${month} 16 - End, 2025`;
+            const calculateDecimalTime = (h, m) => {
+                const decimal = h + (m / 60);
+                return (Math.floor(decimal * 100) / 100).toFixed(2).padStart(5, '0');
             };
 
             const checkUserStatus = async (userObj) => {
@@ -196,14 +279,10 @@
             }, [isInitializing, user]);
 
             const handleResponse = (response) => {
-                try {
-                    const profile = JSON.parse(atob(response.credential.split('.')[1]));
-                    const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
-                    setUser(newUser);
-                    checkUserStatus(newUser);
-                } catch (e) {
-                    console.error("Auth error:", e);
-                }
+                const profile = JSON.parse(atob(response.credential.split('.')[1]));
+                const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
+                setUser(newUser);
+                checkUserStatus(newUser);
             };
 
             const confirmClockAction = async () => {
@@ -224,120 +303,139 @@
 
             if (isInitializing) {
                 return (
-                    <div className="min-h-screen flex flex-col items-center justify-center">
-                        <img src={XMAS_LOGO} className="h-20 mb-4 animate-bounce" />
-                        <p className="text-white xmas-font text-2xl tracking-widest">Loading Sleigh...</p>
+                    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+                        <img src={LOGO_NORMAL} className="h-20 mb-4 animate-pulse" />
+                        <p className="text-slate-400 font-black text-xs uppercase tracking-[0.3em]">Connecting securely...</p>
                     </div>
                 );
             }
 
-            if (!user) return (
-                <div className="min-h-screen flex items-center justify-center p-6">
-                    <Snowfall />
-                    <div className="bg-white rounded-[3rem] shadow-2xl p-12 text-center max-w-sm w-full relative z-50 festive-card">
-                        <img src={XMAS_LOGO} className="h-24 mx-auto mb-6 drop-shadow-xl" />
-                        <h1 className="text-4xl font-black text-red-700 xmas-font mb-2">Holiday Portal</h1>
-                        <p className="text-slate-500 text-sm font-medium mb-10 italic">Checking the shift list twice...</p>
-                        <div className="flex justify-center" ref={googleBtnRef}></div>
-                    </div>
-                </div>
-            );
-
             return (
-                <div className="p-4 md:p-10 max-w-2xl mx-auto w-full relative">
-                    <Snowfall />
-                    {showTimePicker && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-green-900/90 backdrop-blur-md p-4">
-                            <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-8 border-4 border-red-600">
-                                <h2 className="text-2xl font-black text-red-700 xmas-font text-center uppercase mb-6">Confirm {pendingAction} Time</h2>
-                                <div className="flex justify-center gap-4 mb-8">
-                                    <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
-                                        {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
-                                    </select>
-                                    <div className="text-2xl font-black mt-4 text-slate-300">:</div>
-                                    <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
-                                        {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
-                                    </select>
-                                </div>
-                                <button onClick={confirmClockAction} className={`w-full py-4 rounded-2xl font-black text-white shadow-lg ${pendingAction === 'IN' ? 'bg-green-600 shadow-green-200' : 'bg-red-600 shadow-red-200'}`}>CONFIRM</button>
-                                <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400 uppercase text-xs mt-2">Cancel</button>
-                            </div>
-                        </div>
+                <div className={`min-h-screen transition-colors duration-700 ${isXmas ? 'bg-[#0a2e1a]' : 'bg-slate-50'}`}>
+                    {isXmas && (
+                        <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at center, #1a472a 0%, #0a2e1a 100%)' }}></div>
                     )}
+                    {isXmas && <Snowfall />}
+                    {isBursting && <SnowBurst onComplete={() => setIsBursting(false)} />}
 
-                    <div className="flex items-center justify-between mb-8 bg-white/95 p-5 rounded-[2rem] shadow-lg border-2 border-red-100">
-                        <div className="flex items-center gap-4">
-                            <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-red-200" referrerPolicy="no-referrer" />
-                            <div>
-                                <p className="text-sm font-black text-slate-800 leading-none">{user.name}</p>
-                                <p className="text-[10px] text-green-700 font-bold uppercase mt-1">Festive Mode Active 🎄</p>
+                    {!user ? (
+                        <div className="min-h-screen flex items-center justify-center p-6 relative z-10">
+                            <div className={`rounded-[3rem] shadow-2xl p-12 text-center max-w-sm w-full border-4 transition-all duration-500 ${isXmas ? 'bg-white border-red-600' : 'bg-white border-slate-100'}`}>
+                                <LogoFlip isXmas={isXmas} onClick={toggleTheme} />
+                                <h1 className={`text-3xl font-black uppercase mt-6 mb-2 tracking-tight ${isXmas ? 'text-red-700 xmas-font text-4xl' : 'text-slate-800'}`}>
+                                    {isXmas ? 'Holiday Portal' : 'Technician Portal'}
+                                </h1>
+                                <p className={`text-sm font-medium mb-10 ${isXmas ? 'text-slate-500 italic' : 'text-slate-400'}`}>
+                                    {isXmas ? 'Checking the list twice...' : 'Sign in with your work email.'}
+                                </p>
+                                <div className="flex justify-center" ref={googleBtnRef}></div>
                             </div>
                         </div>
-                        <button onClick={() => setUser(null)} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><SafeIcon name="LogOut" /></button>
-                    </div>
-
-                    <div className="bg-white/95 rounded-[2.5rem] shadow-2xl border-4 border-red-600 overflow-hidden mb-8">
-                        <div className="bg-red-700 p-8 text-white flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <div className={`p-3 rounded-xl ${status === 'clocked_in' ? 'bg-green-500' : 'bg-red-900'}`}><SafeIcon name="UserCheck" /></div>
-                                <div><p className="text-red-200 text-[10px] font-bold uppercase mb-1">Shift Status</p><p className="text-xl font-black xmas-font tracking-wider">{status === 'clocked_in' ? 'Working Hard!' : 'At the North Pole'}</p></div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-red-200 text-[10px] font-bold uppercase mb-1">Period</p>
-                                <p className="text-xs font-black">{getPayrollPeriod()}</p>
-                            </div>
-                        </div>
-                        <div className="p-10">
-                            {isSyncing && <div className="flex items-center justify-center gap-2 mb-8 text-green-700 font-black text-xs animate-pulse uppercase tracking-widest"><SafeIcon name="Loader2" className="animate-spin" />Syncing with Santa...</div>}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                <button disabled={status === 'clocked_in' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className="p-12 rounded-[2rem] border-4 border-green-50 hover:border-green-600 transition-all flex flex-col items-center bg-white group disabled:opacity-30 active:scale-95">
-                                    <div className="p-5 bg-green-50 text-green-600 rounded-3xl mb-4 group-hover:bg-green-600 group-hover:text-white transition-colors"><SafeIcon name="LogIn" className="w-10 h-10" /></div>
-                                    <span className="font-black text-slate-800 xmas-font text-2xl uppercase">Clock In</span>
-                                </button>
-                                <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className="p-12 rounded-[2rem] border-4 border-red-50 hover:border-red-600 transition-all flex flex-col items-center bg-white group disabled:opacity-30 active:scale-95">
-                                    <div className="p-5 bg-red-50 text-red-600 rounded-3xl mb-4 group-hover:bg-red-600 group-hover:text-white transition-colors"><SafeIcon name="LogOut" className="w-10 h-10" /></div>
-                                    <span className="font-black text-slate-800 xmas-font text-2xl uppercase">Clock Out</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white/95 rounded-[2rem] border-2 border-green-600 shadow-lg overflow-hidden mb-12">
-                        <div className="p-6 bg-green-50/50 border-b border-green-100 flex items-center justify-between">
-                            <div className="flex items-center gap-3 font-black text-green-800 uppercase text-xs tracking-widest">
-                                <SafeIcon name="History" className="text-red-600" />
-                                Recent Gift Wraps
-                            </div>
-                            <span className="text-[10px] font-black text-green-600 bg-green-100 px-2 py-1 rounded-lg">{logs.length} Entries</span>
-                        </div>
-                        <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto no-scrollbar">
-                            {logs.length === 0 ? (
-                                <p className="text-center text-slate-400 font-bold text-[10px] uppercase py-8 tracking-widest">No activity found in the workshop</p>
-                            ) : logs.map((log, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-red-50 shadow-sm animate-in slide-in-from-bottom-2">
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                                            <SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} />
+                    ) : (
+                        <div className="p-4 md:p-10 max-w-2xl mx-auto w-full relative z-10">
+                            {showTimePicker && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
+                                    <div className={`bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-8 border-4 ${isXmas ? 'border-red-600' : 'border-slate-100'}`}>
+                                        <h2 className={`text-2xl font-black text-center uppercase mb-6 ${isXmas ? 'text-red-700 xmas-font' : 'text-slate-800'}`}>Confirm {pendingAction} Time</h2>
+                                        <div className="flex justify-center gap-4 mb-8">
+                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-200 outline-none">
+                                                {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
+                                            </select>
+                                            <div className="text-2xl font-black mt-4 text-slate-300">:</div>
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-200 outline-none">
+                                                {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
+                                            </select>
                                         </div>
+                                        <button onClick={confirmClockAction} className={`w-full py-4 rounded-2xl font-black text-white shadow-lg ${pendingAction === 'IN' ? (isXmas ? 'bg-green-600' : 'bg-green-500') : (isXmas ? 'bg-red-600' : 'bg-red-500')}`}>CONFIRM</button>
+                                        <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400 uppercase text-xs mt-2">Cancel</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Header */}
+                            <div className={`flex items-center justify-between mb-8 p-5 rounded-[2rem] shadow-lg border-2 transition-all ${isXmas ? 'bg-white/95 border-red-100' : 'bg-white border-slate-100'}`}>
+                                <div className="flex items-center gap-4">
+                                    <img src={user.picture} className={`w-12 h-12 rounded-xl border-2 ${isXmas ? 'border-red-200' : 'border-slate-100'}`} referrerPolicy="no-referrer" />
+                                    <div>
+                                        <p className="text-sm font-black text-slate-800 leading-none">{user.name}</p>
+                                        <p className={`text-[10px] font-bold uppercase mt-1 ${isXmas ? 'text-green-700' : 'text-orange-600'}`}>
+                                            {isXmas ? 'Festive Mode Active 🎄' : 'Verified Technician'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-12 h-8 scale-50">
+                                        <LogoFlip isXmas={isXmas} onClick={toggleTheme} sizeClass="h-full w-full" />
+                                    </div>
+                                    <button onClick={() => setUser(null)} className="p-2 text-slate-300 hover:text-red-500 transition-colors"><SafeIcon name="LogOut" /></button>
+                                </div>
+                            </div>
+
+                            {/* Status Card */}
+                            <div className={`rounded-[2.5rem] shadow-2xl border-4 overflow-hidden mb-8 transition-all ${isXmas ? 'bg-white/95 border-red-600' : 'bg-white border-slate-100'}`}>
+                                <div className={`p-8 text-white flex justify-between items-center transition-colors ${isXmas ? 'bg-red-700' : 'bg-slate-900'}`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className={`p-3 rounded-xl ${status === 'clocked_in' ? 'bg-green-500' : (isXmas ? 'bg-red-900' : 'bg-slate-800')}`}><SafeIcon name="UserCheck" /></div>
                                         <div>
-                                            <p className="text-sm font-black text-slate-800 uppercase leading-none">{log.type === 'IN' ? 'Shift Started' : 'Shift Ended'}</p>
-                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{log.date} @ {log.time}</p>
+                                            <p className="text-slate-300 text-[10px] font-bold uppercase mb-1">Shift Status</p>
+                                            <p className={`text-xl font-black tracking-wider ${isXmas ? 'xmas-font' : ''}`}>
+                                                {status === 'clocked_in' ? (isXmas ? 'Working Hard!' : 'SHIFT ACTIVE') : (isXmas ? 'At the North Pole' : 'OFF DUTY')}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-lg font-black text-slate-800 leading-none">{log.decimal}</p>
-                                        <p className="text-[9px] font-black text-red-300 uppercase mt-1">HR</p>
+                                        <p className="text-slate-300 text-[10px] font-bold uppercase mb-1">Duty Status</p>
+                                        <div className={`px-4 py-1.5 rounded-full font-black text-[10px] ${status === 'clocked_in' ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/50'}`}>
+                                            {status === 'clocked_in' ? '• ONLINE' : '• OFFLINE'}
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                                <div className="p-10">
+                                    {isSyncing && <div className={`flex items-center justify-center gap-2 mb-8 font-black text-xs animate-pulse uppercase tracking-widest ${isXmas ? 'text-green-700' : 'text-orange-500'}`}><SafeIcon name="Loader2" className="animate-spin" /> {isXmas ? "Syncing Workshop..." : 'Syncing Data...'}</div>}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                        <button disabled={status === 'clocked_in' || isSyncing} onClick={() => {setPendingAction('IN'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-30 active:scale-95 ${isXmas ? 'border-green-50 hover:border-green-600' : 'border-slate-50 hover:border-green-500'}`}>
+                                            <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-green-50 text-green-600 group-hover:bg-green-600' : 'bg-green-50 text-green-600 group-hover:bg-green-500'}`}><SafeIcon name="LogIn" className="w-10 h-10" /></div>
+                                            <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock In</span>
+                                        </button>
+                                        <button disabled={(status === 'idle' && logs.length === 0 && status !== 'clocked_in') || isSyncing} onClick={() => {setPendingAction('OUT'); setShowTimePicker(true);}} className={`p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-30 active:scale-95 ${isXmas ? 'border-red-50 hover:border-red-600' : 'border-slate-50 hover:border-red-500'}`}>
+                                            <div className={`p-5 rounded-3xl mb-4 group-hover:text-white transition-colors ${isXmas ? 'bg-red-50 text-red-600 group-hover:bg-red-600' : 'bg-red-50 text-red-600 group-hover:bg-red-500'}`}><SafeIcon name="LogOut" className="w-10 h-10" /></div>
+                                            <span className={`font-black text-slate-800 text-2xl uppercase ${isXmas ? 'xmas-font' : ''}`}>Clock Out</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div className="text-center pb-12 opacity-80">
-                        <img src={XMAS_LOGO} className="h-16 mx-auto mb-4 drop-shadow-lg" />
-                        <p className="text-white xmas-font text-3xl tracking-wider">Merry Christmas Brandon!</p>
-                        <p className="text-green-300 text-[10px] font-black uppercase tracking-[0.5em] mt-2">Skedaddle Holiday Operations</p>
-                    </div>
+                            <div className={`rounded-[2rem] border-2 shadow-lg overflow-hidden mb-12 transition-all ${isXmas ? 'bg-white/95 border-green-600' : 'bg-white border-slate-200'}`}>
+                                <div className={`p-6 border-b flex items-center justify-between ${isXmas ? 'bg-green-50/50 border-green-100' : 'bg-slate-50 border-slate-100'}`}>
+                                    <div className="flex items-center gap-3 font-black uppercase text-xs tracking-widest">
+                                        <SafeIcon name="History" className={isXmas ? 'text-red-600' : 'text-orange-500'} />
+                                        {isXmas ? 'Recent Gift Wraps' : 'Shift History'}
+                                    </div>
+                                    <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${isXmas ? 'text-green-600 bg-green-100' : 'text-slate-400 bg-slate-200'}`}>{logs.length} Records</span>
+                                </div>
+                                <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto no-scrollbar">
+                                    {logs.length === 0 ? <p className="text-center text-slate-400 font-bold text-[10px] uppercase py-8 tracking-widest">No activity found</p> : logs.map((log, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-5 rounded-2xl bg-white border border-slate-100 shadow-sm">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${log.type === 'IN' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}><SafeIcon name={log.type === 'IN' ? 'CheckCircle2' : 'LogOut'} /></div>
+                                                <div><p className="text-sm font-black text-slate-800 uppercase leading-none">{log.type === 'IN' ? 'Shift Started' : 'Shift Ended'}</p><p className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{log.date} @ {log.time}</p></div>
+                                            </div>
+                                            <div className="text-right"><p className="text-lg font-black text-slate-800 leading-none">{log.decimal}</p><p className="text-[9px] font-black text-slate-300 uppercase mt-1">HR</p></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="text-center pb-12 transition-all opacity-80 group">
+                                <div className="inline-block w-24 h-16 scale-75 group-hover:scale-100 transition-transform">
+                                    <LogoFlip isXmas={isXmas} onClick={toggleTheme} sizeClass="h-full w-full" />
+                                </div>
+                                <p className={`font-black uppercase tracking-[0.5em] mt-4 transition-all ${isXmas ? 'text-white xmas-font text-3xl' : 'text-slate-300 text-[10px]'}`}>
+                                    {isXmas ? 'Merry Christmas Brandon!' : 'Skedaddle Wildlife Control'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
