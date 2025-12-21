@@ -220,6 +220,7 @@
                 if (!userObj) return;
                 setIsSyncing(true);
                 try {
+                    // Standard GET to Apps Script works as long as redirection is allowed (browser default)
                     const response = await fetch(`${APPS_SCRIPT_URL}?name=${encodeURIComponent(userObj.name)}`);
                     const data = await response.json();
                     if (data.status) setStatus(data.status);
@@ -342,8 +343,12 @@
 
                 // 2. Sync to Spreadsheet
                 try {
+                    // IMPORTANT: mode: 'no-cors' is required for Apps Script POST requests
+                    // to bypass CORS preflight issues. We use text/plain to avoid preflight.
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
                         body: JSON.stringify({ 
                             email: user.email, 
                             name: user.name, 
@@ -352,11 +357,12 @@
                             note: actionNote
                         })
                     });
-                    // Refresh status after a delay to allow script to finish
+                    
+                    // Refresh status after a delay to allow script processing
                     setTimeout(() => {
                         setActionNote(""); 
                         checkUserStatus(user);
-                    }, 2000);
+                    }, 2500);
                 } catch (err) { 
                     console.error("Sync Error:", err);
                     setIsSyncing(false); 
@@ -369,10 +375,15 @@
                 try {
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
                         body: JSON.stringify({ email: user.email, name: user.name, type: 'GENERAL_NOTE', note: generalNote })
                     });
-                    setTimeout(() => checkUserStatus(user), 2000);
-                } catch (err) { setIsSyncing(false); }
+                    setTimeout(() => checkUserStatus(user), 2500);
+                } catch (err) { 
+                    console.error("General Note Error:", err);
+                    setIsSyncing(false); 
+                }
             };
 
             const isTimeValid = useMemo(() => {
