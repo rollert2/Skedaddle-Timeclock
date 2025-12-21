@@ -222,6 +222,7 @@
                 try {
                     // Standard GET to Apps Script works as long as redirection is allowed (browser default)
                     const response = await fetch(`${APPS_SCRIPT_URL}?name=${encodeURIComponent(userObj.name)}`);
+                    if (!response.ok) throw new Error('Network response was not ok');
                     const data = await response.json();
                     if (data.status) setStatus(data.status);
                     if (data.logs) {
@@ -343,8 +344,7 @@
 
                 // 2. Sync to Spreadsheet
                 try {
-                    // IMPORTANT: mode: 'no-cors' is required for Apps Script POST requests
-                    // to bypass CORS preflight issues. We use text/plain to avoid preflight.
+                    // mode: 'no-cors' is required to bypass preflight OPTIONS request
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -412,7 +412,7 @@
                     {!user ? (
                         <div className="min-h-screen flex items-center justify-center p-6 relative z-10">
                             <div className={`rounded-[3rem] shadow-2xl p-12 text-center max-w-sm w-full border-4 transition-all duration-500 ${isXmas ? 'bg-white border-red-600' : 'bg-white border-slate-100'}`}>
-                                <LogoFlip isXmas={isXmas} onClick={() => { setIsXmas(!isXmas); if (!isXmas) setIsBursting(true); }} />
+                                <LogoFlip isXmas={isXmas} onClick={() => { setIsXmas(!isXmas); if (!isXmas) setIsBursting(true); }} sizeClass="h-full w-full" />
                                 <h1 className={`text-3xl font-black uppercase mt-6 mb-2 tracking-tight ${isXmas ? 'text-red-700 xmas-font text-4xl' : 'text-slate-800'}`}>{isXmas ? 'Holiday Portal' : 'Technician Portal'}</h1>
                                 <p className={`text-sm font-medium mb-10 ${isXmas ? 'text-slate-500 italic' : 'text-slate-400'}`}>{isXmas ? 'Checking the list twice...' : 'Sign in with your work email.'}</p>
                                 <button onClick={handleLogin} className="google-btn">
