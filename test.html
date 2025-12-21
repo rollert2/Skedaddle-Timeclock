@@ -184,6 +184,10 @@
             const [isXmas, setIsXmas] = useState(false);
             const [isBursting, setIsBursting] = useState(false);
             
+            // Auth State for Gmail
+            const [accessToken, setAccessToken] = useState(null);
+            const [tokenClient, setTokenClient] = useState(null);
+
             const [showTimePicker, setShowTimePicker] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
             const [selHour, setSelHour] = useState(new Date().getHours());
@@ -206,7 +210,6 @@
                     if (data.status) setStatus(data.status);
                     if (data.logs) {
                         setLogs(data.logs);
-                        // Find today's note and populate generalNote if present
                         const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
                         const todayLog = data.logs.find(l => l.date === todayStr);
                         if (todayLog && todayLog.notes) {
@@ -223,7 +226,26 @@
                 script.async = true;
                 script.onload = () => {
                     if (window.google) {
-                        window.google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleResponse, auto_select: false });
+                        // Initialize Sign In
+                        window.google.accounts.id.initialize({ 
+                            client_id: CLIENT_ID, 
+                            callback: handleResponse, 
+                            auto_select: false 
+                        });
+
+                        // Initialize Token Client for Gmail Permissions
+                        const client = window.google.accounts.oauth2.initTokenClient({
+                            client_id: CLIENT_ID,
+                            scope: 'https://www.googleapis.com/auth/gmail.send',
+                            callback: (tokenResponse) => {
+                                if (tokenResponse.error !== undefined) {
+                                    console.error("Token error:", tokenResponse.error);
+                                    return;
+                                }
+                                setAccessToken(tokenResponse.access_token);
+                            },
+                        });
+                        setTokenClient(client);
                         setIsInitializing(false);
                     }
                 };
@@ -245,7 +267,60 @@
                     const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
                     setUser(newUser);
                     checkUserStatus(newUser);
+
+                    // Prompt for Gmail permission immediately upon login
+                    if (tokenClient) {
+                        tokenClient.requestAccessToken({ prompt: 'consent' });
+                    }
                 } catch (e) { console.error("Auth error:", e); }
+            };
+
+            const sendEmailAsUser = async (action, time, note) => {
+                // If we don't have an access token yet, we must request it
+                if (!accessToken) {
+                    if (tokenClient) {
+                        tokenClient.requestAccessToken();
+                    }
+                    return false;
+                }
+
+                const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const subjectAction = (action === "IN") ? "Start Time" : "End Time";
+                const actionLabel = (action === "IN") ? "CLOCK IN" : "CLOCK OUT";
+                const subject = `${user.name} - ${subjectAction} - ${dateStr}`;
+                
+                const message = [
+                    `To: ${SUPERVISOR_EMAIL}`,
+                    `Subject: ${subject}`,
+                    'Content-Type: text/plain; charset="UTF-8"',
+                    '',
+                    `${actionLabel}`,
+                    `Time - ${time}`,
+                    `Notes - ${note || "None"}`,
+                    '',
+                    'Automated Email via Timeclock App'
+                ].join('\n');
+
+                // Base64url encoding
+                const encodedEmail = btoa(unescape(encodeURIComponent(message)))
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, '');
+
+                try {
+                    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ raw: encodedEmail })
+                    });
+                    return res.ok;
+                } catch (err) {
+                    console.error("Gmail API Error:", err);
+                    return false;
+                }
             };
 
             const openTimePicker = (action) => {
@@ -265,6 +340,17 @@
                 const decimalValue = calculateDecimalTime(selHour, selMin);
                 setShowTimePicker(false);
                 setIsSyncing(true);
+
+                // 1. Send Email via Gmail API (From User)
+                const emailSent = await sendEmailAsUser(pendingAction, decimalValue, actionNote);
+                if (!emailSent && !accessToken) {
+                    // This happens if the user hasn't granted permissions yet
+                    // requestAccessToken will have popped up
+                    setIsSyncing(false);
+                    return;
+                }
+
+                // 2. Sync to Spreadsheet
                 try {
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
@@ -295,7 +381,6 @@
                 } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
             };
 
-            // Validation logic for Clock Out time
             const isTimeValid = useMemo(() => {
                 if (pendingAction !== 'OUT') return true;
                 const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
@@ -366,7 +451,11 @@
                             <div className={`flex items-center justify-between mb-8 p-5 rounded-[2rem] shadow-lg border-2 transition-all ${isXmas ? 'bg-white/95 border-red-100' : 'bg-white border-slate-100'}`}>
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className={`w-12 h-12 rounded-xl border-2 ${isXmas ? 'border-red-200' : 'border-slate-100'}`} referrerPolicy="no-referrer" />
-                                    <div><p className="text-sm font-black text-slate-800 leading-none">{user.name}</p><p className={`text-[10px] font-bold uppercase mt-1 ${isXmas ? 'text-green-700' : 'text-orange-600'}`}>{isXmas ? 'Festive Mode Active 🎄' : 'Verified Technician'}</p></div>
+                                    <div>
+                                        <p className="text-sm font-black text-slate-800 leading-none">{user.name}</p>
+                                        <p className={`text-[10px] font-bold uppercase mt-1 ${isXmas ? 'text-green-700' : 'text-orange-600'}`}>{isXmas ? 'Festive Mode Active 🎄' : 'Verified Technician'}</p>
+                                        {!accessToken && <p className="text-[8px] text-red-500 font-black animate-pulse">Email Auth Needed</p>}
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-12 h-8 scale-50"><LogoFlip isXmas={isXmas} onClick={() => { setIsXmas(!isXmas); if (!isXmas) setIsBursting(true); }} sizeClass="h-full w-full" /></div>
