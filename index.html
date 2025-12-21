@@ -58,7 +58,7 @@
         }
 
         @keyframes burst {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            0 { transform: translate(-50%, -50%) scale(0); opacity: 1; }
             100% { transform: translate(var(--tw-x), var(--tw-y)) scale(1.5); opacity: 0; }
         }
 
@@ -112,6 +112,7 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_NORMAL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const LOGO_XMAS = "https://i.imgur.com/zdJfkpg.png";
+        const SUPERVISOR_EMAIL = "magicbran@gmail.com";
 
         const SnowBurst = ({ onComplete }) => {
             const particles = useMemo(() => Array.from({ length: 40 }).map((_, i) => ({
@@ -281,24 +282,38 @@
 
             const confirmClockAction = async () => {
                 const decimalValue = calculateDecimalTime(selHour, selMin);
+                const actionType = pendingAction;
+                const prevStatus = status;
+                
                 setShowTimePicker(false);
                 setIsSyncing(true);
+                
+                // Optimistic UI update to prevent "reverting" feeling
+                setStatus(actionType === 'IN' ? 'clocked_in' : 'clocked_out');
+
                 try {
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
+                        cache: 'no-cache',
                         body: JSON.stringify({ 
                             email: user.email, 
                             name: user.name, 
-                            type: pendingAction, 
+                            type: actionType, 
                             decimalTime: decimalValue,
                             note: actionNote,
                             userAccessToken: accessToken 
                         })
                     });
+                    
                     setActionNote(""); 
-                    setTimeout(() => checkUserStatus(user), 2500);
-                } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
+                    // Increase delay to ensure Sheets calculation and script hooks finished
+                    setTimeout(() => checkUserStatus(user), 3500);
+                } catch (err) { 
+                    console.error("Sync failed:", err);
+                    setStatus(prevStatus); // Revert on failure
+                    setIsSyncing(false); 
+                }
             };
 
             const syncGeneralNote = async () => {
@@ -308,10 +323,14 @@
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
+                        cache: 'no-cache',
                         body: JSON.stringify({ email: user.email, name: user.name, type: 'GENERAL_NOTE', note: generalNote })
                     });
-                    setTimeout(() => checkUserStatus(user), 2500);
-                } catch (err) { alert("Sync failed!"); setIsSyncing(false); }
+                    setTimeout(() => checkUserStatus(user), 3000);
+                } catch (err) { 
+                    console.error("Note sync failed:", err);
+                    setIsSyncing(false); 
+                }
             };
 
             const isTimeValid = useMemo(() => {
@@ -357,7 +376,7 @@
                                                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
                                             </select>
                                             <div className="text-2xl font-black mt-4 text-slate-300">:</div>
-                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-200 outline-none">
                                                 {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                             </select>
                                         </div>
