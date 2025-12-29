@@ -139,7 +139,6 @@
         const LOGO_XMAS = "https://i.imgur.com/zdJfkpg.png";
         const SUPERVISOR_EMAIL = "magicbran@gmail.com";
         
-        // MANUAL URL - Google Drive Shared Link
         const MANUAL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing"; 
 
         const Icons = {
@@ -154,7 +153,70 @@
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
             ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
             ShieldCheck: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>,
-            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>
+            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>,
+            ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        };
+
+        // TECHNICAL DATABASE
+        const SPECIES_DATA = {
+            'Raccoons': {
+                icon: '🐾',
+                color: 'blue',
+                bio: 'Dexterous, intelligent, and strong. Usually nocturnal but active during birthing seasons.',
+                entry: 'Roof vents, soffit gaps, roof-wall junctions, and chimneys.',
+                method: 'Humane removal using one-way doors. Physical removal of offspring followed by relocation to mother.'
+            },
+            'Squirrels': {
+                icon: '🥜',
+                color: 'orange',
+                bio: 'Extremely fast and persistent chewers. Diurnal activity (daytime).',
+                entry: 'Fascia boards, roof corners, cedar siding, and plastic roof vents.',
+                method: 'One-way exclusion doors. Heavy-duty galvanized mesh screening on all secondary potential spots.'
+            },
+            'Bats': {
+                icon: '🦇',
+                color: 'slate',
+                bio: 'Protected species. Can fit through gaps as small as 1/4 inch.',
+                entry: 'Ridge vents, brick-soffit gaps, chimney flashing, and gable vents.',
+                method: 'Check valves or netting curtains (one-way exit). Seasonal restrictions apply for maternity colonies.'
+            },
+            'Birds': {
+                icon: '🐦',
+                color: 'red',
+                bio: 'Commonly nest in ventilation systems. Can carry parasites and create fire hazards.',
+                entry: 'Bathroom exhaust vents, stove vents, and dryer vents.',
+                method: 'Removal of nesting material, sanitation of the area, and installation of bird-proof vent covers.'
+            }
+        };
+
+        const PROCEDURE_DATA = {
+            'Exclusion': {
+                summary: 'Creating a permanent barrier between wildlife and the structure.',
+                steps: [
+                    'Identify all primary and secondary entry points.',
+                    'Use 16-gauge 1x1 inch galvanized steel mesh.',
+                    'Bolt mesh into structural members (not just shingles).',
+                    'Ensure 2-3 inch overlap on all sides of the gap.'
+                ]
+            },
+            'One-Way Doors': {
+                summary: 'Allowing animals to exit safely without the ability to return.',
+                steps: [
+                    'Install door directly over the primary entry hole.',
+                    'Seal all other gaps in the immediate area first.',
+                    'Verify door tension is appropriate for the target species.',
+                    'Perform a follow-up check after 3-7 days.'
+                ]
+            },
+            'Decontamination': {
+                summary: 'Cleaning and sanitizing areas affected by wildlife waste.',
+                steps: [
+                    'Don full PPE (Tyvek suit, N95/P100 respirator, gloves).',
+                    'Remove heavily soiled insulation or debris.',
+                    'Fog or spray area with professional-grade antimicrobial.',
+                    'HEPA vacuum remaining fine particulates.'
+                ]
+            }
         };
 
         const SnowBurst = ({ onComplete }) => {
@@ -211,7 +273,7 @@
                         <img src={LOGO_NORMAL} className="w-full h-full object-contain" alt="Normal Logo" />
                     </div>
                     <div className="logo-back">
-                        <img src={LOGO_XMAS} className="h-full w-full object-contain" alt="Xmas Logo" />
+                        <img src={LOGO_XMAS} className="w-full h-full object-contain" alt="Xmas Logo" />
                     </div>
                 </div>
             </div>
@@ -228,6 +290,7 @@
                 return saved ? JSON.parse(saved) : null;
             });
             const [activeTab, setActiveTab] = useState('clock');
+            const [selectedDetail, setSelectedDetail] = useState(null); // { type: 'species'|'procedure', id: string }
             const [status, setStatus] = useState('idle');
             const [logs, setLogs] = useState([]);
             const [isInitializing, setIsInitializing] = useState(true);
@@ -538,10 +601,10 @@
                                 </div>
                             </div>
 
-                            {/* Navigation Bar Integrated in Layout */}
+                            {/* Navigation Bar */}
                             <div className="mb-8 bg-slate-900/95 backdrop-blur-md text-white rounded-full p-2 flex gap-2 shadow-2xl border-4 border-white/10 w-full max-w-sm mx-auto">
                                 <button 
-                                    onClick={() => setActiveTab('clock')}
+                                    onClick={() => { setActiveTab('clock'); setSelectedDetail(null); }}
                                     className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full font-black text-[10px] uppercase tracking-[0.15em] transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'hover:bg-white/5 text-white/40'}`}
                                 >
                                     <SafeIcon name="Clock" className="w-4 h-4" />
@@ -622,62 +685,129 @@
                                 </>
                             ) : (
                                 <div className="space-y-6">
-                                    {/* Main Manual Link Card */}
-                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border-4 border-slate-100 overflow-hidden relative group hub-card">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500"></div>
-                                        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-4 bg-orange-500 text-white rounded-3xl shadow-lg shadow-orange-200"><SafeIcon name="FileText" className="w-8 h-8" /></div>
+                                    {selectedDetail ? (
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border-4 border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                            <button onClick={() => setSelectedDetail(null)} className="flex items-center gap-2 text-slate-400 hover:text-slate-800 transition-colors font-black uppercase text-[10px] tracking-widest mb-6">
+                                                <SafeIcon name="ArrowLeft" className="w-3 h-3" /> Back to Hub
+                                            </button>
+                                            
+                                            {selectedDetail.type === 'species' ? (
                                                 <div>
-                                                    <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Technical Manual</h3>
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Wildlife Control Guide</p>
+                                                    <div className="flex items-center gap-4 mb-8">
+                                                        <div className="text-5xl">{SPECIES_DATA[selectedDetail.id].icon}</div>
+                                                        <div>
+                                                            <h3 className="text-3xl font-black text-slate-800">{selectedDetail.id}</h3>
+                                                            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Wildlife Reference Card</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-6">
+                                                        <div className="p-5 bg-slate-50 rounded-2xl">
+                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Biology & Behavior</p>
+                                                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{SPECIES_DATA[selectedDetail.id].bio}</p>
+                                                        </div>
+                                                        <div className="p-5 bg-orange-50 rounded-2xl">
+                                                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">Common Entry Points</p>
+                                                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{SPECIES_DATA[selectedDetail.id].entry}</p>
+                                                        </div>
+                                                        <div className="p-5 bg-blue-50 rounded-2xl">
+                                                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">The Skedaddle Method</p>
+                                                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{SPECIES_DATA[selectedDetail.id].method}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <div className="flex items-center gap-4 mb-8">
+                                                        <div className="p-4 bg-green-500 text-white rounded-3xl">
+                                                            <SafeIcon name="Hammer" className="w-8 h-8" />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-3xl font-black text-slate-800">{selectedDetail.id}</h3>
+                                                            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Step-by-Step Guide</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-6">
+                                                        <div className="p-5 bg-slate-50 rounded-2xl italic">
+                                                            <p className="text-sm text-slate-600 leading-relaxed font-medium">"{PROCEDURE_DATA[selectedDetail.id].summary}"</p>
+                                                        </div>
+                                                        <div className="space-y-4">
+                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Technical Execution Checklist</p>
+                                                            {PROCEDURE_DATA[selectedDetail.id].steps.map((step, i) => (
+                                                                <div key={i} className="flex gap-4 items-start p-4 bg-white border-2 border-slate-50 rounded-2xl">
+                                                                    <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
+                                                                    <p className="text-sm text-slate-700 font-bold leading-snug">{step}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {/* Main Manual Link Card */}
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border-4 border-slate-100 overflow-hidden relative group hub-card">
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500"></div>
+                                                <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="p-4 bg-orange-500 text-white rounded-3xl shadow-lg shadow-orange-200"><SafeIcon name="FileText" className="w-8 h-8" /></div>
+                                                        <div>
+                                                            <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Full Manual</h3>
+                                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Complete Technical Reference</p>
+                                                        </div>
+                                                    </div>
+                                                    <a href={MANUAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-8 py-4 bg-slate-900 hover:bg-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
+                                                        Open PDF <SafeIcon name="ExternalLink" className="w-4 h-4" />
+                                                    </a>
                                                 </div>
                                             </div>
-                                            <a href={MANUAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-8 py-4 bg-slate-900 hover:bg-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
-                                                Open Full PDF <SafeIcon name="ExternalLink" className="w-4 h-4" />
-                                            </a>
-                                        </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Species Reference Library */}
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-2 border-slate-100 hub-card">
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl"><SafeIcon name="Layout" /></div>
-                                                <h3 className="font-black uppercase tracking-wider text-slate-800">Species Library</h3>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {['Raccoons', 'Squirrels', 'Bats', 'Birds'].map(species => (
-                                                    <button key={species} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-300 transition-all text-left group">
-                                                        <p className="font-black text-slate-800 text-xs">{species}</p>
-                                                        <p className="text-[9px] font-bold text-slate-400 uppercase mt-1 group-hover:text-blue-500">Quick Specs</p>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                {/* Species Reference Library */}
+                                                <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-2 border-slate-100 hub-card">
+                                                    <div className="flex items-center gap-3 mb-6">
+                                                        <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl"><SafeIcon name="Layout" /></div>
+                                                        <h3 className="font-black uppercase tracking-wider text-slate-800">Quick Species Specs</h3>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        {Object.keys(SPECIES_DATA).map(species => (
+                                                            <button 
+                                                                key={species} 
+                                                                onClick={() => setSelectedDetail({ type: 'species', id: species })}
+                                                                className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-300 transition-all text-left group"
+                                                            >
+                                                                <div className="text-xl mb-1">{SPECIES_DATA[species].icon}</div>
+                                                                <p className="font-black text-slate-800 text-xs">{species}</p>
+                                                                <p className="text-[9px] font-bold text-slate-400 uppercase mt-1 group-hover:text-blue-500">View Reference</p>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
 
-                                        {/* Field Procedures */}
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-2 border-slate-100 hub-card">
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="p-3 bg-green-50 text-green-500 rounded-2xl"><SafeIcon name="Hammer" /></div>
-                                                <h3 className="font-black uppercase tracking-wider text-slate-800">Field SOPs</h3>
+                                                {/* Field Procedures */}
+                                                <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-2 border-slate-100 hub-card">
+                                                    <div className="flex items-center gap-3 mb-6">
+                                                        <div className="p-3 bg-green-50 text-green-500 rounded-2xl"><SafeIcon name="Hammer" /></div>
+                                                        <h3 className="font-black uppercase tracking-wider text-slate-800">Standard Guides</h3>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        {Object.keys(PROCEDURE_DATA).map(proc => (
+                                                            <button 
+                                                                key={proc}
+                                                                onClick={() => setSelectedDetail({ type: 'procedure', id: proc })}
+                                                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-300 transition-all text-left"
+                                                            >
+                                                                <span className="font-black text-slate-800 text-xs">{proc}</span>
+                                                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-300 group-hover:text-green-500 transition-colors">
+                                                                    <SafeIcon name="FileText" className="w-4 h-4" />
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="space-y-3">
-                                                <button className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-300 transition-all text-left">
-                                                    <span className="font-black text-slate-800 text-xs">Exclusion Techniques</span>
-                                                    <SafeIcon name="ShieldCheck" className="w-4 h-4 text-slate-300" />
-                                                </button>
-                                                <button className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-300 transition-all text-left">
-                                                    <span className="font-black text-slate-800 text-xs">One-Way Doors</span>
-                                                    <SafeIcon name="ExternalLink" className="w-4 h-4 text-slate-300" />
-                                                </button>
-                                                <button className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-300 transition-all text-left">
-                                                    <span className="font-black text-slate-800 text-xs">Decontamination</span>
-                                                    <SafeIcon name="Loader2" className="w-4 h-4 text-slate-300" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </>
+                                    )}
                                 </div>
                             )}
                             
