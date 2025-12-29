@@ -387,7 +387,6 @@
                                         </div>
                                         <div className="p-8">
                                             {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing Sheet...</div>}
-                                            
                                             {status === 'clocked_out' ? (
                                                 <div className="p-10 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up">
                                                     <Icons.Alert className="text-red-500 w-16 h-16 mx-auto mb-4" />
@@ -469,49 +468,61 @@
                                             </div>
 
                                             <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
-                                                {sortedCategoryNames.map(category => (
-                                                    <div key={category} className="space-y-2">
-                                                        <button 
-                                                            onClick={() => toggleCategory(category)}
-                                                            className="w-full flex items-center justify-between py-2 px-3 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-                                                        >
-                                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{category}</span>
-                                                            <Icons.ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
-                                                        </button>
-                                                        
-                                                        {expandedCategories.includes(category) && (
-                                                            <div className="space-y-3 animate-slide-up">
-                                                                {categorizedSupplies[category].map(item => (
-                                                                    <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50'}`}>
-                                                                        <div className="flex items-center gap-3">
-                                                                            <div 
-                                                                                onClick={() => toggleSupply(item.id)}
-                                                                                className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}
-                                                                            >
-                                                                                {item.checked && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                                                {sortedCategoryNames.map(category => {
+                                                    const categoryItems = categorizedSupplies[category];
+                                                    const selectedInCat = categoryItems.filter(i => i.checked).length;
+                                                    
+                                                    return (
+                                                        <div key={category} className="space-y-2">
+                                                            <button 
+                                                                onClick={() => toggleCategory(category)}
+                                                                className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>
+                                                                    {selectedInCat > 0 && (
+                                                                        <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">
+                                                                            + {selectedInCat}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
+                                                            </button>
+                                                            
+                                                            {expandedCategories.includes(category) && (
+                                                                <div className="space-y-3 animate-slide-up px-1">
+                                                                    {categoryItems.map(item => (
+                                                                        <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}>
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div 
+                                                                                    onClick={() => toggleSupply(item.id)}
+                                                                                    className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}
+                                                                                >
+                                                                                    {item.checked && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                                                                                </div>
+                                                                                <div className="flex-1">
+                                                                                    <p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p>
+                                                                                </div>
+                                                                                {item.category === 'Custom' && (
+                                                                                    <button onClick={() => deleteSupply(item.id)} className="p-1 text-slate-300 hover:text-red-500"><Icons.Trash className="w-4 h-4"/></button>
+                                                                                )}
                                                                             </div>
-                                                                            <div className="flex-1">
-                                                                                <p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p>
-                                                                            </div>
-                                                                            {item.category === 'Custom' && (
-                                                                                <button onClick={() => deleteSupply(item.id)} className="p-1 text-slate-300 hover:text-red-500"><Icons.Trash className="w-4 h-4"/></button>
+                                                                            {item.checked && (
+                                                                                <input 
+                                                                                    type="text" 
+                                                                                    placeholder="Add a note (e.g. 'Need 5 more')" 
+                                                                                    className="w-full mt-3 px-3 py-2 bg-white rounded-lg text-[10px] font-bold border border-orange-100 outline-none focus:border-orange-500 shadow-inner"
+                                                                                    value={item.note}
+                                                                                    onChange={e => updateSupplyNote(item.id, e.target.value)}
+                                                                                />
                                                                             )}
                                                                         </div>
-                                                                        {item.checked && (
-                                                                            <input 
-                                                                                type="text" 
-                                                                                placeholder="Add a note (e.g. 'Need 5 more')" 
-                                                                                className="w-full mt-3 px-3 py-2 bg-white rounded-lg text-[10px] font-bold border border-orange-100 outline-none focus:border-orange-500"
-                                                                                value={item.note}
-                                                                                onChange={e => updateSupplyNote(item.id, e.target.value)}
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
 
