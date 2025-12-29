@@ -67,7 +67,8 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const SUPERVISOR_EMAIL = "magicbran@gmail.com";
-        const MANUAL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing"; 
+        const MANUAL_BASE_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view"; 
+        const MANUAL_FULL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing";
 
         const Icons = {
             LogOut: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
@@ -80,21 +81,54 @@
             Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
             ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
-            Copy: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-            Shield: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>
         };
 
         const SPECIES_DATA = {
-            'Raccoons': { icon: '🐾', bio: 'Highly intelligent and strong. Baby season usually Feb-May.', entry: 'Roof vents, soffits, chimneys.', method: 'Exclusion + check valves.' },
-            'Squirrels': { icon: '🥜', bio: 'Constant chewers. Two litters per year (Spring/Fall).', entry: 'Roof corners, fascia, cedar siding.', method: 'One-way doors + mesh screening.' },
-            'Bats': { icon: '🦇', bio: 'Protected species. Maternal colonies active June-Aug.', entry: 'Ridge vents, brick gaps, gable vents.', method: 'Check valves / Netting.' },
-            'Birds': { icon: '🐦', bio: 'Nest in vents. Parasite & fire hazard risk.', entry: 'Bath/dryer vents, stove exhaust.', method: 'Cleaning + vent guard installation.' },
-            'Skunks': { icon: '🦨', bio: 'Burrowers. Non-aggressive unless trapped.', entry: 'Under decks, sheds, concrete porches.', method: 'Trenching + one-way doors.' }
+            'Raccoons': { 
+                icon: '🐾', 
+                bio: 'Intelligent, dexterous, and strong. Litter size: 3-7.', 
+                signs: 'Heavy thumping, high-pitched chattering, 4-6" entry holes, hand-like prints.',
+                entry: 'Roof vents, soffits, chimneys, roof-wall junctions.', 
+                method: 'Humane physical removal of babies + One-way doors for adults.' 
+            },
+            'Squirrels': { 
+                icon: '🥜', 
+                bio: 'Persistent chewers. Diurnal (active during day).', 
+                signs: 'Quick scurrying/scratching sounds, 1.5-2" chewed holes, nut shells.',
+                entry: 'Roof corners, fascia boards, cedar siding, plastic vents.', 
+                method: 'Exclusion of all secondary spots + OWD at primary entry.' 
+            },
+            'Bats': { 
+                icon: '🦇', 
+                bio: 'Protected. Vital for ecosystem. Entry as small as 1/4".', 
+                signs: 'High-pitched squeaks, scratching at dusk/dawn, guano piles, staining.',
+                entry: 'Ridge vents, brick gaps, gable vents, flashing gaps.', 
+                method: 'One-way netting curtains or check valves. Seasonal restrictions apply.' 
+            },
+            'Birds': { 
+                icon: '🐦', 
+                bio: 'Starlings and Sparrows are most common attic nesters.', 
+                signs: 'Chirping, visible straw/nesting from vents, mites, heavy odors.',
+                entry: 'Kitchen/Bath exhaust vents, dryer vents, damaged soffit.', 
+                method: 'Nest removal + Area sanitation + Heavy duty vent guard install.' 
+            },
+            'Skunks': { 
+                icon: '🦨', 
+                bio: 'Docile unless cornered. Powerful defensive spray (up to 15ft).', 
+                signs: 'Distinct odor, digging under structures, 4-6" burrows, cone-shaped holes.',
+                entry: 'Under decks, sheds, concrete stairs, crawlspaces.', 
+                method: 'Trenching (1ft down, 1ft out) + Screening + One-way doors.' 
+            }
         };
 
-        const CLIENT_TEMPLATES = [
-            { label: 'On My Way', text: 'Hi, this is [Name] from Skedaddle Wildlife. I am on my way to your property and should arrive in about 20 minutes.' },
-            { label: 'Job Complete', text: 'Hello! I have completed the wildlife removal and exclusion work at your home today. I will follow up with you shortly regarding the next steps.' }
+        const WORK_TYPES = [
+            { id: 'rsi', label: "RSI's", desc: "Roof Soffit Intersections", page: 12 },
+            { id: 'plumbing', label: "Plumbing Matts", desc: "Stacks & Pipe Vents", page: 18 },
+            { id: 'roof-vents', label: "Roof Vents", desc: "Static & Ridge Vents", page: 24 },
+            { id: 'bsg', label: "Sealing BSG", desc: "Bottom Sill Gasket / Base", page: 35 },
+            { id: 'owds', label: "Making OWDs", desc: "One-Way Door Fabrication", page: 42 }
         ];
 
         const App = () => {
@@ -117,7 +151,6 @@
             const [selHour, setSelHour] = useState(new Date().getHours());
             const [selMin, setSelMin] = useState(0);
             const [actionNote, setActionNote] = useState("");
-            const [generalNote, setGeneralNote] = useState("");
 
             const checkUserStatus = async (userObj) => {
                 if (!userObj) return;
@@ -171,9 +204,7 @@
                 const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
                 const message = `To: ${SUPERVISOR_EMAIL}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nAutomated via Hub`;
-
                 const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
                 try {
                     await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
                         method: 'POST',
@@ -199,16 +230,6 @@
                 } catch (err) { setIsSyncing(false); }
             };
 
-            const copyToClipboard = (text) => {
-                const formattedText = text.replace('[Name]', user.name);
-                const el = document.createElement('textarea');
-                el.value = formattedText;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-            };
-
             if (isInitializing) return (
                 <div className="min-h-screen flex items-center justify-center bg-white">
                     <Icons.Loader className="w-10 h-10 text-orange-500" />
@@ -220,14 +241,14 @@
                     {!user ? (
                         <div className="bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100">
                             <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" alt="Logo" />
-                            <h1 className="text-3xl font-extrabold text-slate-800 mb-2">TECHNICIAN PORTAL</h1>
-                            <p className="text-slate-400 mb-10 font-medium">Ready to start your shift?</p>
-                            <button onClick={handleLogin} className="google-btn mb-6 font-bold">SIGN IN WITH GOOGLE</button>
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-2 uppercase tracking-tight">Technician Portal</h1>
+                            <p className="text-slate-400 mb-10 font-medium">Please sign in to access your dashboard.</p>
+                            <button onClick={handleLogin} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                             <div className="flex items-center justify-center gap-2 cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
-                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
                                     {rememberMe && <div className="w-2 h-2 bg-white rounded-full"></div>}
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Stay signed in</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Stay signed in</span>
                             </div>
                         </div>
                     ) : (
@@ -235,18 +256,18 @@
                             {showTimePicker && (
                                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                                     <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl">
-                                        <h2 className="text-2xl font-black mb-6 text-center">Confirm {pendingAction}</h2>
+                                        <h2 className="text-2xl font-black mb-6 text-center uppercase tracking-tight">Confirm {pendingAction}</h2>
                                         <div className="flex justify-center gap-4 mb-6">
-                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100">
+                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
                                                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
                                             </select>
-                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100">
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
                                                 {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                             </select>
                                         </div>
-                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Add shift notes..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
-                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg">CONFIRM</button>
-                                        <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm">Cancel</button>
+                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Enter details for the sheet..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
+                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm Entry</button>
+                                        <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px]">Cancel</button>
                                     </div>
                                 </div>
                             )}
@@ -256,7 +277,7 @@
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
                                     <div>
                                         <p className="font-extrabold text-slate-800 leading-none">{user.name}</p>
-                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1">Technician Hub</p>
+                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1">Certified Technician</p>
                                     </div>
                                 </div>
                                 <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
@@ -272,32 +293,31 @@
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
                                         <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                                             <div className="flex items-center gap-4">
-                                                <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
-                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase">Shift Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'ACTIVE' : 'OFF DUTY'}</p></div>
+                                                <div className={`p-3 bg-slate-800 rounded-xl`}><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
+                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
                                             </div>
-                                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-black ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
+                                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
                                         </div>
-                                        <div className="p-8 space-y-6">
-                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing Sheet...</div>}
-                                            
+                                        <div className="p-8">
+                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing Sheet...</div>}
                                             <div className="grid grid-cols-2 gap-4">
                                                 <button disabled={status !== 'idle' || isSyncing} onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-green-50 hover:border-green-200 transition-all group disabled:opacity-30">
                                                     <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
-                                                    <span className="block font-black text-xs uppercase text-slate-600 group-hover:text-green-700">Clock In</span>
+                                                    <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                 </button>
                                                 <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
                                                     <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
-                                                    <span className="block font-black text-xs uppercase text-slate-600 group-hover:text-red-700">Clock Out</span>
+                                                    <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-slate-100">
-                                        <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> Current Cycle</div>
+                                        <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> 14-Day Cycle</div>
                                         <div className="p-4 calendar-grid">
                                             {logs.map((day, idx) => (
-                                                <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}>
+                                                <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center transition-all ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}>
                                                     <span className="text-[9px] font-bold text-slate-400 uppercase">{day.weekday}</span>
                                                     <span className="text-xs font-black text-slate-700">{day.date}</span>
                                                     <span className="text-[10px] font-extrabold mt-1 text-orange-600">{day.total}h</span>
@@ -307,69 +327,77 @@
                                     </div>
                                 </>
                             ) : (
-                                <div className="space-y-6">
-                                    {/* Quick Manual Access */}
-                                    <div className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card">
+                                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                    {/* Work Type Reference */}
+                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Hammer className="w-5 h-5"/></div>
+                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Procedures by Work Type</h3>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {WORK_TYPES.map(work => (
+                                                <div key={work.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group">
+                                                    <div>
+                                                        <p className="font-black text-xs text-slate-800 uppercase tracking-tight">{work.label}</p>
+                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{work.desc}</p>
+                                                    </div>
+                                                    <a 
+                                                        href={`${MANUAL_BASE_URL}#page=${work.page}`} 
+                                                        target="_blank" 
+                                                        className="px-4 py-2 bg-white text-slate-800 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                                                    >
+                                                        Open Guide
+                                                    </a>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Species Reference */}
+                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Layout className="w-5 h-5"/></div>
+                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Species Database</h3>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3 mb-6">
+                                            {Object.keys(SPECIES_DATA).map(s => (
+                                                <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-50'}`}>
+                                                    <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
+                                                    <span className="font-black text-[11px] uppercase tracking-tighter leading-tight">{s}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {selectedSpecies && (
+                                            <div className="space-y-4 animate-in fade-in duration-300">
+                                                <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                                                    <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">At a Glance</p>
+                                                    <p className="text-xs text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].bio}</p>
+                                                </div>
+                                                <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                                                    <p className="text-[9px] font-black text-orange-600 uppercase tracking-widest mb-1">Diagnostic Signs (Noise/Scat/Prints)</p>
+                                                    <p className="text-xs text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
+                                                </div>
+                                                <div className="p-4 bg-slate-900 rounded-2xl text-white">
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Technical Execution</p>
+                                                    <p className="text-xs font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Full Manual Link */}
+                                    <a href={MANUAL_FULL_URL} target="_blank" className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card">
                                         <div className="flex items-center gap-4">
-                                            <div className="p-4 bg-orange-100 text-orange-600 rounded-2xl"><Icons.FileText className="w-6 h-6"/></div>
-                                            <div><h3 className="font-black text-slate-800">Skedaddle Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase">Technical Guide v2025</p></div>
+                                            <div className="p-4 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icons.FileText className="w-6 h-6"/></div>
+                                            <div><h3 className="font-black text-slate-800 text-sm">Full Technical Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase">Interactive PDF (100+ Pages)</p></div>
                                         </div>
-                                        <a href={MANUAL_URL} target="_blank" rel="noopener" className="p-3 bg-slate-900 text-white rounded-xl shadow-lg group-hover:bg-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></a>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {/* Species Reference */}
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                            <h3 className="font-black uppercase text-xs tracking-widest mb-6 text-slate-400">Species Database</h3>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {Object.keys(SPECIES_DATA).map(s => (
-                                                    <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-50'}`}>
-                                                        <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
-                                                        <span className="font-black text-[11px] uppercase tracking-tighter leading-tight">{s}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            {selectedSpecies && (
-                                                <div className="mt-6 p-5 bg-blue-50 rounded-2xl text-[11px] space-y-3 font-medium animate-in fade-in duration-300">
-                                                    <p><span className="font-black uppercase tracking-widest text-blue-600 block mb-1">Behavior</span>{SPECIES_DATA[selectedSpecies].bio}</p>
-                                                    <p><span className="font-black uppercase tracking-widest text-blue-600 block mb-1">Method</span>{SPECIES_DATA[selectedSpecies].method}</p>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Quick Communications */}
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                            <h3 className="font-black uppercase text-xs tracking-widest mb-6 text-slate-400">Client Templates</h3>
-                                            <div className="space-y-3">
-                                                {CLIENT_TEMPLATES.map(t => (
-                                                    <button key={t.label} onClick={() => copyToClipboard(t.text)} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all border border-slate-100 group">
-                                                        <span className="font-black text-xs text-slate-700">{t.label}</span>
-                                                        <Icons.Copy className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Field Safety */}
-                                        <div className="col-span-1 md:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-4 bg-blue-100 text-blue-600 rounded-3xl"><Icons.Shield className="w-8 h-8"/></div>
-                                                <div>
-                                                    <h3 className="font-black text-slate-800">Safety Check</h3>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">PPE & Fall Protection Required</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col items-end">
-                                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Attic Risk: High</span>
-                                                <span className="text-xs font-bold text-slate-500">P100 Recommended</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        <div className="p-3 text-slate-300 group-hover:text-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></div>
+                                    </a>
                                 </div>
                             )}
                             
                             <div className="text-center pt-8 opacity-20">
-                                <p className="font-black uppercase tracking-[0.5em] text-[8px]">Skedaddle Wildlife Control</p>
+                                <p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p>
                             </div>
                         </div>
                     )}
