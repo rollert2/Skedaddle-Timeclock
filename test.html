@@ -17,7 +17,7 @@
         body { 
             font-family: 'Inter', sans-serif; 
             margin: 0; 
-            overflow-x: hidden;
+            overflow-x: hidden; 
             min-height: 100vh;
             background-color: #f8fafc;
             color: #1e293b;
@@ -64,7 +64,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Checklist Transitions */
         .supply-item {
             transition: all 0.3s ease;
         }
@@ -96,7 +95,8 @@
             Plus: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
             Trash: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
             Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-            Package: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/></svg>
+            Package: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/></svg>,
+            ChevronDown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -110,24 +110,24 @@
         };
 
         const DEFAULT_SUPPLIES = [
-            { id: '1', name: '1 inch screen', category: 'Screen', checked: false, note: '' },
-            { id: '2', name: '1/4 inch screen', category: 'Screen', checked: false, note: '' },
+            { id: '1', name: '1 inch screen', category: 'Screens', checked: false, note: '' },
+            { id: '2', name: '1/4 inch screen', category: 'Screens', checked: false, note: '' },
             { id: '3', name: 'deoderizer', category: 'Chemicals', checked: false, note: '' },
             { id: '4', name: 'bacterial digester', category: 'Chemicals', checked: false, note: '' },
             { id: '5', name: 'D/E', category: 'Chemicals', checked: false, note: '' },
             { id: '6', name: 'Roof vents (Top vented)', category: 'Vents', checked: false, note: '' },
             { id: '7', name: 'Roof vents (Bottom Vented)', category: 'Vents', checked: false, note: '' },
             { id: '8', name: 'Wall vents', category: 'Vents', checked: false, note: '' },
-            { id: '9', name: 'Sealant', category: 'Fasteners/Sealants', checked: false, note: '' },
-            { id: '10', name: 'Kopr-Lastic', category: 'Fasteners/Sealants', checked: false, note: '' },
-            { id: '11', name: 'Washer screws', category: 'Fasteners/Sealants', checked: false, note: '' },
-            { id: '12', name: 'Anchor screws', category: 'Fasteners/Sealants', checked: false, note: '' },
-            { id: '13', name: 'DSS screws', category: 'Fasteners/Sealants', checked: false, note: '' },
-            { id: '14', name: 'Foot Covers', category: 'PPE', checked: false, note: '' },
-            { id: '15', name: 'Drop sheets', category: 'PPE', checked: false, note: '' },
-            { id: '16', name: 'latex gloves', category: 'PPE', checked: false, note: '' },
-            { id: '17', name: 'garbage bags', category: 'PPE', checked: false, note: '' },
-            { id: '18', name: 'Respirator Filters', category: 'PPE', checked: false, note: '' }
+            { id: '9', name: 'Sealant', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '10', name: 'Kopr-Lastic', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '11', name: 'Washer screws', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '12', name: 'Anchor screws', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '13', name: 'DSS screws', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '14', name: 'Foot Covers', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '15', name: 'Drop sheets', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '16', name: 'latex gloves', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '17', name: 'garbage bags', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '18', name: 'Respirator Filters', category: 'PPE & Safety', checked: false, note: '' }
         ];
 
         const App = () => {
@@ -149,6 +149,8 @@
             const [supplies, setSupplies] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
             const [newItemName, setNewItemName] = useState('');
+            const [expandedCategories, setExpandedCategories] = useState(['Screens', 'Chemicals', 'Vents', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
+            
             const [showTimePicker, setShowTimePicker] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
             const [selHour, setSelHour] = useState(new Date().getHours());
@@ -167,7 +169,6 @@
                 setIsSyncing(false);
             };
 
-            // Persistence for Supplies
             useEffect(() => {
                 if (user) {
                     const savedSupplies = localStorage.getItem(`supplies_${user.email}`);
@@ -261,12 +262,40 @@
                 setSupplies(prev => prev.filter(s => s.id !== id));
             };
 
-            const sortedSupplies = useMemo(() => {
-                return [...supplies].sort((a, b) => {
-                    if (a.checked === b.checked) return a.name.localeCompare(b.name);
-                    return a.checked ? -1 : 1;
-                }).filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
+            const toggleCategory = (cat) => {
+                setExpandedCategories(prev => 
+                    prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                );
+            };
+
+            // Grouping and Sorting Logic
+            const categorizedSupplies = useMemo(() => {
+                const filtered = supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
+                const groups = {};
+                
+                filtered.forEach(s => {
+                    if (!groups[s.category]) groups[s.category] = [];
+                    groups[s.category].push(s);
+                });
+
+                // Sort items within each group: Checked status first, then Alphabetical
+                Object.keys(groups).forEach(cat => {
+                    groups[cat].sort((a, b) => {
+                        if (a.checked === b.checked) return a.name.localeCompare(b.name);
+                        return a.checked ? -1 : 1;
+                    });
+                });
+
+                return groups;
             }, [supplies, supplySearch]);
+
+            const sortedCategoryNames = useMemo(() => {
+                return Object.keys(categorizedSupplies).sort((a, b) => {
+                    if (a === 'Custom') return 1;
+                    if (b === 'Custom') return -1;
+                    return a.localeCompare(b);
+                });
+            }, [categorizedSupplies]);
 
             if (isInitializing) return (
                 <div className="min-h-screen flex items-center justify-center bg-white">
@@ -398,7 +427,7 @@
                                                 <div className="flex gap-2">
                                                     <input 
                                                         type="text" 
-                                                        placeholder="Add item..." 
+                                                        placeholder="Add custom item..." 
                                                         className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500"
                                                         value={newItemName}
                                                         onChange={e => setNewItemName(e.target.value)}
@@ -408,32 +437,47 @@
                                                 </div>
                                             </div>
 
-                                            <div className="flex-1 overflow-y-auto max-h-[400px] no-scrollbar space-y-3">
-                                                {sortedSupplies.map(item => (
-                                                    <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50'}`}>
-                                                        <div className="flex items-center gap-3">
-                                                            <div 
-                                                                onClick={() => toggleSupply(item.id)}
-                                                                className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}
-                                                            >
-                                                                {item.checked && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                                            <div className="flex-1 overflow-y-auto max-h-[600px] no-scrollbar space-y-4">
+                                                {sortedCategoryNames.map(category => (
+                                                    <div key={category} className="space-y-2">
+                                                        <button 
+                                                            onClick={() => toggleCategory(category)}
+                                                            className="w-full flex items-center justify-between py-2 px-3 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                                                        >
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{category}</span>
+                                                            <Icons.ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
+                                                        </button>
+                                                        
+                                                        {expandedCategories.includes(category) && (
+                                                            <div className="space-y-3 animate-slide-up">
+                                                                {categorizedSupplies[category].map(item => (
+                                                                    <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50'}`}>
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div 
+                                                                                onClick={() => toggleSupply(item.id)}
+                                                                                className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}
+                                                                            >
+                                                                                {item.checked && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                                                                            </div>
+                                                                            <div className="flex-1">
+                                                                                <p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p>
+                                                                            </div>
+                                                                            {item.category === 'Custom' && (
+                                                                                <button onClick={() => deleteSupply(item.id)} className="p-1 text-slate-300 hover:text-red-500"><Icons.Trash className="w-4 h-4"/></button>
+                                                                            )}
+                                                                        </div>
+                                                                        {item.checked && (
+                                                                            <input 
+                                                                                type="text" 
+                                                                                placeholder="Add a note (e.g. 'Need 5 more')" 
+                                                                                className="w-full mt-3 px-3 py-2 bg-white rounded-lg text-[10px] font-bold border border-orange-100 outline-none focus:border-orange-500"
+                                                                                value={item.note}
+                                                                                onChange={e => updateSupplyNote(item.id, e.target.value)}
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                ))}
                                                             </div>
-                                                            <div className="flex-1">
-                                                                <p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p>
-                                                                {item.category !== 'Custom' && <p className="text-[8px] font-bold text-slate-400 uppercase">{item.category}</p>}
-                                                            </div>
-                                                            {item.category === 'Custom' && (
-                                                                <button onClick={() => deleteSupply(item.id)} className="p-1 text-slate-300 hover:text-red-500"><Icons.Trash className="w-4 h-4"/></button>
-                                                            )}
-                                                        </div>
-                                                        {item.checked && (
-                                                            <input 
-                                                                type="text" 
-                                                                placeholder="Add a note (size, quantity...)" 
-                                                                className="w-full mt-3 px-3 py-2 bg-white rounded-lg text-[10px] font-bold border border-orange-100 outline-none focus:border-orange-500"
-                                                                value={item.note}
-                                                                onChange={e => updateSupplyNote(item.id, e.target.value)}
-                                                            />
                                                         )}
                                                     </div>
                                                 ))}
