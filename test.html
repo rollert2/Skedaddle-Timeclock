@@ -55,6 +55,14 @@
         .hub-card:active {
             transform: scale(0.98);
         }
+        
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -67,7 +75,6 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const SUPERVISOR_EMAIL = "magicbran@gmail.com";
-        const MANUAL_BASE_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view"; 
         const MANUAL_FULL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing";
 
         const Icons = {
@@ -82,54 +89,100 @@
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
             ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
             ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
-            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>
+            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>,
+            CheckCircle: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         };
 
         const SPECIES_DATA = {
             'Raccoons': { 
                 icon: '🐾', 
-                bio: 'Intelligent, dexterous, and strong. Litter size: 3-7.', 
-                signs: 'Heavy thumping, high-pitched chattering, 4-6" entry holes, hand-like prints.',
-                entry: 'Roof vents, soffits, chimneys, roof-wall junctions.', 
-                method: 'Humane physical removal of babies + One-way doors for adults.' 
+                bio: 'Intelligent, dexterous, and strong. Maternal cycle begins late winter.', 
+                signs: 'Hand-like prints, high-pitched chattering, heavy thumping at night, large tubular scat (look for undigested seeds).',
+                entry: 'Roof vents, soffits, chimneys, roof-wall junctions (RSI).', 
+                method: 'Check valves or physical removal of young. Ensure 16-gauge mesh is bolted, not just stapled.' 
             },
             'Squirrels': { 
                 icon: '🥜', 
-                bio: 'Persistent chewers. Diurnal (active during day).', 
-                signs: 'Quick scurrying/scratching sounds, 1.5-2" chewed holes, nut shells.',
-                entry: 'Roof corners, fascia boards, cedar siding, plastic vents.', 
-                method: 'Exclusion of all secondary spots + OWD at primary entry.' 
+                bio: 'Aggressive chewers. Diurnal activity (most active at dawn/dusk).', 
+                signs: 'Quick scratching sounds, chewed plastic/wood, small oval scat (pointed ends), nut shells in attic.',
+                entry: 'Roof corners, fascia board gaps, cedar siding, plastic vent caps.', 
+                method: 'One-way exclusion doors. Seal all non-primary gaps with galvanized steel mesh first.' 
             },
             'Bats': { 
                 icon: '🦇', 
-                bio: 'Protected. Vital for ecosystem. Entry as small as 1/4".', 
-                signs: 'High-pitched squeaks, scratching at dusk/dawn, guano piles, staining.',
-                entry: 'Ridge vents, brick gaps, gable vents, flashing gaps.', 
-                method: 'One-way netting curtains or check valves. Seasonal restrictions apply.' 
+                bio: 'Protected species. Maternal colonies active June-August (Blackout period).', 
+                signs: 'Staining at entry (rub marks), guano piles (crumbles like dry soil), high-pitched chirps.',
+                entry: 'Ridge vents, brick gaps, gable vents, flashing overlaps.', 
+                method: 'Install one-way netting curtains or cones. Must wait for non-birthing season to seal.' 
             },
             'Birds': { 
                 icon: '🐦', 
-                bio: 'Starlings and Sparrows are most common attic nesters.', 
-                signs: 'Chirping, visible straw/nesting from vents, mites, heavy odors.',
-                entry: 'Kitchen/Bath exhaust vents, dryer vents, damaged soffit.', 
-                method: 'Nest removal + Area sanitation + Heavy duty vent guard install.' 
+                bio: 'Starlings and Sparrows are most common. Nesting material is a fire hazard.', 
+                signs: 'Visible straw from vents, constant chirping, mites, heavy ammonia odor from waste.',
+                entry: 'Bathroom exhaust vents, dryer vents, kitchen vents.', 
+                method: 'Remove nest, sanitize with antimicrobial, install heavy-duty bird-proof vent guards.' 
             },
             'Skunks': { 
                 icon: '🦨', 
-                bio: 'Docile unless cornered. Powerful defensive spray (up to 15ft).', 
-                signs: 'Distinct odor, digging under structures, 4-6" burrows, cone-shaped holes.',
-                entry: 'Under decks, sheds, concrete stairs, crawlspaces.', 
-                method: 'Trenching (1ft down, 1ft out) + Screening + One-way doors.' 
+                bio: 'Ground burrowers. Docile but defensive. Excellent diggers.', 
+                signs: 'Distinct musk odor, cone-shaped holes in lawn, 4-6" burrows under structures.',
+                entry: 'Under decks, sheds, concrete stairs, crawlspace vents.', 
+                method: 'Trenching and Screening: Dig 1ft down, 1ft out (L-shape). Install OWD at primary exit.' 
             }
         };
 
-        const WORK_TYPES = [
-            { id: 'rsi', label: "RSI's", desc: "Roof Soffit Intersections", page: 12 },
-            { id: 'plumbing', label: "Plumbing Matts", desc: "Stacks & Pipe Vents", page: 18 },
-            { id: 'roof-vents', label: "Roof Vents", desc: "Static & Ridge Vents", page: 24 },
-            { id: 'bsg', label: "Sealing BSG", desc: "Bottom Sill Gasket / Base", page: 35 },
-            { id: 'owds', label: "Making OWDs", desc: "One-Way Door Fabrication", page: 42 }
-        ];
+        const WORK_GUIDES = {
+            'rsi': {
+                label: "RSI Guide",
+                desc: "Roof Soffit Intersections",
+                steps: [
+                    "Inspect the 'V' where the roofline meets the soffit.",
+                    "Ensure mesh is tucked behind the fascia board.",
+                    "Secure with 1-inch zip screws and washers every 4-6 inches.",
+                    "Paint mesh to match trim for aesthetics."
+                ]
+            },
+            'plumbing': {
+                label: "Plumbing Guide",
+                desc: "Stacks & Pipe Vents",
+                steps: [
+                    "Clear any debris around the stack base.",
+                    "Measure circumference for custom mesh fit.",
+                    "Install a 'Skedaddle Hat' or custom screening.",
+                    "Verify the rubber boot is not damaged."
+                ]
+            },
+            'roof-vents': {
+                label: "Roof Vents Guide",
+                desc: "Static & Ridge Vents",
+                steps: [
+                    "Check for pulled nails or chewed plastic corners.",
+                    "Cage vents with 1x1 galvanized steel mesh.",
+                    "Ensure the cage is tall enough for the vent to breathe.",
+                    "Seal base with professional grade sealant."
+                ]
+            },
+            'bsg': {
+                label: "Sealing BSG",
+                desc: "Bottom Sill Gasket / Base",
+                steps: [
+                    "Inspect where the siding meets the foundation.",
+                    "Seal gaps larger than 1/4 inch with mesh or sealant.",
+                    "Ensure proper drainage (don't block weep holes entirely).",
+                    "Check corner posts for hidden entry paths."
+                ]
+            },
+            'owds': {
+                label: "OWD Fabrication",
+                desc: "One-Way Door Build",
+                steps: [
+                    "Construct 'tunnel' using galvanized mesh.",
+                    "Install the 'flap' with enough tension to snap shut.",
+                    "Ensure zero resistance for the animal exiting.",
+                    "Label with date of installation for follow-up."
+                ]
+            }
+        };
 
         const App = () => {
             const [user, setUser] = useState(() => {
@@ -138,6 +191,7 @@
             });
             const [activeTab, setActiveTab] = useState('clock');
             const [selectedSpecies, setSelectedSpecies] = useState(null);
+            const [selectedWork, setSelectedWork] = useState(null);
             const [status, setStatus] = useState('idle');
             const [logs, setLogs] = useState([]);
             const [isInitializing, setIsInitializing] = useState(true);
@@ -242,7 +296,7 @@
                         <div className="bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100">
                             <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" alt="Logo" />
                             <h1 className="text-3xl font-extrabold text-slate-800 mb-2 uppercase tracking-tight">Technician Portal</h1>
-                            <p className="text-slate-400 mb-10 font-medium">Please sign in to access your dashboard.</p>
+                            <p className="text-slate-400 mb-10 font-medium">Log in to track time and access technical data.</p>
                             <button onClick={handleLogin} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                             <div className="flex items-center justify-center gap-2 cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
                                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
@@ -276,7 +330,7 @@
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
                                     <div>
-                                        <p className="font-extrabold text-slate-800 leading-none">{user.name}</p>
+                                        <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight">{user.name}</p>
                                         <p className="text-[10px] font-bold text-orange-600 uppercase mt-1">Certified Technician</p>
                                     </div>
                                 </div>
@@ -284,7 +338,7 @@
                             </div>
 
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-xs mx-auto">
-                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
+                                <button onClick={() => { setActiveTab('clock'); setSelectedSpecies(null); setSelectedWork(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
                                 <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
                             </div>
 
@@ -327,72 +381,98 @@
                                     </div>
                                 </>
                             ) : (
-                                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                    {/* Work Type Reference */}
-                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Hammer className="w-5 h-5"/></div>
-                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Procedures by Work Type</h3>
-                                        </div>
-                                        <div className="space-y-3">
-                                            {WORK_TYPES.map(work => (
-                                                <div key={work.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group">
-                                                    <div>
-                                                        <p className="font-black text-xs text-slate-800 uppercase tracking-tight">{work.label}</p>
-                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{work.desc}</p>
-                                                    </div>
-                                                    <a 
-                                                        href={`${MANUAL_BASE_URL}#page=${work.page}`} 
-                                                        target="_blank" 
-                                                        className="px-4 py-2 bg-white text-slate-800 border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all shadow-sm"
-                                                    >
-                                                        Open Guide
-                                                    </a>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Species Reference */}
-                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Layout className="w-5 h-5"/></div>
-                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Species Database</h3>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3 mb-6">
-                                            {Object.keys(SPECIES_DATA).map(s => (
-                                                <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-50'}`}>
-                                                    <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
-                                                    <span className="font-black text-[11px] uppercase tracking-tighter leading-tight">{s}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                        {selectedSpecies && (
-                                            <div className="space-y-4 animate-in fade-in duration-300">
-                                                <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                                                    <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">At a Glance</p>
-                                                    <p className="text-xs text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].bio}</p>
-                                                </div>
-                                                <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-                                                    <p className="text-[9px] font-black text-orange-600 uppercase tracking-widest mb-1">Diagnostic Signs (Noise/Scat/Prints)</p>
-                                                    <p className="text-xs text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
-                                                </div>
-                                                <div className="p-4 bg-slate-900 rounded-2xl text-white">
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Technical Execution</p>
-                                                    <p className="text-xs font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
+                                <div className="space-y-6 animate-slide-up">
+                                    {/* Work Guide Detail View */}
+                                    {selectedWork ? (
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-4 border-blue-100">
+                                            <button onClick={() => setSelectedWork(null)} className="flex items-center gap-2 text-slate-400 hover:text-slate-800 transition-colors font-black uppercase text-[10px] tracking-widest mb-6">
+                                                <Icons.ArrowLeft className="w-3 h-3" /> Back to Hub
+                                            </button>
+                                            <div className="flex items-center gap-4 mb-8">
+                                                <div className="p-4 bg-blue-600 text-white rounded-3xl"><Icons.Hammer className="w-8 h-8"/></div>
+                                                <div>
+                                                    <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">{WORK_GUIDES[selectedWork].label}</h3>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{WORK_GUIDES[selectedWork].desc}</p>
                                                 </div>
                                             </div>
-                                        )}
-                                    </div>
-
-                                    {/* Full Manual Link */}
-                                    <a href={MANUAL_FULL_URL} target="_blank" className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card">
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-4 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icons.FileText className="w-6 h-6"/></div>
-                                            <div><h3 className="font-black text-slate-800 text-sm">Full Technical Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase">Interactive PDF (100+ Pages)</p></div>
+                                            <div className="space-y-4">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Field Execution Steps</p>
+                                                {WORK_GUIDES[selectedWork].steps.map((step, i) => (
+                                                    <div key={i} className="flex gap-4 items-start p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
+                                                        <p className="text-sm text-slate-700 font-semibold leading-snug">{step}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="mt-8 pt-8 border-t border-slate-100 text-center">
+                                                <p className="text-[10px] text-slate-400 font-medium mb-4 italic">Need more details? Check the full PDF manual below.</p>
+                                            </div>
                                         </div>
-                                        <div className="p-3 text-slate-300 group-hover:text-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></div>
-                                    </a>
+                                    ) : (
+                                        <>
+                                            {/* Work Type Reference Grid */}
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
+                                                <div className="flex items-center gap-3 mb-6">
+                                                    <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Hammer className="w-5 h-5"/></div>
+                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Procedures by Work Type</h3>
+                                                </div>
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    {Object.keys(WORK_GUIDES).map(key => (
+                                                        <button 
+                                                            key={key} 
+                                                            onClick={() => setSelectedWork(key)}
+                                                            className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-green-300 transition-all group"
+                                                        >
+                                                            <div className="text-left">
+                                                                <p className="font-black text-xs text-slate-800 uppercase tracking-tight">{WORK_GUIDES[key].label}</p>
+                                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{WORK_GUIDES[key].desc}</p>
+                                                            </div>
+                                                            <div className="p-2 bg-white rounded-xl shadow-sm text-slate-300 group-hover:text-green-600">
+                                                                <Icons.FileText className="w-4 h-4"/>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Species Reference */}
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
+                                                <div className="flex items-center gap-3 mb-6">
+                                                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Layout className="w-5 h-5"/></div>
+                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostic Species Guide</h3>
+                                                </div>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                                                    {Object.keys(SPECIES_DATA).map(s => (
+                                                        <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100'}`}>
+                                                            <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
+                                                            <span className="font-black text-[10px] uppercase tracking-tighter leading-tight">{s}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                {selectedSpecies && (
+                                                    <div className="space-y-4 animate-slide-up">
+                                                        <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                                                            <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Diagnostic Signs (Noise/Scat/Prints)</p>
+                                                            <p className="text-xs text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
+                                                        </div>
+                                                        <div className="p-4 bg-slate-900 rounded-2xl text-white">
+                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Skedaddle Execution Method</p>
+                                                            <p className="text-xs font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Full Manual Link (Fall-back) */}
+                                            <a href={MANUAL_FULL_URL} target="_blank" className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-4 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icons.FileText className="w-6 h-6"/></div>
+                                                    <div><h3 className="font-black text-slate-800 text-sm">Full Technical Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Manual Lookup & Search</p></div>
+                                                </div>
+                                                <div className="p-3 text-slate-300 group-hover:text-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></div>
+                                            </a>
+                                        </>
+                                    )}
                                 </div>
                             )}
                             
