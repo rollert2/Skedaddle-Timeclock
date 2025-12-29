@@ -88,10 +88,7 @@
             Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
             ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
-            ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
-            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>,
-            Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-            CheckCircle: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -146,59 +143,6 @@
             }
         };
 
-        const WORK_GUIDES = {
-            'rsi': {
-                label: "RSI Guide",
-                desc: "Roof Soffit Intersections",
-                steps: [
-                    "Inspect the 'V' junction.",
-                    "Tuck mesh behind fascia board.",
-                    "Zip screw/washer every 4-6 inches.",
-                    "Paint to match trim."
-                ]
-            },
-            'plumbing': {
-                label: "Plumbing Guide",
-                desc: "Stacks & Pipe Vents",
-                steps: [
-                    "Clear debris from rubber boot.",
-                    "Custom fit 1x1 steel mesh.",
-                    "Install 'Skedaddle Hat' protector.",
-                    "Ensure vertical clearance for stack."
-                ]
-            },
-            'roof-vents': {
-                label: "Roof Vents",
-                desc: "Static & Ridge Vents",
-                steps: [
-                    "Check for pulled nails/chewed corners.",
-                    "Cage with 1x1 galvanized mesh.",
-                    "Leave space for vent to breathe.",
-                    "Apply sealant to mesh base."
-                ]
-            },
-            'bsg': {
-                label: "Sealing BSG",
-                desc: "Bottom Sill Gasket",
-                steps: [
-                    "Check siding-foundation junction.",
-                    "Seal gaps > 1/4 inch with mesh.",
-                    "Do not fully block weep holes.",
-                    "Secure corners with sealant."
-                ]
-            },
-            'owds': {
-                label: "Making OWDs",
-                desc: "One-Way Door Build",
-                steps: [
-                    "Fabricate mesh tunnel.",
-                    "Test flap tension (snaps shut).",
-                    "Verify zero resistance for animal.",
-                    "Date and label for follow-up."
-                ]
-            }
-        };
-
         const App = () => {
             const [user, setUser] = useState(() => {
                 const saved = localStorage.getItem('skedaddle_user');
@@ -206,7 +150,6 @@
             });
             const [activeTab, setActiveTab] = useState('clock');
             const [selectedSpecies, setSelectedSpecies] = useState(null);
-            const [selectedWork, setSelectedWork] = useState(null);
             const [status, setStatus] = useState('idle');
             const [logs, setLogs] = useState([]);
             const [isInitializing, setIsInitializing] = useState(true);
@@ -352,7 +295,7 @@
                             </div>
 
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-xs mx-auto">
-                                <button onClick={() => { setActiveTab('clock'); setSelectedSpecies(null); setSelectedWork(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
+                                <button onClick={() => { setActiveTab('clock'); setSelectedSpecies(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
                                 <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
                             </div>
 
@@ -384,7 +327,7 @@
                                                         <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                     </button>
-                                                    <button disabled={status === 'idle' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
+                                                    <button disabled={status === 'idle' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:border-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
                                                         <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                     </button>
@@ -409,38 +352,29 @@
                             ) : (
                                 <div className="space-y-6 animate-slide-up">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                                        {/* Procedures by Work Type */}
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex flex-col h-full">
+                                        {/* The Hub: Manual Section */}
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex flex-col h-full hub-card">
                                             <div className="flex items-center gap-3 mb-6">
-                                                <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Hammer className="w-5 h-5"/></div>
-                                                <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Field Procedures</h3>
+                                                <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.FileText className="w-5 h-5"/></div>
+                                                <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">The Hub</h3>
                                             </div>
-                                            <div className="space-y-2 flex-1">
-                                                {Object.keys(WORK_GUIDES).map(key => (
-                                                    <button 
-                                                        key={key} 
-                                                        onClick={() => setSelectedWork(key === selectedWork ? null : key)}
-                                                        className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all group ${selectedWork === key ? 'bg-green-600 border-green-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 hover:border-green-300'}`}
-                                                    >
-                                                        <div className="text-left">
-                                                            <p className={`font-black text-[10px] uppercase tracking-tight ${selectedWork === key ? 'text-white' : 'text-slate-800'}`}>{WORK_GUIDES[key].label}</p>
-                                                        </div>
-                                                        <Icons.FileText className={`w-4 h-4 ${selectedWork === key ? 'text-green-200' : 'text-slate-300 group-hover:text-green-500'}`}/>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            {selectedWork && (
-                                                <div className="mt-4 p-4 bg-green-50 rounded-2xl border border-green-100 animate-slide-up">
-                                                    <p className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-2">Key Steps</p>
-                                                    <ul className="space-y-2">
-                                                        {WORK_GUIDES[selectedWork].steps.map((s, i) => (
-                                                            <li key={i} className="text-[11px] font-semibold text-slate-700 flex gap-2">
-                                                                <Icons.CheckCircle className="w-3 h-3 text-green-500 mt-0.5 shrink-0" /> {s}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                                <div className="p-4 bg-white rounded-full shadow-sm mb-4">
+                                                    <Icons.FileText className="w-12 h-12 text-orange-500" />
                                                 </div>
-                                            )}
+                                                <h4 className="font-black text-slate-800 mb-2">Technical Manual</h4>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 leading-relaxed">
+                                                    Full Access to Skedaddle's Standard Technical Procedures
+                                                </p>
+                                                <a 
+                                                    href={MANUAL_FULL_URL} 
+                                                    target="_blank" 
+                                                    rel="noopener"
+                                                    className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg"
+                                                >
+                                                    Open Manual <Icons.ExternalLink className="w-4 h-4"/>
+                                                </a>
+                                            </div>
                                         </div>
 
                                         {/* Species Reference */}
@@ -471,15 +405,6 @@
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Full Manual Link Footer */}
-                                    <a href={MANUAL_FULL_URL} target="_blank" className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card w-full">
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-4 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icons.FileText className="w-6 h-6"/></div>
-                                            <div><h3 className="font-black text-slate-800 text-sm">Full Technical Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Manual Lookup & Search</p></div>
-                                        </div>
-                                        <div className="p-3 text-slate-300 group-hover:text-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></div>
-                                    </a>
                                 </div>
                             )}
                             
