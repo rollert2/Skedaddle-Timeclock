@@ -12,7 +12,7 @@
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         body { 
             font-family: 'Inter', sans-serif; 
@@ -20,6 +20,7 @@
             overflow-x: hidden;
             min-height: 100vh;
             background-color: #f8fafc;
+            color: #1e293b;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -47,13 +48,12 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
         .google-btn:hover { background: #357abd; transform: translateY(-1px); }
-        .google-btn:active { transform: translateY(0); }
 
         .hub-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease-out;
         }
-        .hub-card:hover {
-            transform: translateY(-4px);
+        .hub-card:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
@@ -61,99 +61,41 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useMemo } = React;
 
         const CLIENT_ID = "826145031424-e5rd2jbbnreu8am7re4m6qpc6m9aqpgl.apps.googleusercontent.com"; 
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
-        const LOGO_NORMAL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
+        const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const SUPERVISOR_EMAIL = "magicbran@gmail.com";
-        
         const MANUAL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing"; 
 
         const Icons = {
-            LogOut: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-            LogIn: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 5 12 10 7"/><line x1="15" y1="12" x2="5" y2="12"/></svg>,
-            UserCheck: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>,
-            AlertTriangle: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-            Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-            Loader2: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
-            Layout: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
-            Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
-            ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
-            ShieldCheck: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>,
-            Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>,
-            ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            LogOut: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+            LogIn: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 5 12 10 7"/><line x1="15" y1="12" x2="5" y2="12"/></svg>,
+            UserCheck: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>,
+            Alert: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+            Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+            Loader: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`animate-spin ${props.className}`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
+            Layout: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
+            Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
+            ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+            Copy: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+            Shield: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         };
 
-        // TECHNICAL DATABASE
         const SPECIES_DATA = {
-            'Raccoons': {
-                icon: '🐾',
-                color: 'blue',
-                bio: 'Dexterous, intelligent, and strong. Usually nocturnal but active during birthing seasons.',
-                entry: 'Roof vents, soffit gaps, roof-wall junctions, and chimneys.',
-                method: 'Humane removal using one-way doors. Physical removal of offspring followed by relocation to mother.'
-            },
-            'Squirrels': {
-                icon: '🥜',
-                color: 'orange',
-                bio: 'Extremely fast and persistent chewers. Diurnal activity (daytime).',
-                entry: 'Fascia boards, roof corners, cedar siding, and plastic roof vents.',
-                method: 'One-way exclusion doors. Heavy-duty galvanized mesh screening on all secondary potential spots.'
-            },
-            'Bats': {
-                icon: '🦇',
-                color: 'slate',
-                bio: 'Protected species. Can fit through gaps as small as 1/4 inch.',
-                entry: 'Ridge vents, brick-soffit gaps, chimney flashing, and gable vents.',
-                method: 'Check valves or netting curtains (one-way exit). Seasonal restrictions apply for maternity colonies.'
-            },
-            'Birds': {
-                icon: '🐦',
-                color: 'red',
-                bio: 'Commonly nest in ventilation systems. Can carry parasites and create fire hazards.',
-                entry: 'Bathroom exhaust vents, stove vents, and dryer vents.',
-                method: 'Removal of nesting material, sanitation of the area, and installation of bird-proof vent covers.'
-            },
-            'Skunks': {
-                icon: '🦨',
-                color: 'gray',
-                bio: 'Ground-dwelling, known for their defensive spray. Non-aggressive but will spray if threatened. Active in spring for birthing.',
-                entry: 'Under decks, sheds, crawlspaces, concrete porches, and stairs.',
-                method: 'Trenching and screening using L-shape mesh. Installation of one-way exclusion doors at primary tunnel exits.'
-            }
+            'Raccoons': { icon: '🐾', bio: 'Highly intelligent and strong. Baby season usually Feb-May.', entry: 'Roof vents, soffits, chimneys.', method: 'Exclusion + check valves.' },
+            'Squirrels': { icon: '🥜', bio: 'Constant chewers. Two litters per year (Spring/Fall).', entry: 'Roof corners, fascia, cedar siding.', method: 'One-way doors + mesh screening.' },
+            'Bats': { icon: '🦇', bio: 'Protected species. Maternal colonies active June-Aug.', entry: 'Ridge vents, brick gaps, gable vents.', method: 'Check valves / Netting.' },
+            'Birds': { icon: '🐦', bio: 'Nest in vents. Parasite & fire hazard risk.', entry: 'Bath/dryer vents, stove exhaust.', method: 'Cleaning + vent guard installation.' },
+            'Skunks': { icon: '🦨', bio: 'Burrowers. Non-aggressive unless trapped.', entry: 'Under decks, sheds, concrete porches.', method: 'Trenching + one-way doors.' }
         };
 
-        const PROCEDURE_DATA = {
-            'Exclusion': {
-                summary: 'Creating a permanent barrier between wildlife and the structure.',
-                steps: [
-                    'Identify all primary and secondary entry points.',
-                    'Use 16-gauge 1x1 inch galvanized steel mesh.',
-                    'Bolt mesh into structural members (not just shingles).',
-                    'Ensure 2-3 inch overlap on all sides of the gap.'
-                ]
-            },
-            'One-Way Doors': {
-                summary: 'Allowing animals to exit safely without the ability to return.',
-                steps: [
-                    'Install door directly over the primary entry hole.',
-                    'Seal all other gaps in the immediate area first.',
-                    'Verify door tension is appropriate for the target species.',
-                    'Perform a follow-up check after 3-7 days.'
-                ]
-            },
-            'Decontamination': {
-                summary: 'Cleaning and sanitizing areas affected by wildlife waste.',
-                steps: [
-                    'Don full PPE (Tyvek suit, N95/P100 respirator, gloves).',
-                    'Remove heavily soiled insulation or debris.',
-                    'Fog or spray area with professional-grade antimicrobial.',
-                    'HEPA vacuum remaining fine particulates.'
-                ]
-            }
-        };
+        const CLIENT_TEMPLATES = [
+            { label: 'On My Way', text: 'Hi, this is [Name] from Skedaddle Wildlife. I am on my way to your property and should arrive in about 20 minutes.' },
+            { label: 'Job Complete', text: 'Hello! I have completed the wildlife removal and exclusion work at your home today. I will follow up with you shortly regarding the next steps.' }
+        ];
 
         const App = () => {
             const [user, setUser] = useState(() => {
@@ -161,13 +103,12 @@
                 return saved ? JSON.parse(saved) : null;
             });
             const [activeTab, setActiveTab] = useState('clock');
-            const [selectedDetail, setSelectedDetail] = useState(null); 
+            const [selectedSpecies, setSelectedSpecies] = useState(null);
             const [status, setStatus] = useState('idle');
             const [logs, setLogs] = useState([]);
             const [isInitializing, setIsInitializing] = useState(true);
             const [isSyncing, setIsSyncing] = useState(false);
             const [rememberMe, setRememberMe] = useState(true);
-            
             const [accessToken, setAccessToken] = useState(null);
             const [tokenClient, setTokenClient] = useState(null);
 
@@ -178,11 +119,6 @@
             const [actionNote, setActionNote] = useState("");
             const [generalNote, setGeneralNote] = useState("");
 
-            const calculateDecimalTime = (h, m) => {
-                const decimal = h + (m / 60);
-                return (Math.floor(decimal * 100) / 100).toFixed(2).padStart(5, '0');
-            };
-
             const checkUserStatus = async (userObj) => {
                 if (!userObj) return;
                 setIsSyncing(true);
@@ -190,14 +126,7 @@
                     const response = await fetch(`${APPS_SCRIPT_URL}?name=${encodeURIComponent(userObj.name)}`);
                     const data = await response.json();
                     if (data.status) setStatus(data.status);
-                    if (data.logs) {
-                        setLogs(data.logs);
-                        const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
-                        const todayLog = data.logs.find(l => l.date === todayStr);
-                        if (todayLog && todayLog.notes) {
-                            setGeneralNote(todayLog.notes);
-                        }
-                    }
+                    if (data.logs) setLogs(data.logs);
                 } catch (err) { console.error("Status error:", err); }
                 setIsSyncing(false);
             };
@@ -207,49 +136,30 @@
                 script.src = "https://accounts.google.com/gsi/client";
                 script.async = true;
                 script.onload = () => {
-                    if (window.google) {
-                        const client = window.google.accounts.oauth2.initTokenClient({
-                            client_id: CLIENT_ID,
-                            scope: 'openid email profile https://www.googleapis.com/auth/gmail.send',
-                            callback: async (tokenResponse) => {
-                                if (tokenResponse.error !== undefined) {
-                                    console.error("Auth error:", tokenResponse.error);
-                                    return;
-                                }
-                                setAccessToken(tokenResponse.access_token);
-                                
-                                try {
-                                    const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                                        headers: { 'Authorization': `Bearer ${tokenResponse.access_token}` }
-                                    });
-                                    const profile = await userInfoRes.json();
-                                    const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
-                                    setUser(newUser);
-                                    if (rememberMe) {
-                                        localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
-                                    }
-                                    checkUserStatus(newUser);
-                                } catch (e) {
-                                    console.error("Profile fetch error:", e);
-                                }
-                            },
-                        });
-                        setTokenClient(client);
-                        setIsInitializing(false);
-                        
-                        if (user) {
-                            checkUserStatus(user);
-                        }
-                    }
+                    const client = window.google.accounts.oauth2.initTokenClient({
+                        client_id: CLIENT_ID,
+                        scope: 'openid email profile https://www.googleapis.com/auth/gmail.send',
+                        callback: async (tokenResponse) => {
+                            if (tokenResponse.error) return;
+                            setAccessToken(tokenResponse.access_token);
+                            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                                headers: { 'Authorization': `Bearer ${tokenResponse.access_token}` }
+                            });
+                            const profile = await userInfoRes.json();
+                            const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
+                            setUser(newUser);
+                            if (rememberMe) localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
+                            checkUserStatus(newUser);
+                        },
+                    });
+                    setTokenClient(client);
+                    setIsInitializing(false);
+                    if (user) checkUserStatus(user);
                 };
                 document.head.appendChild(script);
             }, []);
 
-            const handleLogin = () => {
-                if (tokenClient) {
-                    tokenClient.requestAccessToken({ prompt: 'consent' });
-                }
-            };
+            const handleLogin = () => tokenClient?.requestAccessToken({ prompt: 'consent' });
 
             const handleLogout = () => {
                 setUser(null);
@@ -258,290 +168,139 @@
             };
 
             const sendEmailAsUser = async (action, time, note) => {
-                let currentToken = accessToken;
-                if (!currentToken) {
-                    return new Promise((resolve) => {
-                        tokenClient.callback = async (resp) => {
-                            if (resp.access_token) {
-                                setAccessToken(resp.access_token);
-                                const success = await executeEmailSend(resp.access_token, action, time, note);
-                                resolve(success);
-                            } else {
-                                resolve(false);
-                            }
-                        };
-                        tokenClient.requestAccessToken({ prompt: '' }); 
-                    });
-                }
-                return await executeEmailSend(currentToken, action, time, note);
-            };
-
-            const executeEmailSend = async (token, action, time, note) => {
                 const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const subjectAction = (action === "IN") ? "Start Time" : "End Time";
-                const actionLabel = (action === "IN") ? "CLOCK IN" : "CLOCK OUT";
-                const subject = `${user.name} - ${subjectAction} - ${dateStr}`;
-                
-                const message = [
-                    `To: ${SUPERVISOR_EMAIL}`,
-                    `Subject: ${subject}`,
-                    'Content-Type: text/plain; charset="UTF-8"',
-                    '',
-                    `${actionLabel}`,
-                    `Time - ${time}`,
-                    `Notes - ${note || "None"}`,
-                    '',
-                    'Automated Email via Timeclock App'
-                ].join('\n');
+                const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
+                const message = `To: ${SUPERVISOR_EMAIL}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nAutomated via Hub`;
 
-                const encodedEmail = btoa(unescape(encodeURIComponent(message)))
-                    .replace(/\+/g, '-')
-                    .replace(/\//g, '_')
-                    .replace(/=+$/, '');
+                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
                 try {
-                    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
                         method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({ raw: encodedEmail })
                     });
-                    return res.ok;
-                } catch (err) {
-                    console.error("Gmail API Error:", err);
-                    return false;
-                }
-            };
-
-            const openTimePicker = (action) => {
-                setPendingAction(action);
-                const now = new Date();
-                let h = now.getHours();
-                let m = Math.round(now.getMinutes() / 15) * 15;
-                if (m === 60) { h++; m = 0; }
-                if (h === 24) h = 0;
-                setSelHour(h);
-                setSelMin(m);
-                setShowTimePicker(true);
+                } catch (err) { console.error("Email error:", err); }
             };
 
             const confirmClockAction = async () => {
-                const decimalValue = calculateDecimalTime(selHour, selMin);
+                const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-
-                await sendEmailAsUser(pendingAction, decimalValue, actionNote);
-
+                if (accessToken) await sendEmailAsUser(pendingAction, decimalTime, actionNote);
                 try {
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ 
-                            email: user.email, 
-                            name: user.name, 
-                            type: pendingAction, 
-                            decimalTime: decimalValue,
-                            note: actionNote
-                        })
+                        body: JSON.stringify({ email: user.email, name: user.name, type: pendingAction, decimalTime, note: actionNote })
                     });
-                    
-                    setTimeout(() => {
-                        setActionNote(""); 
-                        checkUserStatus(user);
-                    }, 2500);
-                } catch (err) { 
-                    console.error("Sync Error:", err);
-                    setIsSyncing(false); 
-                }
+                    setTimeout(() => { setActionNote(""); checkUserStatus(user); }, 2500);
+                } catch (err) { setIsSyncing(false); }
             };
 
-            const syncGeneralNote = async () => {
-                if (!generalNote.trim()) return;
-                setIsSyncing(true);
-                try {
-                    await fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ email: user.email, name: user.name, type: 'GENERAL_NOTE', note: generalNote })
-                    });
-                    setTimeout(() => checkUserStatus(user), 2500);
-                } catch (err) { 
-                    console.error("General Note Error:", err);
-                    setIsSyncing(false); 
-                }
+            const copyToClipboard = (text) => {
+                const formattedText = text.replace('[Name]', user.name);
+                const el = document.createElement('textarea');
+                el.value = formattedText;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
             };
-
-            const isTimeValid = useMemo(() => {
-                if (pendingAction !== 'OUT') return true;
-                const todayStr = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
-                const todayLog = logs.find(l => l.date === todayStr);
-                if (!todayLog || !todayLog.start) return true;
-                const selectedDecimal = parseFloat(calculateDecimalTime(selHour, selMin));
-                const clockInDecimal = parseFloat(todayLog.start);
-                return selectedDecimal > clockInDecimal;
-            }, [pendingAction, selHour, selMin, logs]);
 
             if (isInitializing) return (
-                <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-                    <div className="h-16 w-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-slate-400 font-black text-xs uppercase tracking-[0.3em] mt-8">Initializing Hub...</p>
+                <div className="min-h-screen flex items-center justify-center bg-white">
+                    <Icons.Loader className="w-10 h-10 text-orange-500" />
                 </div>
             );
 
             return (
-                <div className="min-h-screen bg-slate-50">
+                <div className="min-h-screen max-w-2xl mx-auto px-4 py-8">
                     {!user ? (
-                        <div className="min-h-screen flex items-center justify-center p-6 relative z-10">
-                            <div className="bg-white rounded-[3rem] shadow-2xl p-10 text-center max-w-sm w-full border-4 border-slate-100">
-                                <div className="h-32 w-full mb-8 flex items-center justify-center">
-                                    <img src={LOGO_NORMAL} className="h-full w-full object-contain" alt="Skedaddle Logo" />
+                        <div className="bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100">
+                            <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" alt="Logo" />
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-2">TECHNICIAN PORTAL</h1>
+                            <p className="text-slate-400 mb-10 font-medium">Ready to start your shift?</p>
+                            <button onClick={handleLogin} className="google-btn mb-6 font-bold">SIGN IN WITH GOOGLE</button>
+                            <div className="flex items-center justify-center gap-2 cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
+                                    {rememberMe && <div className="w-2 h-2 bg-white rounded-full"></div>}
                                 </div>
-                                <h1 className="text-3xl font-black uppercase mb-2 tracking-tight text-slate-800">Technician Portal</h1>
-                                <p className="text-sm font-medium mb-10 text-slate-400">Sign in with your work email to start your shift.</p>
-                                
-                                <button onClick={handleLogin} className="google-btn mb-6">
-                                    <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                                    SIGN IN WITH GOOGLE
-                                </button>
-
-                                <div className="flex items-center justify-center gap-2 cursor-pointer group" onClick={() => setRememberMe(!rememberMe)}>
-                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300 group-hover:border-blue-400'}`}>
-                                        {rememberMe && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Stay signed in</span>
-                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Stay signed in</span>
                             </div>
                         </div>
                     ) : (
-                        <div className="p-4 md:p-10 max-w-5xl mx-auto w-full relative z-10">
+                        <div className="space-y-6">
                             {showTimePicker && (
-                                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
-                                    <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl p-8 border-4 border-slate-100">
-                                        <h2 className="text-2xl font-black text-center uppercase mb-6 text-slate-800">Confirm {pendingAction}</h2>
-                                        <div className="flex justify-center gap-4 mb-4">
-                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+                                    <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl">
+                                        <h2 className="text-2xl font-black mb-6 text-center">Confirm {pendingAction}</h2>
+                                        <div className="flex justify-center gap-4 mb-6">
+                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100">
                                                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
                                             </select>
-                                            <div className="text-2xl font-black mt-4 text-slate-300">:</div>
-                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="bg-slate-50 p-4 rounded-2xl text-2xl font-black border-2 border-slate-100 outline-none">
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100">
                                                 {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                             </select>
                                         </div>
-                                        <div className="mb-6">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">{pendingAction} Specific Note</p>
-                                            <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder={`Add a note for this specific ${pendingAction}...`} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm focus:border-orange-500 outline-none min-h-[80px]" />
-                                        </div>
-                                        {!isTimeValid && (
-                                            <p className="text-red-500 text-[10px] font-bold uppercase mb-4 text-center">Error: End time cannot be before clock-in time.</p>
-                                        )}
-                                        <button 
-                                            disabled={!isTimeValid}
-                                            onClick={confirmClockAction} 
-                                            className="w-full py-4 rounded-2xl font-black text-white shadow-lg disabled:opacity-30 bg-orange-600"
-                                        >
-                                            CONFIRM
-                                        </button>
-                                        <button onClick={() => setShowTimePicker(false)} className="w-full py-4 font-black text-slate-400 uppercase text-xs mt-2">Cancel</button>
+                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Add shift notes..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
+                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg">CONFIRM</button>
+                                        <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm">Cancel</button>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="flex items-center justify-between mb-8 p-5 rounded-[2rem] shadow-lg border-2 bg-white border-slate-100">
+                            <div className="bg-white rounded-[2rem] p-6 shadow-md flex items-center justify-between border border-slate-100">
                                 <div className="flex items-center gap-4">
-                                    <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-100" referrerPolicy="no-referrer" />
+                                    <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
                                     <div>
-                                        <p className="text-sm font-black text-slate-800 leading-none">{user.name}</p>
-                                        <p className="text-[10px] font-bold uppercase mt-1 text-orange-600">Verified Technician</p>
+                                        <p className="font-extrabold text-slate-800 leading-none">{user.name}</p>
+                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1">Technician Hub</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-16 h-8 flex items-center justify-center">
-                                        <img src={LOGO_NORMAL} className="h-full object-contain grayscale" alt="LogoSmall" />
-                                    </div>
-                                    <button onClick={handleLogout} className="p-2 text-slate-300 hover:text-red-500 transition-colors"><SafeIcon name="LogOut" /></button>
-                                </div>
+                                <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
                             </div>
 
-                            <div className="mb-8 bg-slate-900/95 backdrop-blur-md text-white rounded-full p-2 flex gap-2 shadow-2xl border-4 border-white/10 w-full max-w-sm mx-auto">
-                                <button 
-                                    onClick={() => { setActiveTab('clock'); setSelectedDetail(null); }}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full font-black text-[10px] uppercase tracking-[0.15em] transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'hover:bg-white/5 text-white/40'}`}
-                                >
-                                    <SafeIcon name="Clock" className="w-4 h-4" />
-                                    Time Clock
-                                </button>
-                                <button 
-                                    onClick={() => setActiveTab('hub')}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full font-black text-[10px] uppercase tracking-[0.15em] transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'hover:bg-white/5 text-white/40'}`}
-                                >
-                                    <SafeIcon name="Layout" className="w-4 h-4" />
-                                    The Hub
-                                </button>
+                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-xs mx-auto">
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
                             </div>
 
                             {activeTab === 'clock' ? (
                                 <>
-                                    <div className="rounded-[2.5rem] shadow-2xl border-4 overflow-hidden mb-8 transition-all bg-white border-slate-100">
-                                        <div className="p-8 text-white flex justify-between items-center transition-colors bg-slate-900">
+                                    <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
+                                        <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                                             <div className="flex items-center gap-4">
-                                                <div className={`p-3 rounded-xl ${status === 'clocked_in' ? 'bg-green-50 text-green-600' : 'bg-slate-800 text-white'}`}><SafeIcon name="UserCheck" className="w-6 h-6" /></div>
-                                                <div><p className="text-slate-300 text-[10px] font-bold uppercase mb-1">Shift Status</p><p className="text-xl font-black tracking-wider">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
+                                                <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
+                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase">Shift Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'ACTIVE' : 'OFF DUTY'}</p></div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className={`px-4 py-1.5 rounded-full font-black text-[10px] ${status === 'clocked_in' ? 'bg-green-400/20 text-green-400' : 'bg-white/10 text-white/50'}`}>{status === 'clocked_in' ? '• ONLINE' : '• OFFLINE'}</div>
-                                            </div>
+                                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-black ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
                                         </div>
-                                        <div className="p-10">
-                                            {isSyncing && <div className="flex items-center justify-center gap-2 mb-8 text-orange-500 font-black text-[10px] uppercase animate-pulse"><SafeIcon name="Loader2" className="animate-spin" />Cloud Synchronizing...</div>}
+                                        <div className="p-8 space-y-6">
+                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing Sheet...</div>}
                                             
-                                            {status === 'clocked_out' ? (
-                                                <div className="p-10 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center mb-8">
-                                                    <SafeIcon name="AlertTriangle" className="text-red-500 w-16 h-16 mx-auto mb-4" />
-                                                    <h3 className="text-red-900 font-black uppercase text-2xl mb-4">Shift Fully Recorded</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed max-w-md mx-auto">
-                                                        You have completed your shift and notes for today. <br/>
-                                                        <span className="font-black text-lg block mt-4">Please contact your supervisor for any required manual adjustments.</span>
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
-                                                    <button disabled={status !== 'idle' || isSyncing} onClick={() => {openTimePicker('IN');}} className="p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 border-slate-50 hover:border-green-500">
-                                                        <div className="p-5 rounded-3xl mb-4 text-green-600 bg-green-50 group-hover:bg-green-500 group-hover:text-white transition-colors"><SafeIcon name="LogIn" className="w-10 h-10" /></div>
-                                                        <span className="font-black text-slate-800 text-2xl uppercase">Clock In</span>
-                                                    </button>
-                                                    <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => {openTimePicker('OUT');}} className="p-12 rounded-[2rem] border-4 transition-all flex flex-col items-center bg-white group disabled:opacity-20 active:scale-95 border-slate-50 hover:border-red-500">
-                                                        <div className="p-5 rounded-3xl mb-4 text-red-600 bg-red-50 group-hover:bg-red-500 group-hover:text-white transition-colors"><SafeIcon name="LogOut" className="w-10 h-10" /></div>
-                                                        <span className="font-black text-slate-800 text-2xl uppercase">Clock Out</span>
-                                                    </button>
-                                                </div>
-                                            )}
-
-                                            <div className="pt-8 border-t border-slate-100">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase mb-3 ml-1 tracking-[0.2em]">Reason for no hours / General notes</p>
-                                                <div className="flex flex-col gap-3">
-                                                    <textarea value={generalNote} onChange={e => setGeneralNote(e.target.value)} placeholder="Enter details to be saved in the sheet..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-orange-500 outline-none min-h-[120px]" />
-                                                    <button onClick={syncGeneralNote} disabled={isSyncing || !generalNote.trim()} className="py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-widest transition-all bg-slate-800 text-white disabled:opacity-30">Save Shift Note</button>
-                                                </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <button disabled={status !== 'idle' || isSyncing} onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-green-50 hover:border-green-200 transition-all group disabled:opacity-30">
+                                                    <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
+                                                    <span className="block font-black text-xs uppercase text-slate-600 group-hover:text-green-700">Clock In</span>
+                                                </button>
+                                                <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
+                                                    <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
+                                                    <span className="block font-black text-xs uppercase text-slate-600 group-hover:text-red-700">Clock Out</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="rounded-[2rem] border-2 shadow-lg overflow-hidden bg-white transition-all border-slate-200">
-                                        <div className="p-6 border-b flex items-center justify-between bg-slate-50">
-                                            <div className="flex items-center gap-3 font-black uppercase text-xs tracking-widest text-slate-700"><SafeIcon name="Calendar" className="text-orange-500" />Current 14-Day Cycle</div>
-                                        </div>
+                                    <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-slate-100">
+                                        <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> Current Cycle</div>
                                         <div className="p-4 calendar-grid">
-                                            {logs.length === 0 ? (
-                                                <div className="col-span-full py-10 text-center animate-pulse text-slate-400 font-black text-[10px] uppercase">Syncing Calendar Data...</div>
-                                            ) : logs.map((day, idx) => (
-                                                <div key={idx} className={`p-3 rounded-2xl border-2 flex flex-col items-center group transition-all hover:scale-105 ${day.start || day.end ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-100 opacity-60'}`}>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">{day.weekday}</span>
-                                                    <span className="text-sm font-black text-slate-800 mb-1">{day.date}</span>
-                                                    <div className={`px-2 py-0.5 rounded-full text-[10px] font-black ${day.total !== '0.00' ? 'bg-slate-800 text-white' : 'text-slate-300'}`}>{day.total} HR</div>
+                                            {logs.map((day, idx) => (
+                                                <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">{day.weekday}</span>
+                                                    <span className="text-xs font-black text-slate-700">{day.date}</span>
+                                                    <span className="text-[10px] font-extrabold mt-1 text-orange-600">{day.total}h</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -549,131 +308,68 @@
                                 </>
                             ) : (
                                 <div className="space-y-6">
-                                    {selectedDetail ? (
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border-4 border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                            <button onClick={() => setSelectedDetail(null)} className="flex items-center gap-2 text-slate-400 hover:text-slate-800 transition-colors font-black uppercase text-[10px] tracking-widest mb-6">
-                                                <SafeIcon name="ArrowLeft" className="w-3 h-3" /> Back to Hub
-                                            </button>
-                                            
-                                            {selectedDetail.type === 'species' ? (
-                                                <div>
-                                                    <div className="flex items-center gap-4 mb-8">
-                                                        <div className="text-5xl">{SPECIES_DATA[selectedDetail.id].icon}</div>
-                                                        <div>
-                                                            <h3 className="text-3xl font-black text-slate-800">{selectedDetail.id}</h3>
-                                                            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Wildlife Reference Card</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-6">
-                                                        <div className="p-5 bg-slate-50 rounded-2xl">
-                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Biology & Behavior</p>
-                                                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{SPECIES_DATA[selectedDetail.id].bio}</p>
-                                                        </div>
-                                                        <div className="p-5 bg-orange-50 rounded-2xl">
-                                                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">Common Entry Points</p>
-                                                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{SPECIES_DATA[selectedDetail.id].entry}</p>
-                                                        </div>
-                                                        <div className="p-5 bg-blue-50 rounded-2xl">
-                                                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">The Skedaddle Method</p>
-                                                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{SPECIES_DATA[selectedDetail.id].method}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    <div className="flex items-center gap-4 mb-8">
-                                                        <div className="p-4 bg-green-500 text-white rounded-3xl">
-                                                            <SafeIcon name="Hammer" className="w-8 h-8" />
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="text-3xl font-black text-slate-800">{selectedDetail.id}</h3>
-                                                            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Step-by-Step Guide</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-6">
-                                                        <div className="p-5 bg-slate-50 rounded-2xl italic">
-                                                            <p className="text-sm text-slate-600 leading-relaxed font-medium">"{PROCEDURE_DATA[selectedDetail.id].summary}"</p>
-                                                        </div>
-                                                        <div className="space-y-4">
-                                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Technical Execution Checklist</p>
-                                                            {PROCEDURE_DATA[selectedDetail.id].steps.map((step, i) => (
-                                                                <div key={i} className="flex gap-4 items-start p-4 bg-white border-2 border-slate-50 rounded-2xl">
-                                                                    <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
-                                                                    <p className="text-sm text-slate-700 font-bold leading-snug">{step}</p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
+                                    {/* Quick Manual Access */}
+                                    <div className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-4 bg-orange-100 text-orange-600 rounded-2xl"><Icons.FileText className="w-6 h-6"/></div>
+                                            <div><h3 className="font-black text-slate-800">Skedaddle Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase">Technical Guide v2025</p></div>
+                                        </div>
+                                        <a href={MANUAL_URL} target="_blank" rel="noopener" className="p-3 bg-slate-900 text-white rounded-xl shadow-lg group-hover:bg-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></a>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Species Reference */}
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
+                                            <h3 className="font-black uppercase text-xs tracking-widest mb-6 text-slate-400">Species Database</h3>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {Object.keys(SPECIES_DATA).map(s => (
+                                                    <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-50'}`}>
+                                                        <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
+                                                        <span className="font-black text-[11px] uppercase tracking-tighter leading-tight">{s}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {selectedSpecies && (
+                                                <div className="mt-6 p-5 bg-blue-50 rounded-2xl text-[11px] space-y-3 font-medium animate-in fade-in duration-300">
+                                                    <p><span className="font-black uppercase tracking-widest text-blue-600 block mb-1">Behavior</span>{SPECIES_DATA[selectedSpecies].bio}</p>
+                                                    <p><span className="font-black uppercase tracking-widest text-blue-600 block mb-1">Method</span>{SPECIES_DATA[selectedSpecies].method}</p>
                                                 </div>
                                             )}
                                         </div>
-                                    ) : (
-                                        <>
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border-4 border-slate-100 overflow-hidden relative group hub-card">
-                                                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[5rem] -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500"></div>
-                                                <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="p-4 bg-orange-500 text-white rounded-3xl shadow-lg shadow-orange-200"><SafeIcon name="FileText" className="w-8 h-8" /></div>
-                                                        <div>
-                                                            <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Full Manual</h3>
-                                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Complete Technical Reference</p>
-                                                        </div>
-                                                    </div>
-                                                    <a href={MANUAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-8 py-4 bg-slate-900 hover:bg-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
-                                                        Open PDF <SafeIcon name="ExternalLink" className="w-4 h-4" />
-                                                    </a>
+
+                                        {/* Quick Communications */}
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
+                                            <h3 className="font-black uppercase text-xs tracking-widest mb-6 text-slate-400">Client Templates</h3>
+                                            <div className="space-y-3">
+                                                {CLIENT_TEMPLATES.map(t => (
+                                                    <button key={t.label} onClick={() => copyToClipboard(t.text)} className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-all border border-slate-100 group">
+                                                        <span className="font-black text-xs text-slate-700">{t.label}</span>
+                                                        <Icons.Copy className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Field Safety */}
+                                        <div className="col-span-1 md:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-4 bg-blue-100 text-blue-600 rounded-3xl"><Icons.Shield className="w-8 h-8"/></div>
+                                                <div>
+                                                    <h3 className="font-black text-slate-800">Safety Check</h3>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">PPE & Fall Protection Required</p>
                                                 </div>
                                             </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-2 border-slate-100 hub-card">
-                                                    <div className="flex items-center gap-3 mb-6">
-                                                        <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl"><SafeIcon name="Layout" /></div>
-                                                        <h3 className="font-black uppercase tracking-wider text-slate-800">Quick Species Specs</h3>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        {Object.keys(SPECIES_DATA).map(species => (
-                                                            <button 
-                                                                key={species} 
-                                                                onClick={() => setSelectedDetail({ type: 'species', id: species })}
-                                                                className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-300 transition-all text-left group"
-                                                            >
-                                                                <div className="text-xl mb-1">{SPECIES_DATA[species].icon}</div>
-                                                                <p className="font-black text-slate-800 text-xs">{species}</p>
-                                                                <p className="text-[9px] font-bold text-slate-400 uppercase mt-1 group-hover:text-blue-500">View Reference</p>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-2 border-slate-100 hub-card">
-                                                    <div className="flex items-center gap-3 mb-6">
-                                                        <div className="p-3 bg-green-50 text-green-500 rounded-2xl"><SafeIcon name="Hammer" /></div>
-                                                        <h3 className="font-black uppercase tracking-wider text-slate-800">Standard Guides</h3>
-                                                    </div>
-                                                    <div className="space-y-3">
-                                                        {Object.keys(PROCEDURE_DATA).map(proc => (
-                                                            <button 
-                                                                key={proc}
-                                                                onClick={() => setSelectedDetail({ type: 'procedure', id: proc })}
-                                                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-300 transition-all text-left"
-                                                            >
-                                                                <span className="font-black text-slate-800 text-xs">{proc}</span>
-                                                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-300 group-hover:text-green-500 transition-colors">
-                                                                    <SafeIcon name="FileText" className="w-4 h-4" />
-                                                                </div>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
+                                            <div className="flex flex-col items-end">
+                                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Attic Risk: High</span>
+                                                <span className="text-xs font-bold text-slate-500">P100 Recommended</span>
                                             </div>
-                                        </>
-                                    )}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                             
-                            <div className="text-center pb-12 mt-12 opacity-80">
-                                <p className="font-black uppercase tracking-[0.5em] text-slate-300 text-[10px]">Skedaddle Wildlife Control</p>
+                            <div className="text-center pt-8 opacity-20">
+                                <p className="font-black uppercase tracking-[0.5em] text-[8px]">Skedaddle Wildlife Control</p>
                             </div>
                         </div>
                     )}
