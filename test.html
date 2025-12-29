@@ -90,44 +90,44 @@
             ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
             ArrowLeft: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
             Hammer: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86c0-1 .81-1.84 1.81-1.84.28 0 .56.07.82.19l.52.26c.3.15.65.15.95 0l.52-.26a1.84 1.84 0 0 1 2.56 1.68v.86c0 .85-.33 1.65-.93 2.25l-1.25 1.25c-.24.24-.24.62 0 .86l1.25 1.25c.6.6.93 1.41.93 2.25v.86c0 1-.81 1.84-1.81 1.84-.28 0-.56-.07-.82-.19l-.52-.26c-.3-.15-.65-.15-.95 0l-.52.26a1.84 1.84 0 0 1-2.56-1.68v-.86c0-.84.33-1.65.93-2.25l1.25-1.25c.24-.24.24-.62 0-.86Z"/></svg>,
-            CheckCircle: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         };
 
         const SPECIES_DATA = {
             'Raccoons': { 
                 icon: '🐾', 
                 bio: 'Intelligent, dexterous, and strong. Maternal cycle begins late winter.', 
-                signs: 'Hand-like prints, high-pitched chattering, heavy thumping at night, large tubular scat (look for undigested seeds).',
-                entry: 'Roof vents, soffits, chimneys, roof-wall junctions (RSI).', 
-                method: 'Check valves or physical removal of young. Ensure 16-gauge mesh is bolted, not just stapled.' 
+                signs: 'Hand-like prints, high-pitched chattering, heavy thumping at night, large tubular scat (seeds inside).',
+                entry: 'Roof vents, soffits, chimneys, RSI points.', 
+                method: 'One-way doors or physical baby removal. Bolt all mesh.' 
             },
             'Squirrels': { 
                 icon: '🥜', 
-                bio: 'Aggressive chewers. Diurnal activity (most active at dawn/dusk).', 
-                signs: 'Quick scratching sounds, chewed plastic/wood, small oval scat (pointed ends), nut shells in attic.',
-                entry: 'Roof corners, fascia board gaps, cedar siding, plastic vent caps.', 
-                method: 'One-way exclusion doors. Seal all non-primary gaps with galvanized steel mesh first.' 
+                bio: 'Constant chewers. Active during daylight hours.', 
+                signs: 'Quick scurrying sounds, chewed plastic/wood, small oval scat, nut shells.',
+                entry: 'Roof corners, fascia board gaps, cedar siding.', 
+                method: 'Seal secondary gaps first + OWD at primary entry.' 
             },
             'Bats': { 
                 icon: '🦇', 
-                bio: 'Protected species. Maternal colonies active June-August (Blackout period).', 
-                signs: 'Staining at entry (rub marks), guano piles (crumbles like dry soil), high-pitched chirps.',
-                entry: 'Ridge vents, brick gaps, gable vents, flashing overlaps.', 
-                method: 'Install one-way netting curtains or cones. Must wait for non-birthing season to seal.' 
+                bio: 'Protected. Vital ecosystem role. Can enter 1/4" gaps.', 
+                signs: 'Rub marks at entry, guano piles (looks like soil), high chirps at dusk.',
+                entry: 'Ridge vents, brick gaps, gable vents.', 
+                method: 'Netting curtains or check valves. Seasonal restrictions apply.' 
             },
             'Birds': { 
                 icon: '🐦', 
-                bio: 'Starlings and Sparrows are most common. Nesting material is a fire hazard.', 
-                signs: 'Visible straw from vents, constant chirping, mites, heavy ammonia odor from waste.',
-                entry: 'Bathroom exhaust vents, dryer vents, kitchen vents.', 
-                method: 'Remove nest, sanitize with antimicrobial, install heavy-duty bird-proof vent guards.' 
+                bio: 'Vent nesters. Nests are fire hazards and carry mites.', 
+                signs: 'Visible straw, chirping, mites on walls, ammonia odor.',
+                entry: 'Kitchen/Bath exhaust vents, dryer vents.', 
+                method: 'Nest removal + Area sanitation + Vent guard install.' 
             },
             'Skunks': { 
                 icon: '🦨', 
-                bio: 'Ground burrowers. Docile but defensive. Excellent diggers.', 
-                signs: 'Distinct musk odor, cone-shaped holes in lawn, 4-6" burrows under structures.',
-                entry: 'Under decks, sheds, concrete stairs, crawlspace vents.', 
-                method: 'Trenching and Screening: Dig 1ft down, 1ft out (L-shape). Install OWD at primary exit.' 
+                bio: 'Ground burrowers. Defensive spray reaches 15ft.', 
+                signs: 'Musk odor, 4-6" burrows, cone-shaped lawn holes.',
+                entry: 'Under decks, sheds, concrete stairs.', 
+                method: 'Trenching (L-shape mesh) + OWD at tunnel exit.' 
             }
         };
 
@@ -136,50 +136,50 @@
                 label: "RSI Guide",
                 desc: "Roof Soffit Intersections",
                 steps: [
-                    "Inspect the 'V' where the roofline meets the soffit.",
-                    "Ensure mesh is tucked behind the fascia board.",
-                    "Secure with 1-inch zip screws and washers every 4-6 inches.",
-                    "Paint mesh to match trim for aesthetics."
+                    "Inspect the 'V' junction.",
+                    "Tuck mesh behind fascia board.",
+                    "Zip screw/washer every 4-6 inches.",
+                    "Paint to match trim."
                 ]
             },
             'plumbing': {
                 label: "Plumbing Guide",
                 desc: "Stacks & Pipe Vents",
                 steps: [
-                    "Clear any debris around the stack base.",
-                    "Measure circumference for custom mesh fit.",
-                    "Install a 'Skedaddle Hat' or custom screening.",
-                    "Verify the rubber boot is not damaged."
+                    "Clear debris from rubber boot.",
+                    "Custom fit 1x1 steel mesh.",
+                    "Install 'Skedaddle Hat' protector.",
+                    "Ensure vertical clearance for stack."
                 ]
             },
             'roof-vents': {
-                label: "Roof Vents Guide",
+                label: "Roof Vents",
                 desc: "Static & Ridge Vents",
                 steps: [
-                    "Check for pulled nails or chewed plastic corners.",
-                    "Cage vents with 1x1 galvanized steel mesh.",
-                    "Ensure the cage is tall enough for the vent to breathe.",
-                    "Seal base with professional grade sealant."
+                    "Check for pulled nails/chewed corners.",
+                    "Cage with 1x1 galvanized mesh.",
+                    "Leave space for vent to breathe.",
+                    "Apply sealant to mesh base."
                 ]
             },
             'bsg': {
                 label: "Sealing BSG",
-                desc: "Bottom Sill Gasket / Base",
+                desc: "Bottom Sill Gasket",
                 steps: [
-                    "Inspect where the siding meets the foundation.",
-                    "Seal gaps larger than 1/4 inch with mesh or sealant.",
-                    "Ensure proper drainage (don't block weep holes entirely).",
-                    "Check corner posts for hidden entry paths."
+                    "Check siding-foundation junction.",
+                    "Seal gaps > 1/4 inch with mesh.",
+                    "Do not fully block weep holes.",
+                    "Secure corners with sealant."
                 ]
             },
             'owds': {
-                label: "OWD Fabrication",
+                label: "Making OWDs",
                 desc: "One-Way Door Build",
                 steps: [
-                    "Construct 'tunnel' using galvanized mesh.",
-                    "Install the 'flap' with enough tension to snap shut.",
-                    "Ensure zero resistance for the animal exiting.",
-                    "Label with date of installation for follow-up."
+                    "Fabricate mesh tunnel.",
+                    "Test flap tension (snaps shut).",
+                    "Verify zero resistance for animal.",
+                    "Date and label for follow-up."
                 ]
             }
         };
@@ -291,12 +291,12 @@
             );
 
             return (
-                <div className="min-h-screen max-w-2xl mx-auto px-4 py-8">
+                <div className="min-h-screen max-w-4xl mx-auto px-4 py-8">
                     {!user ? (
-                        <div className="bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100">
+                        <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10">
                             <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" alt="Logo" />
                             <h1 className="text-3xl font-extrabold text-slate-800 mb-2 uppercase tracking-tight">Technician Portal</h1>
-                            <p className="text-slate-400 mb-10 font-medium">Log in to track time and access technical data.</p>
+                            <p className="text-slate-400 mb-10 font-medium italic">Wildlife Control Technical Resource</p>
                             <button onClick={handleLogin} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                             <div className="flex items-center justify-center gap-2 cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
                                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
@@ -330,8 +330,8 @@
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
                                     <div>
-                                        <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight">{user.name}</p>
-                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1">Certified Technician</p>
+                                        <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight text-sm md:text-base">{user.name}</p>
+                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1 tracking-widest">Certified Technician</p>
                                     </div>
                                 </div>
                                 <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
@@ -343,7 +343,7 @@
                             </div>
 
                             {activeTab === 'clock' ? (
-                                <>
+                                <div className="max-w-2xl mx-auto space-y-6">
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
                                         <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                                             <div className="flex items-center gap-4">
@@ -359,7 +359,7 @@
                                                     <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
                                                     <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                 </button>
-                                                <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
+                                                <button disabled={status === 'idle' || status === 'clocked_out' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
                                                     <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
                                                     <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                 </button>
@@ -379,100 +379,83 @@
                                             ))}
                                         </div>
                                     </div>
-                                </>
+                                </div>
                             ) : (
                                 <div className="space-y-6 animate-slide-up">
-                                    {/* Work Guide Detail View */}
-                                    {selectedWork ? (
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-4 border-blue-100">
-                                            <button onClick={() => setSelectedWork(null)} className="flex items-center gap-2 text-slate-400 hover:text-slate-800 transition-colors font-black uppercase text-[10px] tracking-widest mb-6">
-                                                <Icons.ArrowLeft className="w-3 h-3" /> Back to Hub
-                                            </button>
-                                            <div className="flex items-center gap-4 mb-8">
-                                                <div className="p-4 bg-blue-600 text-white rounded-3xl"><Icons.Hammer className="w-8 h-8"/></div>
-                                                <div>
-                                                    <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tight">{WORK_GUIDES[selectedWork].label}</h3>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{WORK_GUIDES[selectedWork].desc}</p>
-                                                </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Side by Side Section: Procedures & Species */}
+                                        
+                                        {/* Procedures by Work Type */}
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex flex-col">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Hammer className="w-5 h-5"/></div>
+                                                <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Field Procedures</h3>
                                             </div>
-                                            <div className="space-y-4">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Field Execution Steps</p>
-                                                {WORK_GUIDES[selectedWork].steps.map((step, i) => (
-                                                    <div key={i} className="flex gap-4 items-start p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
-                                                        <p className="text-sm text-slate-700 font-semibold leading-snug">{step}</p>
-                                                    </div>
+                                            <div className="space-y-2 flex-1">
+                                                {Object.keys(WORK_GUIDES).map(key => (
+                                                    <button 
+                                                        key={key} 
+                                                        onClick={() => setSelectedWork(key === selectedWork ? null : key)}
+                                                        className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all group ${selectedWork === key ? 'bg-green-600 border-green-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 hover:border-green-300'}`}
+                                                    >
+                                                        <div className="text-left">
+                                                            <p className={`font-black text-[10px] uppercase tracking-tight ${selectedWork === key ? 'text-white' : 'text-slate-800'}`}>{WORK_GUIDES[key].label}</p>
+                                                        </div>
+                                                        <Icons.FileText className={`w-4 h-4 ${selectedWork === key ? 'text-green-200' : 'text-slate-300 group-hover:text-green-500'}`}/>
+                                                    </button>
                                                 ))}
                                             </div>
-                                            <div className="mt-8 pt-8 border-t border-slate-100 text-center">
-                                                <p className="text-[10px] text-slate-400 font-medium mb-4 italic">Need more details? Check the full PDF manual below.</p>
-                                            </div>
+                                            {selectedWork && (
+                                                <div className="mt-4 p-4 bg-green-50 rounded-2xl border border-green-100 animate-slide-up">
+                                                    <p className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-2">Key Steps</p>
+                                                    <ul className="space-y-2">
+                                                        {WORK_GUIDES[selectedWork].steps.map((s, i) => (
+                                                            <li key={i} className="text-[11px] font-semibold text-slate-700 flex gap-2">
+                                                                <Icons.CheckCircle className="w-3 h-3 text-green-500 mt-0.5 shrink-0" /> {s}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <>
-                                            {/* Work Type Reference Grid */}
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Hammer className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Procedures by Work Type</h3>
-                                                </div>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {Object.keys(WORK_GUIDES).map(key => (
-                                                        <button 
-                                                            key={key} 
-                                                            onClick={() => setSelectedWork(key)}
-                                                            className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-green-300 transition-all group"
-                                                        >
-                                                            <div className="text-left">
-                                                                <p className="font-black text-xs text-slate-800 uppercase tracking-tight">{WORK_GUIDES[key].label}</p>
-                                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{WORK_GUIDES[key].desc}</p>
-                                                            </div>
-                                                            <div className="p-2 bg-white rounded-xl shadow-sm text-slate-300 group-hover:text-green-600">
-                                                                <Icons.FileText className="w-4 h-4"/>
-                                                            </div>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
 
-                                            {/* Species Reference */}
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Layout className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostic Species Guide</h3>
-                                                </div>
-                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                                                    {Object.keys(SPECIES_DATA).map(s => (
-                                                        <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100'}`}>
-                                                            <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
-                                                            <span className="font-black text-[10px] uppercase tracking-tighter leading-tight">{s}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                                {selectedSpecies && (
-                                                    <div className="space-y-4 animate-slide-up">
-                                                        <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                                                            <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Diagnostic Signs (Noise/Scat/Prints)</p>
-                                                            <p className="text-xs text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
-                                                        </div>
-                                                        <div className="p-4 bg-slate-900 rounded-2xl text-white">
-                                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Skedaddle Execution Method</p>
-                                                            <p className="text-xs font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
-                                                        </div>
+                                        {/* Species Reference */}
+                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex flex-col">
+                                            <div className="flex items-center gap-3 mb-6">
+                                                <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div>
+                                                <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostic Guide</h3>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2 mb-4 flex-1">
+                                                {Object.keys(SPECIES_DATA).map(s => (
+                                                    <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-3 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 hover:border-blue-200'}`}>
+                                                        <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
+                                                        <span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {selectedSpecies && (
+                                                <div className="space-y-3 animate-slide-up">
+                                                    <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100">
+                                                        <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Diagnostic Signs</p>
+                                                        <p className="text-[11px] text-slate-700 font-medium leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
                                                     </div>
-                                                )}
-                                            </div>
-
-                                            {/* Full Manual Link (Fall-back) */}
-                                            <a href={MANUAL_FULL_URL} target="_blank" className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-4 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icons.FileText className="w-6 h-6"/></div>
-                                                    <div><h3 className="font-black text-slate-800 text-sm">Full Technical Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Manual Lookup & Search</p></div>
+                                                    <div className="p-3 bg-slate-900 rounded-2xl text-white">
+                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Method</p>
+                                                        <p className="text-[11px] font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
+                                                    </div>
                                                 </div>
-                                                <div className="p-3 text-slate-300 group-hover:text-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></div>
-                                            </a>
-                                        </>
-                                    )}
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Full Manual Link Footer */}
+                                    <a href={MANUAL_FULL_URL} target="_blank" className="bg-white rounded-[2rem] p-6 shadow-md border border-slate-100 flex items-center justify-between group hub-card max-w-2xl mx-auto">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-4 bg-slate-100 text-slate-600 rounded-2xl group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icons.FileText className="w-6 h-6"/></div>
+                                            <div><h3 className="font-black text-slate-800 text-sm">Full Technical Manual</h3><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Comprehensive Field Lookup</p></div>
+                                        </div>
+                                        <div className="p-3 text-slate-300 group-hover:text-orange-600 transition-colors"><Icons.ExternalLink className="w-5 h-5"/></div>
+                                    </a>
                                 </div>
                             )}
                             
