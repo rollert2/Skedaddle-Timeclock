@@ -65,7 +65,7 @@
         }
 
         .supply-item {
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -101,13 +101,13 @@
         };
 
         const SPECIES_DATA = {
-            'Raccoons': { icon: '🐾', signs: 'Hand-prints, nocturnal thumping, chattering, large tubular scat with undigested fruit/seeds.', method: 'OWDs or physical baby removal. Bolt 16ga mesh.' },
-            'Squirrels': { icon: '🥜', signs: 'Fast scratching during daylight, 1.5-2" chewed holes, nut shells, pointed-end scat.', method: 'Secondary gap sealing + primary entry OWD.' },
-            'Bats': { icon: '🦇', signs: 'Oily stains at entry, crumbly guano piles, high-pitched chirps at dusk.', method: 'Netting/Check valves. Blackout periods June-Aug.' },
-            'Birds': { icon: '🐦', signs: 'Visible straw/nesting from vents, mites, ammonia odor, constant chirping.', method: 'Nest removal + sanitation + heavy vent guard installation.' },
-            'Skunks': { icon: '🦨', signs: 'Faint odor, cone-shaped holes, 4-6" burrows under structures.', method: 'L-shape trench screening (1ft deep, 1ft out) + OWD.' },
-            'Mice': { icon: '🐭', signs: 'Small rice-sized scat, wall scratching, nested attic insulation, chewed wiring.', method: 'Search & Seal. Focus on foundation BSG and roofline gaps.' },
-            'Rats': { icon: '🐀', signs: 'Large droppings, grease rub marks on walls, heavy chewing on wood/PVC.', method: 'Structural fortification with high-strength mesh + trapping.' }
+            'Raccoons': { icon: '🐾', signs: 'Hand-prints, nocturnal thumping, chattering, large scat with seeds.', method: 'OWDs or baby removal. Bolt 16ga mesh.' },
+            'Squirrels': { icon: '🥜', signs: 'Daylight scratching, 1.5-2" holes, nut shells, pointed-end scat.', method: 'Secondary sealing + primary OWD.' },
+            'Bats': { icon: '🦇', signs: 'Stains at entry, crumbly guano, dusk chirps.', method: 'Netting curtains/cones. Seasonal rules apply.' },
+            'Birds': { icon: '🐦', signs: 'Visible straw, chirping, mites, ammonia odor.', method: 'Nest removal + sanitation + guards.' },
+            'Skunks': { icon: '🦨', signs: 'Musk odor, cone-shaped holes, 4-6" burrows.', method: 'L-shape trenching + OWD.' },
+            'Mice': { icon: '🐭', signs: 'Rice droppings, wall scratching, nested insulation.', method: 'Search & Seal foundation/roofline.' },
+            'Rats': { icon: '🐀', signs: 'Grease marks, gnawed PVC/wood, large droppings.', method: 'Fortification with steel mesh + trapping.' }
         };
 
         const BIRTHING_CALENDAR = [
@@ -140,7 +140,10 @@
         ];
 
         const App = () => {
-            const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('skedaddle_user')));
+            const [user, setUser] = useState(() => {
+                const s = localStorage.getItem('skedaddle_user');
+                try { return s ? JSON.parse(s) : null; } catch (e) { return null; }
+            });
             const [activeTab, setActiveTab] = useState('clock');
             const [selectedSpecies, setSelectedSpecies] = useState(null);
             const [status, setStatus] = useState('idle');
@@ -151,14 +154,12 @@
             const [accessToken, setAccessToken] = useState(null);
             const [tokenClient, setTokenClient] = useState(null);
 
-            // Admin Logic
             const [adminClicks, setAdminClicks] = useState(0);
             const [supervisorEmails, setSupervisorEmails] = useState(() => {
-                const saved = localStorage.getItem('skedaddle_admins');
-                return saved ? JSON.parse(saved) : ["magicbran@gmail.com"];
+                const s = localStorage.getItem('skedaddle_admins');
+                try { return s ? JSON.parse(s) : ["magicbran@gmail.com"]; } catch (e) { return ["magicbran@gmail.com"]; }
             });
 
-            // Supplies Logic
             const [supplies, setSupplies] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
             const [newItemName, setNewItemName] = useState('');
@@ -173,8 +174,13 @@
             useEffect(() => {
                 if (user) {
                     const saved = localStorage.getItem(`supplies_${user.email}`);
-                    if (saved) setSupplies(JSON.parse(saved));
-                    else setSupplies(DEFAULT_STOCK.map(item => ({ ...item, checked: false, note: '' })));
+                    if (saved) {
+                        try { setSupplies(JSON.parse(saved)); } catch (e) { 
+                             setSupplies(DEFAULT_STOCK.map(item => ({ ...item, checked: false, note: '' })));
+                        }
+                    } else {
+                        setSupplies(DEFAULT_STOCK.map(item => ({ ...item, checked: false, note: '' })));
+                    }
                 }
             }, [user]);
 
@@ -189,6 +195,7 @@
             }, [supervisorEmails]);
 
             useEffect(() => {
+                const timeout = setTimeout(() => { if (isInitializing) setIsInitializing(false); }, 5000);
                 const script = document.createElement('script');
                 script.src = "https://accounts.google.com/gsi/client";
                 script.async = true;
@@ -211,6 +218,7 @@
                     if (user) checkUserStatus(user);
                 };
                 document.head.appendChild(script);
+                return () => clearTimeout(timeout);
             }, []);
 
             const checkUserStatus = async (u) => {
@@ -252,6 +260,12 @@
                 });
                 setTimeout(() => setAdminClicks(0), 3000);
             };
+
+            const toggleSupply = (id) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
+            const updateSupplyNote = (id, note) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
+            const addSupply = () => { if (!newItemName.trim()) return; setSupplies([{ id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' }, ...supplies]); setNewItemName(''); };
+            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
+            const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
 
             const categorizedStock = useMemo(() => {
                 const groups = {};
@@ -323,7 +337,7 @@
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
                                         <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                                             <div className="flex items-center gap-4">
-                                                <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
+                                                <div className={`p-3 bg-slate-800 rounded-xl`}><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
                                                 <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : (status === 'clocked_out' ? 'SHIFT ENDED' : 'OFF DUTY')}</p></div>
                                             </div>
                                             <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
