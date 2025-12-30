@@ -65,7 +65,7 @@
         }
 
         .supply-item {
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
     </style>
 </head>
@@ -87,7 +87,6 @@
             Alert: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
             Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
             Loader: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`animate-spin ${props.className}`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
-            Layout: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
             Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
             FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
             ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
@@ -102,13 +101,13 @@
         };
 
         const SPECIES_DATA = {
-            'Raccoons': { icon: '🐾', bio: 'Intelligent/Strong. Maternal cycle begins late winter.', signs: 'Hand-prints, thumping, tubular scat (seeds).', method: 'OWDs or Physical Removal.' },
-            'Squirrels': { icon: '🥜', bio: 'Persistent chewers. Diurnal activity.', signs: 'Scratching, 2" holes, nut shells.', method: 'Seal secondary + OWD primary.' },
-            'Bats': { icon: '🦇', bio: 'Protected. Vital role. Blackout June-Aug.', signs: 'Entry stains, guano (soil-like).', method: 'Check valves / Netting.' },
-            'Birds': { icon: '🐦', bio: 'Vent nesters. Fire hazard. Carry mites.', signs: 'Straw, chirping, mites, ammonia.', method: 'Nest removal + Sanitation + Guards.' },
-            'Skunks': { icon: '🦨', bio: 'Ground burrowers. Defensive spray 15ft.', signs: 'Musk, cone holes, 6" burrows.', method: 'Trenching + OWD.' },
-            'Mice': { icon: '🐭', bio: 'Small. Enter dime-sized gaps.', signs: 'Rice droppings, nested insulation.', method: 'Search & Seal foundation/roofline.' },
-            'Rats': { icon: '🐀', bio: 'Aggressive chewers. Neophobic.', signs: 'Grease marks, gnawed wood/PVC.', method: 'Steel mesh + Trapping.' }
+            'Raccoons': { icon: '🐾', signs: 'Hand-prints, nocturnal thumping, chattering, large tubular scat with undigested fruit/seeds.', method: 'OWDs or physical baby removal. Bolt 16ga mesh.' },
+            'Squirrels': { icon: '🥜', signs: 'Fast scratching during daylight, 1.5-2" chewed holes, nut shells, pointed-end scat.', method: 'Secondary gap sealing + primary entry OWD.' },
+            'Bats': { icon: '🦇', signs: 'Oily stains at entry, crumbly guano piles, high-pitched chirps at dusk.', method: 'Netting/Check valves. Blackout periods June-Aug.' },
+            'Birds': { icon: '🐦', signs: 'Visible straw/nesting from vents, mites, ammonia odor, constant chirping.', method: 'Nest removal + sanitation + heavy vent guard installation.' },
+            'Skunks': { icon: '🦨', signs: 'Faint odor, cone-shaped holes, 4-6" burrows under structures.', method: 'L-shape trench screening (1ft deep, 1ft out) + OWD.' },
+            'Mice': { icon: '🐭', signs: 'Small rice-sized scat, wall scratching, nested attic insulation, chewed wiring.', method: 'Search & Seal. Focus on foundation BSG and roofline gaps.' },
+            'Rats': { icon: '🐀', signs: 'Large droppings, grease rub marks on walls, heavy chewing on wood/PVC.', method: 'Structural fortification with high-strength mesh + trapping.' }
         };
 
         const BIRTHING_CALENDAR = [
@@ -119,32 +118,29 @@
             { name: 'Skunks', months: [3, 4, 5], color: 'bg-gray-400' }
         ];
 
-        const DEFAULT_SUPPLIES = [
-            { id: '1', name: '1 inch screen', category: 'Screens', checked: false, note: '' },
-            { id: '2', name: '1/4 inch screen', category: 'Screens', checked: false, note: '' },
-            { id: '3', name: 'deoderizer', category: 'Chemicals', checked: false, note: '' },
-            { id: '4', name: 'bacterial digester', category: 'Chemicals', checked: false, note: '' },
-            { id: '5', name: 'D/E', category: 'Chemicals', checked: false, note: '' },
-            { id: '6', name: 'Roof vents (Top vented)', category: 'Vents', checked: false, note: '' },
-            { id: '7', name: 'Roof vents (Bottom Vented)', category: 'Vents', checked: false, note: '' },
-            { id: '8', name: 'Wall vents', category: 'Vents', checked: false, note: '' },
-            { id: '9', name: 'Sealant', category: 'Fasteners & Sealants', checked: false, note: '' },
-            { id: '10', name: 'Kopr-Lastic', category: 'Fasteners & Sealants', checked: false, note: '' },
-            { id: '11', name: 'Washer screws', category: 'Fasteners & Sealants', checked: false, note: '' },
-            { id: '12', name: 'Anchor screws', category: 'Fasteners & Sealants', checked: false, note: '' },
-            { id: '13', name: 'DSS screws', category: 'Fasteners & Sealants', checked: false, note: '' },
-            { id: '14', name: 'Foot Covers', category: 'PPE & Safety', checked: false, note: '' },
-            { id: '15', name: 'Drop sheets', category: 'PPE & Safety', checked: false, note: '' },
-            { id: '16', name: 'latex gloves', category: 'PPE & Safety', checked: false, note: '' },
-            { id: '17', name: 'garbage bags', category: 'PPE & Safety', checked: false, note: '' },
-            { id: '18', name: 'Respirator Filters', category: 'PPE & Safety', checked: false, note: '' }
+        const DEFAULT_STOCK = [
+            { id: '1', name: '1 inch screen', category: 'Screens' },
+            { id: '2', name: '1/4 inch screen', category: 'Screens' },
+            { id: '3', name: 'deoderizer', category: 'Chemicals' },
+            { id: '4', name: 'bacterial digester', category: 'Chemicals' },
+            { id: '5', name: 'D/E', category: 'Chemicals' },
+            { id: '6', name: 'Roof vents (Top vented)', category: 'Vents' },
+            { id: '7', name: 'Roof vents (Bottom Vented)', category: 'Vents' },
+            { id: '8', name: 'Wall vents', category: 'Vents' },
+            { id: '9', name: 'Sealant', category: 'Fasteners & Sealants' },
+            { id: '10', name: 'Kopr-Lastic', category: 'Fasteners & Sealants' },
+            { id: '11', name: 'Washer screws', category: 'Fasteners & Sealants' },
+            { id: '12', name: 'Anchor screws', category: 'Fasteners & Sealants' },
+            { id: '13', name: 'DSS screws', category: 'Fasteners & Sealants' },
+            { id: '14', name: 'Foot Covers', category: 'PPE & Safety' },
+            { id: '15', name: 'Drop sheets', category: 'PPE & Safety' },
+            { id: '16', name: 'latex gloves', category: 'PPE & Safety' },
+            { id: '17', name: 'garbage bags', category: 'PPE & Safety' },
+            { id: '18', name: 'Respirator Filters', category: 'PPE & Safety' }
         ];
 
         const App = () => {
-            const [user, setUser] = useState(() => {
-                const saved = localStorage.getItem('skedaddle_user');
-                return saved ? JSON.parse(saved) : null;
-            });
+            const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('skedaddle_user')));
             const [activeTab, setActiveTab] = useState('clock');
             const [selectedSpecies, setSelectedSpecies] = useState(null);
             const [status, setStatus] = useState('idle');
@@ -155,18 +151,18 @@
             const [accessToken, setAccessToken] = useState(null);
             const [tokenClient, setTokenClient] = useState(null);
 
-            // Hidden Admin State
+            // Admin Logic
             const [adminClicks, setAdminClicks] = useState(0);
             const [supervisorEmails, setSupervisorEmails] = useState(() => {
                 const saved = localStorage.getItem('skedaddle_admins');
-                return saved ? JSON.parse(saved) : [SUPERVISOR_EMAIL];
+                return saved ? JSON.parse(saved) : ["magicbran@gmail.com"];
             });
 
-            // Supplies State
+            // Supplies Logic
             const [supplies, setSupplies] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
             const [newItemName, setNewItemName] = useState('');
-            const [expandedCategories, setExpandedCategories] = useState(['Screens', 'Chemicals', 'Vents', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
+            const [expandedCats, setExpandedCats] = useState(['Screens', 'Chemicals', 'Vents', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
             
             const [showTimePicker, setShowTimePicker] = useState(false);
             const [pendingAction, setPendingAction] = useState(null);
@@ -174,23 +170,11 @@
             const [selMin, setSelMin] = useState(0);
             const [actionNote, setActionNote] = useState("");
 
-            const checkUserStatus = async (userObj) => {
-                if (!userObj) return;
-                setIsSyncing(true);
-                try {
-                    const response = await fetch(`${APPS_SCRIPT_URL}?name=${encodeURIComponent(userObj.name)}`);
-                    const data = await response.json();
-                    if (data.status) setStatus(data.status);
-                    if (data.logs) setLogs(data.logs);
-                } catch (err) { console.error("Status error:", err); }
-                setIsSyncing(false);
-            };
-
             useEffect(() => {
                 if (user) {
-                    const savedSupplies = localStorage.getItem(`supplies_${user.email}`);
-                    if (savedSupplies) setSupplies(JSON.parse(savedSupplies));
-                    else setSupplies(DEFAULT_SUPPLIES);
+                    const saved = localStorage.getItem(`supplies_${user.email}`);
+                    if (saved) setSupplies(JSON.parse(saved));
+                    else setSupplies(DEFAULT_STOCK.map(item => ({ ...item, checked: false, note: '' })));
                 }
             }, [user]);
 
@@ -212,18 +196,15 @@
                     const client = window.google.accounts.oauth2.initTokenClient({
                         client_id: CLIENT_ID,
                         scope: 'openid email profile https://www.googleapis.com/auth/gmail.send',
-                        callback: async (tokenResponse) => {
-                            if (tokenResponse.error) return;
-                            setAccessToken(tokenResponse.access_token);
-                            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                                headers: { 'Authorization': `Bearer ${tokenResponse.access_token}` }
-                            });
-                            const profile = await userInfoRes.json();
-                            const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
+                        callback: async (resp) => {
+                            if (resp.error) return;
+                            setAccessToken(resp.access_token);
+                            const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': `Bearer ${resp.access_token}` } }).then(r => r.json());
+                            const newUser = { email: info.email, name: info.name, picture: info.picture };
                             setUser(newUser);
                             if (rememberMe) localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
                             checkUserStatus(newUser);
-                        },
+                        }
                     });
                     setTokenClient(client);
                     setIsInitializing(false);
@@ -232,93 +213,49 @@
                 document.head.appendChild(script);
             }, []);
 
-            const handleLogin = () => tokenClient?.requestAccessToken({ prompt: 'consent' });
-
-            const handleLogout = () => {
-                setUser(null);
-                setAccessToken(null);
-                localStorage.removeItem('skedaddle_user');
-                setActiveTab('clock');
-            };
-
-            const sendEmailAsUser = async (action, time, note) => {
-                const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
-                const message = `To: ${supervisorEmails.join(', ')}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nAutomated via Hub`;
-                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            const checkUserStatus = async (u) => {
+                if (!u) return;
+                setIsSyncing(true);
                 try {
-                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ raw: encodedEmail })
-                    });
-                } catch (err) { console.error("Email error:", err); }
+                    const data = await fetch(`${APPS_SCRIPT_URL}?name=${encodeURIComponent(u.name)}`).then(r => r.json());
+                    if (data.status) setStatus(data.status);
+                    if (data.logs) setLogs(data.logs);
+                } catch (e) {}
+                setIsSyncing(false);
             };
 
-            const confirmClockAction = async () => {
+            const sendEmail = async (action, time, note) => {
+                const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${date}`;
+                const body = `To: ${supervisorEmails.join(', ')}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime: ${time}\nNotes: ${note || "None"}\n\nSent via Technician Hub`;
+                const raw = btoa(unescape(encodeURIComponent(body))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                try {
+                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw }) });
+                } catch (e) {}
+            };
+
+            const confirmAction = async () => {
                 const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-                if (accessToken) await sendEmailAsUser(pendingAction, decimalTime, actionNote);
+                if (accessToken) await sendEmail(pendingAction, decimalTime, actionNote);
                 try {
-                    await fetch(APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ email: user.email, name: user.name, type: pendingAction, decimalTime, note: actionNote })
-                    });
+                    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ email: user.email, name: user.name, type: pendingAction, decimalTime, note: actionNote }) });
                     setTimeout(() => { setActionNote(""); checkUserStatus(user); }, 2500);
-                } catch (err) { setIsSyncing(false); }
+                } catch (e) { setIsSyncing(false); }
             };
 
-            const toggleSupply = (id) => {
-                setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
-            };
-
-            const updateSupplyNote = (id, note) => {
-                setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
-            };
-
-            const addSupply = () => {
-                if (!newItemName.trim()) return;
-                const newItem = { id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' };
-                setSupplies([newItem, ...supplies]);
-                setNewItemName('');
-            };
-
-            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
-            const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
-            const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
-
-            const copySuppliesList = () => {
-                const checkedItems = supplies.filter(s => s.checked);
-                if (checkedItems.length === 0) return;
-                let text = `SUPPLIES NEEDED (${new Date().toLocaleDateString()}):\n`;
-                checkedItems.forEach(item => { text += `- ${item.name}${item.note ? ` (${item.note})` : ''}\n`; });
-                const el = document.createElement('textarea');
-                el.value = text;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-            };
-
-            const handleAdminClick = () => {
+            const handleLogoClick = () => {
                 setAdminClicks(prev => {
-                    const next = prev + 1;
-                    if (next >= 5) {
-                        setActiveTab('admin');
-                        return 0;
-                    }
-                    return next;
+                    if (prev + 1 >= 5) { setActiveTab('admin'); return 0; }
+                    return prev + 1;
                 });
-                setTimeout(() => setAdminClicks(0), 3000); // Reset clicks after 3 seconds of inactivity
+                setTimeout(() => setAdminClicks(0), 3000);
             };
 
-            const categorizedSupplies = useMemo(() => {
-                const filtered = supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
+            const categorizedStock = useMemo(() => {
                 const groups = {};
-                filtered.forEach(s => {
+                supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase())).forEach(s => {
                     if (!groups[s.category]) groups[s.category] = [];
                     groups[s.category].push(s);
                 });
@@ -326,19 +263,13 @@
                 return groups;
             }, [supplies, supplySearch]);
 
-            const sortedCategoryNames = useMemo(() => {
-                return Object.keys(categorizedSupplies).sort((a, b) => {
-                    if (a === 'Custom') return 1;
-                    if (b === 'Custom') return -1;
-                    return a.localeCompare(b);
-                });
-            }, [categorizedSupplies]);
+            const copyList = () => {
+                const list = supplies.filter(s => s.checked).map(s => `- ${s.name}${s.note ? ` (${s.note})` : ''}`).join('\n');
+                if (!list) return;
+                const area = document.createElement('textarea'); area.value = `NEEDED SUPPLIES (${new Date().toLocaleDateString()}):\n${list}`; document.body.appendChild(area); area.select(); document.execCommand('copy'); document.body.removeChild(area);
+            };
 
-            if (isInitializing) return (
-                <div className="min-h-screen flex items-center justify-center bg-white">
-                    <Icons.Loader className="w-10 h-10 text-orange-500" />
-                </div>
-            );
+            if (isInitializing) return <div className="min-h-screen flex items-center justify-center bg-white"><Icons.Loader className="w-10 h-10 text-orange-500" /></div>;
 
             return (
                 <div className="min-h-screen max-w-4xl mx-auto px-4 py-8">
@@ -348,9 +279,7 @@
                             <h1 className="text-3xl font-extrabold text-slate-800 mb-2 uppercase tracking-tight">Technician Portal</h1>
                             <button onClick={handleLogin} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                             <div className="flex items-center justify-center gap-2 cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
-                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
-                                    {rememberMe && <div className="w-2 h-2 bg-white rounded-full"></div>}
-                                </div>
+                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>{rememberMe && <div className="w-2 h-2 bg-white rounded-full"></div>}</div>
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Stay signed in</span>
                             </div>
                         </div>
@@ -358,18 +287,14 @@
                         <div className="space-y-6">
                             {showTimePicker && (
                                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
-                                    <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl">
+                                    <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
                                         <h2 className="text-2xl font-black mb-6 text-center uppercase tracking-tight">Confirm {pendingAction}</h2>
                                         <div className="flex justify-center gap-4 mb-6">
-                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
-                                                {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
-                                            </select>
-                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
-                                                {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
-                                            </select>
+                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100">{[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}</select>
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100">{[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}</select>
                                         </div>
-                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Enter details for the sheet..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
-                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm Entry</button>
+                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Entry notes..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm border-2 border-slate-100" rows="3" />
+                                        <button onClick={confirmAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm Entry</button>
                                         <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px]">Cancel</button>
                                     </div>
                                 </div>
@@ -378,58 +303,43 @@
                             <div className="bg-white rounded-[2rem] p-6 shadow-md flex items-center justify-between border border-slate-100">
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
-                                    <div>
-                                        <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight text-sm md:text-base">{user.name}</p>
-                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1 tracking-widest">Certified Technician</p>
-                                    </div>
+                                    <div><p className="font-extrabold text-slate-800 uppercase tracking-tight text-sm md:text-base">{user.name}</p><p className="text-[10px] font-bold text-orange-600 uppercase mt-1 tracking-widest">Technician</p></div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div 
-                                        onClick={handleAdminClick}
-                                        className="w-12 h-8 cursor-default select-none transition-transform active:scale-95"
-                                    >
-                                        <img src={LOGO_URL} className="h-full object-contain grayscale opacity-20 hover:opacity-100 transition-opacity" alt="AdminTrigger" />
-                                    </div>
+                                <div className="flex items-center gap-3">
+                                    <img onClick={handleLogoClick} src={LOGO_URL} className="h-6 opacity-30 cursor-default hover:opacity-100 transition-opacity" alt="Admin" />
                                     <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
                                 </div>
                             </div>
 
-                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-xs mx-auto">
-                                <button onClick={() => { setActiveTab('clock'); setSelectedSpecies(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
-                                <button onClick={() => { setActiveTab('hub'); setSelectedSpecies(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
-                            </div>
+                            {activeTab !== 'admin' && (
+                                <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-xs mx-auto">
+                                    <button onClick={() => { setActiveTab('clock'); setSelectedSpecies(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
+                                    <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
+                                </div>
+                            )}
 
-                            {activeTab === 'clock' && (
-                                <div className="max-w-2xl mx-auto space-y-6">
+                            {activeTab === 'clock' ? (
+                                <div className="max-w-2xl mx-auto space-y-6 animate-slide-up">
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
                                         <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                                             <div className="flex items-center gap-4">
-                                                <div className={`p-3 bg-slate-800 rounded-xl`}><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
-                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
+                                                <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
+                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : (status === 'clocked_out' ? 'SHIFT ENDED' : 'OFF DUTY')}</p></div>
                                             </div>
                                             <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
                                         </div>
                                         <div className="p-8">
-                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing Sheet...</div>}
+                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Updating Sheet...</div>}
                                             {status === 'clocked_out' ? (
                                                 <div className="p-10 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up">
                                                     <Icons.Alert className="text-red-500 w-16 h-16 mx-auto mb-4" />
                                                     <h3 className="text-red-900 font-black uppercase text-2xl mb-4 tracking-tight">Shift Fully Recorded</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed max-w-md mx-auto text-sm">
-                                                        You have completed your shift entries for today. <br/>
-                                                        <span className="font-black text-lg block mt-4">Please contact your supervisor for manual adjustments.</span>
-                                                    </p>
+                                                    <p className="text-red-700 leading-relaxed max-w-md mx-auto text-sm font-medium">You have completed your shift entries for today. <br/> <span className="font-black text-lg block mt-4">Please contact your supervisor for manual adjustments.</span></p>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <button disabled={status !== 'idle' || isSyncing} onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-green-50 hover:border-green-200 transition-all group disabled:opacity-30">
-                                                        <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
-                                                        <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
-                                                    </button>
-                                                    <button disabled={status === 'idle' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30">
-                                                        <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
-                                                        <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
-                                                    </button>
+                                                    <button disabled={status !== 'idle' || isSyncing} onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-green-50 hover:border-green-200 transition-all group disabled:opacity-30"><Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" /><span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest text-center">Clock In</span></button>
+                                                    <button disabled={status !== 'clocked_in' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 hover:bg-red-50 hover:border-red-200 transition-all group disabled:opacity-30"><Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" /><span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest text-center">Clock Out</span></button>
                                                 </div>
                                             )}
                                         </div>
@@ -437,69 +347,33 @@
 
                                     <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-slate-100">
                                         <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> 14-Day Cycle</div>
-                                        <div className="p-4 calendar-grid">
-                                            {logs.map((day, idx) => (
-                                                <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center transition-all ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}>
-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">{day.weekday}</span>
-                                                    <span className="text-xs font-black text-slate-700">{day.date}</span>
-                                                    <span className="text-[10px] font-extrabold mt-1 text-orange-600">{day.total}h</span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <div className="p-4 calendar-grid">{logs.map((day, idx) => (
+                                            <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center transition-all ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}><span className="text-[9px] font-bold text-slate-400 uppercase">{day.weekday}</span><span className="text-xs font-black text-slate-700">{day.date}</span><span className="text-[10px] font-extrabold mt-1 text-orange-600">{day.total}h</span></div>
+                                        ))}</div>
                                     </div>
                                 </div>
-                            )}
-
-                            {activeTab === 'hub' && (
+                            ) : activeTab === 'hub' ? (
                                 <div className="space-y-6 animate-slide-up">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                         <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 flex flex-col h-full overflow-hidden">
                                             <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl shadow-sm hover:bg-red-50 hover:text-red-500 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
-                                                    <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl shadow-lg hover:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
-                                                </div>
+                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3></div>
+                                                <div className="flex gap-2"><button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl shadow-sm hover:bg-red-50 hover:text-red-500 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button><button onClick={copyList} className="p-2.5 bg-slate-900 text-white rounded-xl shadow-lg hover:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button></div>
                                             </div>
-                                            
                                             <div className="space-y-4 mb-6">
-                                                <div className="relative">
-                                                    <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} />
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <input type="text" placeholder="Add custom item..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} />
-                                                    <button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg"><Icons.Plus className="w-5 h-5" /></button>
-                                                </div>
+                                                <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg"><Icons.Plus className="w-5 h-5" /></button></div>
                                             </div>
-
                                             <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
-                                                {sortedCategoryNames.map(category => {
-                                                    const categoryItems = categorizedSupplies[category];
-                                                    const selectedInCat = categoryItems.filter(i => i.checked).length;
+                                                {Object.keys(categorizedStock).sort((a,b) => a==='Custom'?1:b==='Custom'?-1:a.localeCompare(b)).map(cat => {
+                                                    const selected = categorizedStock[cat].filter(i => i.checked).length;
                                                     return (
-                                                        <div key={category} className="space-y-2">
-                                                            <button onClick={() => toggleCategory(category)} className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>
-                                                                    {selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">+ {selectedInCat}</span>}
-                                                                </div>
-                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
-                                                            </button>
-                                                            {expandedCategories.includes(category) && (
+                                                        <div key={cat} className="space-y-2">
+                                                            <button onClick={() => setExpandedCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])} className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg transition-colors ${selected > 0 ? 'bg-orange-100' : 'bg-slate-100'}`}><div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selected > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{cat}</span>{selected > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">+ {selected}</span>}</div><Icons.ChevronDown className={`w-4 h-4 transition-transform ${selected > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCats.includes(cat) ? 'rotate-180' : ''}`} /></button>
+                                                            {expandedCats.includes(cat) && (
                                                                 <div className="space-y-3 animate-slide-up px-1">
-                                                                    {categoryItems.map(item => (
-                                                                        <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}>
-                                                                            <div className="flex items-center gap-3">
-                                                                                <div onClick={() => toggleSupply(item.id)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2 h-2 bg-white rounded-full"></div>}</div>
-                                                                                <div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>
-                                                                                {item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-1 text-slate-300 hover:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}
-                                                                            </div>
-                                                                            {item.checked && <input type="text" placeholder="Add a note (e.g. 'Need 5 more')" className="w-full mt-3 px-3 py-2 bg-white rounded-lg text-[10px] font-bold border border-orange-100 outline-none focus:border-orange-500 shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}
-                                                                        </div>
+                                                                    {categorizedStock[cat].map(item => (
+                                                                        <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200 shadow-sm' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2 h-2 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-1 text-slate-300 hover:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-2 bg-white rounded-lg text-[10px] font-bold border border-orange-100 outline-none focus:border-orange-500" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>
                                                                     ))}
                                                                 </div>
                                                             )}
@@ -508,156 +382,24 @@
                                                 })}
                                             </div>
                                         </div>
-
                                         <div className="space-y-6 h-full">
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">The Hub</h3>
-                                                </div>
-                                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center">
-                                                    <Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" />
-                                                    <h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4>
-                                                    <a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a>
-                                                </div>
-                                            </div>
-
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2 mb-4">
-                                                    {Object.keys(SPECIES_DATA).map(s => (
-                                                        <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-3 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 hover:border-blue-200'}`}>
-                                                            <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
-                                                            <span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                                {selectedSpecies && (
-                                                    <div className="space-y-3 animate-slide-up">
-                                                        <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100 text-[10px]">
-                                                            <p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p>
-                                                            <p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
-                                                        </div>
-                                                        <div className="p-3 bg-slate-900 rounded-2xl text-white text-[10px]">
-                                                            <p className="font-black text-slate-400 uppercase mb-1">Method</p>
-                                                            <p className="font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">The Hub</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4 uppercase tracking-tight">Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Open Reference <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-3 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 hover:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>)}</div>{selectedSpecies && <div className="space-y-3 animate-slide-up"><div className="p-3 bg-blue-50 rounded-2xl border border-blue-100 text-[10px]"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-3 bg-slate-900 rounded-2xl text-white text-[10px]"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>}</div>
                                         </div>
                                     </div>
-
-                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div>
-                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3>
-                                        </div>
-                                        <div className="space-y-4 overflow-x-auto no-scrollbar">
-                                            <div className="min-w-[400px]">
-                                                <div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1">
-                                                    <div className="w-20 shrink-0">Species</div>
-                                                    {['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (
-                                                        <div key={i} className="flex-1 text-center">{m}</div>
-                                                    ))}
-                                                </div>
-                                                {BIRTHING_CALENDAR.map(species => (
-                                                    <div key={species.name} className="flex items-center h-8 group hover:bg-slate-50 rounded-lg transition-colors">
-                                                        <div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>
-                                                        {Array.from({length: 12}).map((_, i) => (
-                                                            <div key={i} className="flex-1 h-full px-0.5 py-2">
-                                                                <div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => <div key={i} className="flex-1 text-center">{m}</div>)}</div>{BIRTHING_CALENDAR.map(species => <div key={species.name} className="flex items-center h-8 group hover:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => <div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>)}</div>)}</div></div></div>
                                 </div>
-                            )}
-
-                            {activeTab === 'admin' && (
+                            ) : (
                                 <div className="space-y-6 animate-slide-up max-w-2xl mx-auto">
                                     <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border-4 border-slate-900">
-                                        <div className="flex items-center gap-3 mb-8">
-                                            <div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.Settings className="w-5 h-5"/></div>
-                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">System Admin</h3>
-                                        </div>
-
-                                        <div className="space-y-8">
-                                            {/* Supervisor Email Management */}
-                                            <section>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Notification Recipients</p>
-                                                <div className="space-y-3 mb-4">
-                                                    {supervisorEmails.map((email, idx) => (
-                                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
-                                                            <span className="text-xs font-bold text-slate-700">{email}</span>
-                                                            <button 
-                                                                onClick={() => setSupervisorEmails(prev => prev.filter((_, i) => i !== idx))}
-                                                                className="p-1 text-slate-300 hover:text-red-500"
-                                                                disabled={supervisorEmails.length <= 1}
-                                                            >
-                                                                <Icons.Trash className="w-4 h-4"/>
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <input 
-                                                        id="newAdminEmail"
-                                                        type="email" 
-                                                        placeholder="New email..." 
-                                                        className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-slate-900"
-                                                    />
-                                                    <button 
-                                                        onClick={() => {
-                                                            const input = document.getElementById('newAdminEmail');
-                                                            if (input.value.includes('@')) {
-                                                                setSupervisorEmails([...supervisorEmails, input.value]);
-                                                                input.value = '';
-                                                            }
-                                                        }}
-                                                        className="px-6 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest"
-                                                    >
-                                                        Add
-                                                    </button>
-                                                </div>
-                                            </section>
-
-                                            {/* Advanced Tools */}
-                                            <section className="pt-8 border-t border-slate-100">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Dangerous Tools</p>
-                                                <button 
-                                                    onClick={() => {
-                                                        if (confirm('Warning: This will clear all supply lists and user caches. Continue?')) {
-                                                            localStorage.clear();
-                                                            window.location.reload();
-                                                        }
-                                                    }}
-                                                    className="w-full flex items-center justify-center gap-2 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border-2 border-red-100"
-                                                >
-                                                    <Icons.RefreshCcw className="w-4 h-4"/> Factory Reset App
-                                                </button>
-                                            </section>
-                                            
-                                            <button 
-                                                onClick={() => setActiveTab('clock')}
-                                                className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px]"
-                                            >
-                                                Close Admin Panel
-                                            </button>
-                                        </div>
+                                        <div className="flex items-center gap-3 mb-8"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.Settings className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">System Admin</h3></div>
+                                        <section><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Notification Recipients</p><div className="space-y-3 mb-4">{supervisorEmails.map((email, idx) => <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-slate-100"><span className="text-xs font-bold text-slate-700">{email}</span><button onClick={() => setSupervisorEmails(prev => prev.filter((_, i) => i !== idx))} className="p-1 text-slate-300 hover:text-red-500" disabled={supervisorEmails.length <= 1}><Icons.Trash className="w-4 h-4"/></button></div>)}</div><div className="flex gap-2"><input id="newAdminEmail" type="email" placeholder="New email..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-slate-900"/><button onClick={() => { const input = document.getElementById('newAdminEmail'); if (input.value.includes('@')) { setSupervisorEmails([...supervisorEmails, input.value]); input.value = ''; } }} className="px-6 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Add</button></div></section>
+                                        <section className="pt-8 border-t border-slate-100 mt-8"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">System</p><button onClick={() => { if (confirm('Warning: This will clear all data. Continue?')) { localStorage.clear(); window.location.reload(); } }} className="w-full flex items-center justify-center gap-2 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all border-2 border-red-100"><Icons.RefreshCcw className="w-4 h-4"/> Factory Reset</button></section>
+                                        <button onClick={() => setActiveTab('clock')} className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px] mt-6">Close Admin</button>
                                     </div>
                                 </div>
                             )}
-                            
-                            <div className="text-center pt-8 opacity-20">
-                                <p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p>
-                            </div>
+                            <div className="text-center pt-8 opacity-20"><p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p></div>
                         </div>
                     )}
                 </div>
