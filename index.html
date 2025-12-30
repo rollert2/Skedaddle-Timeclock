@@ -286,4 +286,228 @@
                 setSupplies([newItem, ...supplies]);
                 setNewItemName('');
             };
-            const deleteSupply = (id)
+            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
+            const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
+            const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+
+            const copySuppliesList = () => {
+                const checkedItems = supplies.filter(s => s.checked);
+                if (checkedItems.length === 0) return;
+                let text = `SUPPLIES NEEDED (${new Date().toLocaleDateString()}):\n`;
+                checkedItems.forEach(item => { text += `- ${item.name}${item.note ? ` (${item.note})` : ''}\n`; });
+                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+                else {
+                    const el = document.createElement('textarea');
+                    el.value = text; document.body.appendChild(el);
+                    el.select(); document.execCommand('copy');
+                    document.body.removeChild(el);
+                }
+            };
+
+            const categorizedSupplies = useMemo(() => {
+                const filtered = supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
+                const groups = {};
+                filtered.forEach(s => { if (!groups[s.category]) groups[s.category] = []; groups[s.category].push(s); });
+                Object.keys(groups).forEach(cat => groups[cat].sort((a, b) => a.name.localeCompare(b.name)));
+                return groups;
+            }, [supplies, supplySearch]);
+
+            const sortedCategoryNames = useMemo(() => Object.keys(categorizedSupplies).sort((a, b) => {
+                if (a === 'Custom') return 1; if (b === 'Custom') return -1;
+                return a.localeCompare(b);
+            }), [categorizedSupplies]);
+
+            if (isInitializing) return (
+                <div className="min-h-screen flex items-center justify-center bg-white">
+                    <Icons.Loader className="w-10 h-10 text-orange-500" />
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen max-w-4xl mx-auto px-4 py-8">
+                    {!user ? (
+                        <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10">
+                            <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" alt="Logo" />
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-2 uppercase tracking-tight">Technician Portal</h1>
+                            <button onClick={handleLogin} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
+                            <div className="flex items-center justify-center gap-2 cursor-pointer p-4" onClick={() => setRememberMe(!rememberMe)}>
+                                <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
+                                    {rememberMe && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Stay signed in</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {showTimePicker && (
+                                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+                                    <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
+                                        <h2 className="text-2xl font-black mb-6 text-center uppercase tracking-tight">Confirm {pendingAction}</h2>
+                                        <div className="flex justify-center gap-4 mb-6">
+                                            <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
+                                                {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
+                                            </select>
+                                            <select value={selMin} onChange={e => setSelMin(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
+                                                {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
+                                            </select>
+                                        </div>
+                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Enter details for the sheet..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
+                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs active:scale-95 transition-transform">Confirm Entry</button>
+                                        <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px]">Cancel</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="bg-white rounded-[2rem] p-4 md:p-6 shadow-md flex items-center justify-between border border-slate-100">
+                                <div className="flex items-center gap-4">
+                                    <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
+                                    <div>
+                                        <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight text-sm md:text-base">{user.name}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${accessToken ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <p className={`text-[9px] font-black uppercase tracking-widest ${accessToken ? 'text-green-600' : 'text-red-500'}`}>
+                                                Gmail {accessToken ? 'Synced' : 'Offline'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {!accessToken && (
+                                        <button onClick={handleLogin} className="p-2.5 bg-red-50 text-red-600 rounded-xl shadow-sm border border-red-100 active:scale-95 transition-transform flex items-center gap-2">
+                                            <Icons.Mail className="w-4 h-4" />
+                                            <span className="text-[9px] font-black uppercase">Reconnect</span>
+                                        </button>
+                                    )}
+                                    <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
+                                </div>
+                            </div>
+
+                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[280px] mx-auto">
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
+                            </div>
+
+                            {activeTab === 'clock' && (
+                                <div className="max-w-2xl mx-auto space-y-6">
+                                    {status === 'clocked_out' ? (
+                                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100 p-8 md:p-10 bg-red-50 border-4 border-dashed border-red-200 text-center animate-slide-up">
+                                            <Icons.Alert className="text-red-500 w-16 h-16 mx-auto mb-4" />
+                                            <h3 className="text-red-900 font-black uppercase text-2xl mb-4 tracking-tight">Shift Recorded</h3>
+                                            <p className="text-red-700 font-medium leading-relaxed max-w-md mx-auto text-sm">
+                                                Shift entries for today are complete. <br/>
+                                                <span className="font-black text-lg block mt-4">Contact office for manual adjustments.</span>
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
+                                            <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
+                                                    <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
+                                                </div>
+                                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
+                                            </div>
+                                            <div className="p-6 md:p-8">
+                                                {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
+                                                
+                                                {!accessToken ? (
+                                                    <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                        <Icons.Mail className="text-red-500 w-12 h-12 mx-auto mb-4" />
+                                                        <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Email Required</h3>
+                                                        <p className="text-red-700 font-medium leading-relaxed text-xs">
+                                                            To track your time, you must sync your Gmail account.
+                                                            <span className="font-black block mt-3 uppercase tracking-widest">Tap "Reconnect" in the header above</span>
+                                                        </p>
+                                                    </div>
+                                                ) : null}
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <button 
+                                                        disabled={status !== 'idle' || isSyncing || !accessToken} 
+                                                        onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} 
+                                                        className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all group disabled:opacity-20 disabled:grayscale"
+                                                    >
+                                                        <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
+                                                        <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
+                                                    </button>
+                                                    <button 
+                                                        disabled={status === 'idle' || isSyncing || !accessToken} 
+                                                        onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} 
+                                                        className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all group disabled:opacity-20 disabled:grayscale"
+                                                    >
+                                                        <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
+                                                        <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-slate-100">
+                                        <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> 14-Day Cycle</div>
+                                        <div className="p-4 calendar-grid">
+                                            {logs.map((day, idx) => (
+                                                <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center transition-all ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">{day.weekday}</span>
+                                                    <span className="text-xs font-black text-slate-700">{day.date}</span>
+                                                    <span className="text-[10px] font-extrabold mt-1 text-orange-600">{day.total}h</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'hub' && (
+                                <div className="space-y-6 animate-slide-up">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                        <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100 flex flex-col h-full overflow-hidden">
+                                            <div className="flex items-center justify-between mb-6">
+                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3></div>
+                                                <div className="flex gap-2">
+                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl active:bg-red-50 active:text-red-500 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
+                                                    <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl active:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4 mb-6">
+                                                <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add custom item..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button></div>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
+                                                {sortedCategoryNames.map(category => {
+                                                    const categoryItems = categorizedSupplies[category];
+                                                    const selectedInCat = categoryItems.filter(i => i.checked).length;
+                                                    return (
+                                                        <div key={category} className="space-y-2">
+                                                            <button onClick={() => toggleCategory(category)} className={`w-full flex items-center justify-between py-3 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}>
+                                                                <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">+ {selectedInCat}</span>}</div>
+                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
+                                                            </button>
+                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-6 h-full mt-6 md:mt-0">
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
+                                </div>
+                            )}
+                            
+                            <div className="text-center pt-8 opacity-20"><p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p></div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
