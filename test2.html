@@ -23,7 +23,6 @@
             min-height: 100vh;
             background-color: #f8fafc;
             color: #1e293b;
-            /* Prevents 300ms tap delay on some mobile browsers */
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
@@ -73,9 +72,8 @@
             transition: all 0.3s ease;
         }
 
-        /* Better mobile inputs */
         input, select, textarea {
-            font-size: 16px !important; /* Prevents iOS zoom on focus */
+            font-size: 16px !important;
         }
     </style>
 </head>
@@ -89,7 +87,7 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const MANUAL_FULL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing";
-        const SUPERVISOR_EMAIL = "office@skedaddle.com";
+        const SUPERVISOR_EMAIL = "magicbran@gmail.com";
 
         const Icons = {
             LogOut: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
@@ -107,7 +105,8 @@
             Package: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/></svg>,
             ChevronDown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
             Copy: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-            RefreshCcw: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            RefreshCcw: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+            Mail: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -164,7 +163,6 @@
             const [accessToken, setAccessToken] = useState(null);
             const [tokenClient, setTokenClient] = useState(null);
 
-            // Supplies State
             const [supplies, setSupplies] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
             const [newItemName, setNewItemName] = useState('');
@@ -188,7 +186,6 @@
                 setIsSyncing(false);
             };
 
-            // Safe Token Client Initializer for Mobile
             const initializeGsi = () => {
                 if (!window.google) {
                     setTimeout(initializeGsi, 500);
@@ -254,19 +251,22 @@
                 const message = `To: ${SUPERVISOR_EMAIL}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nAutomated via Hub`;
                 const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
                 try {
-                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({ raw: encodedEmail })
                     });
-                } catch (err) { console.error("Email error:", err); }
+                    return res.ok;
+                } catch (err) { return false; }
             };
 
             const confirmClockAction = async () => {
+                if (!accessToken) return;
                 const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-                if (accessToken) await sendEmailAsUser(pendingAction, decimalTime, actionNote);
+                
+                await sendEmailAsUser(pendingAction, decimalTime, actionNote);
                 try {
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
@@ -278,21 +278,14 @@
                 } catch (err) { setIsSyncing(false); }
             };
 
-            const toggleSupply = (id) => {
-                setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
-            };
-
-            const updateSupplyNote = (id, note) => {
-                setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
-            };
-
+            const toggleSupply = (id) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
+            const updateSupplyNote = (id, note) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
             const addSupply = () => {
                 if (!newItemName.trim()) return;
                 const newItem = { id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' };
                 setSupplies([newItem, ...supplies]);
                 setNewItemName('');
             };
-
             const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
             const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
             const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
@@ -302,16 +295,11 @@
                 if (checkedItems.length === 0) return;
                 let text = `SUPPLIES NEEDED (${new Date().toLocaleDateString()}):\n`;
                 checkedItems.forEach(item => { text += `- ${item.name}${item.note ? ` (${item.note})` : ''}\n`; });
-                
-                // Better fallback for mobile clipboard
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(text);
-                } else {
+                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+                else {
                     const el = document.createElement('textarea');
-                    el.value = text;
-                    document.body.appendChild(el);
-                    el.select();
-                    document.execCommand('copy');
+                    el.value = text; document.body.appendChild(el);
+                    el.select(); document.execCommand('copy');
                     document.body.removeChild(el);
                 }
             };
@@ -319,21 +307,15 @@
             const categorizedSupplies = useMemo(() => {
                 const filtered = supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
                 const groups = {};
-                filtered.forEach(s => {
-                    if (!groups[s.category]) groups[s.category] = [];
-                    groups[s.category].push(s);
-                });
+                filtered.forEach(s => { if (!groups[s.category]) groups[s.category] = []; groups[s.category].push(s); });
                 Object.keys(groups).forEach(cat => groups[cat].sort((a, b) => a.name.localeCompare(b.name)));
                 return groups;
             }, [supplies, supplySearch]);
 
-            const sortedCategoryNames = useMemo(() => {
-                return Object.keys(categorizedSupplies).sort((a, b) => {
-                    if (a === 'Custom') return 1;
-                    if (b === 'Custom') return -1;
-                    return a.localeCompare(b);
-                });
-            }, [categorizedSupplies]);
+            const sortedCategoryNames = useMemo(() => Object.keys(categorizedSupplies).sort((a, b) => {
+                if (a === 'Custom') return 1; if (b === 'Custom') return -1;
+                return a.localeCompare(b);
+            }), [categorizedSupplies]);
 
             if (isInitializing) return (
                 <div className="min-h-screen flex items-center justify-center bg-white">
@@ -381,57 +363,85 @@
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
                                     <div>
                                         <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight text-sm md:text-base">{user.name}</p>
-                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1 tracking-widest">Certified Technician</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${accessToken ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <p className={`text-[9px] font-black uppercase tracking-widest ${accessToken ? 'text-green-600' : 'text-red-500'}`}>
+                                                Gmail {accessToken ? 'Synced' : 'Offline'}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-12 h-10 flex items-center justify-center select-none">
-                                        <img src={LOGO_URL} className="h-6 object-contain opacity-40" alt="Logo" />
-                                    </div>
+                                    {!accessToken && (
+                                        <button onClick={handleLogin} className="p-2.5 bg-red-50 text-red-600 rounded-xl shadow-sm border border-red-100 active:scale-95 transition-transform flex items-center gap-2">
+                                            <Icons.Mail className="w-4 h-4" />
+                                            <span className="text-[9px] font-black uppercase">Reconnect</span>
+                                        </button>
+                                    )}
                                     <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
                                 </div>
                             </div>
 
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[280px] mx-auto">
-                                <button onClick={() => { setActiveTab('clock'); setSelectedSpecies(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
-                                <button onClick={() => { setActiveTab('hub'); setSelectedSpecies(null); }} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
                             </div>
 
                             {activeTab === 'clock' && (
                                 <div className="max-w-2xl mx-auto space-y-6">
-                                    <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
-                                        <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center">
-                                            <div className="flex items-center gap-4">
-                                                <div className={`p-3 bg-slate-800 rounded-xl`}><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
-                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
-                                            </div>
-                                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
+                                    {status === 'clocked_out' ? (
+                                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100 p-8 md:p-10 bg-red-50 border-4 border-dashed border-red-200 text-center animate-slide-up">
+                                            <Icons.Alert className="text-red-500 w-16 h-16 mx-auto mb-4" />
+                                            <h3 className="text-red-900 font-black uppercase text-2xl mb-4 tracking-tight">Shift Recorded</h3>
+                                            <p className="text-red-700 font-medium leading-relaxed max-w-md mx-auto text-sm">
+                                                Shift entries for today are complete. <br/>
+                                                <span className="font-black text-lg block mt-4">Contact office for manual adjustments.</span>
+                                            </p>
                                         </div>
-                                        <div className="p-6 md:p-8">
-                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing Sheet...</div>}
-                                            {status === 'clocked_out' ? (
-                                                <div className="p-8 md:p-10 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up">
-                                                    <Icons.Alert className="text-red-500 w-16 h-16 mx-auto mb-4" />
-                                                    <h3 className="text-red-900 font-black uppercase text-2xl mb-4 tracking-tight">Shift Recorded</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed max-w-md mx-auto text-sm">
-                                                        Shift entries for today are complete. <br/>
-                                                        <span className="font-black text-lg block mt-4">Contact office for manual adjustments.</span>
-                                                    </p>
+                                    ) : (
+                                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
+                                            <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
+                                                    <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
                                                 </div>
-                                            ) : (
+                                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
+                                            </div>
+                                            <div className="p-6 md:p-8">
+                                                {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
+                                                
+                                                {!accessToken ? (
+                                                    <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                        <Icons.Mail className="text-red-500 w-12 h-12 mx-auto mb-4" />
+                                                        <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Email Required</h3>
+                                                        <p className="text-red-700 font-medium leading-relaxed text-xs">
+                                                            To track your time, you must sync your Gmail account.
+                                                            <span className="font-black block mt-3 uppercase tracking-widest">Tap "Reconnect" in the header above</span>
+                                                        </p>
+                                                    </div>
+                                                ) : null}
+
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <button disabled={status !== 'idle' || isSyncing} onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all group disabled:opacity-30">
+                                                    <button 
+                                                        disabled={status !== 'idle' || isSyncing || !accessToken} 
+                                                        onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} 
+                                                        className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all group disabled:opacity-20 disabled:grayscale"
+                                                    >
                                                         <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                     </button>
-                                                    <button disabled={status === 'idle' || isSyncing} onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all group disabled:opacity-30">
+                                                    <button 
+                                                        disabled={status === 'idle' || isSyncing || !accessToken} 
+                                                        onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} 
+                                                        className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all group disabled:opacity-20 disabled:grayscale"
+                                                    >
                                                         <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                     </button>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-slate-100">
                                         <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> 14-Day Cycle</div>
@@ -453,27 +463,16 @@
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                         <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100 flex flex-col h-full overflow-hidden">
                                             <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3>
-                                                </div>
+                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3></div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl shadow-sm active:bg-red-50 active:text-red-500 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
-                                                    <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl shadow-lg active:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
+                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl active:bg-red-50 active:text-red-500 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
+                                                    <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl active:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
                                                 </div>
                                             </div>
-                                            
                                             <div className="space-y-4 mb-6">
-                                                <div className="relative">
-                                                    <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} />
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <input type="text" placeholder="Add custom item..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} />
-                                                    <button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button>
-                                                </div>
+                                                <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add custom item..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button></div>
                                             </div>
-
                                             <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
                                                 {sortedCategoryNames.map(category => {
                                                     const categoryItems = categorizedSupplies[category];
@@ -481,106 +480,25 @@
                                                     return (
                                                         <div key={category} className="space-y-2">
                                                             <button onClick={() => toggleCategory(category)} className={`w-full flex items-center justify-between py-3 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>
-                                                                    {selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">+ {selectedInCat}</span>}
-                                                                </div>
+                                                                <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">+ {selectedInCat}</span>}</div>
                                                                 <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
                                                             </button>
-                                                            {expandedCategories.includes(category) && (
-                                                                <div className="space-y-3 animate-slide-up px-1">
-                                                                    {categoryItems.map(item => (
-                                                                        <div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}>
-                                                                            <div className="flex items-center gap-3">
-                                                                                <div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div>
-                                                                                <div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>
-                                                                                {item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}
-                                                                            </div>
-                                                                            {item.checked && <input type="text" placeholder="Add a note (e.g. 'Need 5 more')" className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none focus:border-orange-500 shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
+                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
                                                         </div>
                                                     );
                                                 })}
                                             </div>
                                         </div>
-
                                         <div className="space-y-6 h-full mt-6 md:mt-0">
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3>
-                                                </div>
-                                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center">
-                                                    <Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" />
-                                                    <h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4>
-                                                    <a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a>
-                                                </div>
-                                            </div>
-
-                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100">
-                                                <div className="flex items-center gap-3 mb-6">
-                                                    <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div>
-                                                    <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2 mb-4">
-                                                    {Object.keys(SPECIES_DATA).map(s => (
-                                                        <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}>
-                                                            <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
-                                                            <span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                                {selectedSpecies && (
-                                                    <div className="space-y-3 animate-slide-up">
-                                                        <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs">
-                                                            <p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p>
-                                                            <p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
-                                                        </div>
-                                                        <div className="p-4 bg-slate-900 rounded-2xl text-white text-xs">
-                                                            <p className="font-black text-slate-400 uppercase mb-1">Method</p>
-                                                            <p className="font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
                                         </div>
                                     </div>
-
-                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100">
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div>
-                                            <h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3>
-                                        </div>
-                                        <div className="space-y-4 overflow-x-auto no-scrollbar">
-                                            <div className="min-w-[400px]">
-                                                <div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1">
-                                                    <div className="w-20 shrink-0">Species</div>
-                                                    {['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (
-                                                        <div key={i} className="flex-1 text-center">{m}</div>
-                                                    ))}
-                                                </div>
-                                                {BIRTHING_CALENDAR.map(species => (
-                                                    <div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors">
-                                                        <div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>
-                                                        {Array.from({length: 12}).map((_, i) => (
-                                                            <div key={i} className="flex-1 h-full px-0.5 py-2">
-                                                                <div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
                                 </div>
                             )}
                             
-                            <div className="text-center pt-8 opacity-20">
-                                <p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p>
-                            </div>
+                            <div className="text-center pt-8 opacity-20"><p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p></div>
                         </div>
                     )}
                 </div>
@@ -592,3 +510,4 @@
     </script>
 </body>
 </html>
+
