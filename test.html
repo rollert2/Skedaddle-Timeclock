@@ -107,7 +107,8 @@
             Package: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/></svg>,
             ChevronDown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
             Copy: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-            RefreshCcw: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            RefreshCcw: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+            Mail: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -252,27 +253,59 @@
                 const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
                 const message = `To: ${SUPERVISOR_EMAIL}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nAutomated via Hub`;
-                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                
+                // Gmail API expects base64url encoding
+                const encodedEmail = btoa(unescape(encodeURIComponent(message)))
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, '');
+                    
                 try {
-                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
                         method: 'POST',
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Authorization': `Bearer ${accessToken}`, 
+                            'Content-Type': 'application/json' 
+                        },
                         body: JSON.stringify({ raw: encodedEmail })
                     });
-                } catch (err) { console.error("Email error:", err); }
+                    
+                    if (!res.ok) {
+                        const err = await res.json();
+                        console.error("Gmail Send Error:", err);
+                        return false;
+                    }
+                    return true;
+                } catch (err) { 
+                    console.error("Email network error:", err); 
+                    return false;
+                }
             };
 
             const confirmClockAction = async () => {
                 const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-                if (accessToken) await sendEmailAsUser(pendingAction, decimalTime, actionNote);
+                
+                let emailSent = false;
+                if (accessToken) {
+                    emailSent = await sendEmailAsUser(pendingAction, decimalTime, actionNote);
+                } else {
+                    console.warn("No access token available. Email skipped.");
+                }
+
                 try {
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ email: user.email, name: user.name, type: pendingAction, decimalTime, note: actionNote })
+                        body: JSON.stringify({ 
+                            email: user.email, 
+                            name: user.name, 
+                            type: pendingAction, 
+                            decimalTime, 
+                            note: actionNote + (emailSent ? "" : " [Email Fail]")
+                        })
                     });
                     setTimeout(() => { setActionNote(""); checkUserStatus(user); }, 2500);
                 } catch (err) { setIsSyncing(false); }
@@ -361,6 +394,16 @@
                                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                                     <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
                                         <h2 className="text-2xl font-black mb-6 text-center uppercase tracking-tight">Confirm {pendingAction}</h2>
+                                        
+                                        {!accessToken && (
+                                            <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3">
+                                                <Icons.Alert className="w-5 h-5 text-red-500 shrink-0" />
+                                                <p className="text-[10px] font-bold text-red-700 uppercase leading-tight">
+                                                    Gmail Sync Offline. Email won't be sent. Reconnect on main screen.
+                                                </p>
+                                            </div>
+                                        )}
+
                                         <div className="flex justify-center gap-4 mb-6">
                                             <select value={selHour} onChange={e => setSelHour(Number(e.target.value))} className="p-4 bg-slate-50 rounded-xl text-xl font-bold border-2 border-slate-100 outline-none">
                                                 {[...Array(24).keys()].map(h => <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>)}
@@ -381,13 +424,21 @@
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
                                     <div>
                                         <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight text-sm md:text-base">{user.name}</p>
-                                        <p className="text-[10px] font-bold text-orange-600 uppercase mt-1 tracking-widest">Certified Technician</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${accessToken ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <p className={`text-[9px] font-black uppercase tracking-widest ${accessToken ? 'text-green-600' : 'text-red-500'}`}>
+                                                Gmail {accessToken ? 'Synced' : 'Offline'}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-12 h-10 flex items-center justify-center select-none">
-                                        <img src={LOGO_URL} className="h-6 object-contain opacity-40" alt="Logo" />
-                                    </div>
+                                    {!accessToken && (
+                                        <button onClick={handleLogin} className="p-2.5 bg-red-50 text-red-600 rounded-xl shadow-sm border border-red-100 active:scale-95 transition-transform flex items-center gap-2">
+                                            <Icons.Mail className="w-4 h-4" />
+                                            <span className="text-[9px] font-black uppercase">Reconnect</span>
+                                        </button>
+                                    )}
                                     <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
                                 </div>
                             </div>
