@@ -61,16 +61,15 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        input, select, textarea {
-            font-size: 16px !important; /* Prevents iOS zoom */
-        }
+        .supply-item { transition: all 0.3s ease; }
+        input, select, textarea { font-size: 16px !important; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         const CLIENT_ID = "826145031424-e5rd2jbbnreu8am7re4m6qpc6m9aqpgl.apps.googleusercontent.com"; 
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
@@ -98,13 +97,13 @@
         };
 
         const SPECIES_DATA = {
-            'Raccoons': { icon: '🦝', signs: 'Hand-prints, thumping, tubular scat (seeds).', method: 'OWDs or Physical Removal.' },
-            'Squirrels': { icon: '🐿️', signs: 'Scratching, 2" holes, nut shells.', method: 'Seal secondary + OWD primary.' },
-            'Bats': { icon: '🦇', signs: 'Entry stains, guano (soil-like).', method: 'Check valves / Netting.' },
-            'Birds': { icon: '🐦', signs: 'Straw, chirping, mites, ammonia.', method: 'Nest removal + Sanitation + Guards.' },
-            'Skunks': { icon: '🦨', signs: 'Musk, cone holes, 6" burrows.', method: 'Trenching + OWD.' },
-            'Mice': { icon: '🐭', signs: 'Rice droppings, nested insulation.', method: 'Search & Seal foundation/roofline.' },
-            'Rats': { icon: '🐀', signs: 'Grease marks, gnawed wood/PVC.', method: 'Steel mesh + Trapping.' }
+            'Raccoons': { icon: '🦝', bio: 'Intelligent/Strong. Maternal cycle begins late winter.', signs: 'Hand-prints, thumping, tubular scat (seeds).', method: 'OWDs or Physical Removal.' },
+            'Squirrels': { icon: '🐿️', bio: 'Persistent chewers. Diurnal activity.', signs: 'Scratching, 2" holes, nut shells.', method: 'Seal secondary + OWD primary.' },
+            'Bats': { icon: '🦇', bio: 'Protected. Vital role. Blackout June-Aug.', signs: 'Entry stains, guano (soil-like).', method: 'Check valves / Netting.' },
+            'Birds': { icon: '🐦', bio: 'Vent nesters. Fire hazard. Carry mites.', signs: 'Straw, chirping, mites, ammonia.', method: 'Nest removal + Sanitation + Guards.' },
+            'Skunks': { icon: '🦨', bio: 'Ground burrowers. Defensive spray 15ft.', signs: 'Musk, cone holes, 6" burrows.', method: 'Trenching + OWD.' },
+            'Mice': { icon: '🐭', bio: 'Small. Enter dime-sized gaps.', signs: 'Rice droppings, nested insulation.', method: 'Search & Seal foundation/roofline.' },
+            'Rats': { icon: '🐀', bio: 'Aggressive chewers. Neophobic.', signs: 'Grease marks, gnawed wood/PVC.', method: 'Steel mesh + Trapping.' }
         };
 
         const BIRTHING_CALENDAR = [
@@ -116,10 +115,24 @@
         ];
 
         const DEFAULT_SUPPLIES = [
-            { id: '1', name: '1 inch screen', category: 'Screens', checked: false },
-            { id: '2', name: '1/4 inch screen', category: 'Screens', checked: false },
-            { id: '3', name: 'Sealant', category: 'Fasteners & Sealants', checked: false },
-            { id: '4', name: ' latex gloves', category: 'PPE & Safety', checked: false }
+            { id: '1', name: '1 inch screen', category: 'Screens', checked: false, note: '' },
+            { id: '2', name: '1/4 inch screen', category: 'Screens', checked: false, note: '' },
+            { id: '3', name: 'deoderizer', category: 'Chemicals', checked: false, note: '' },
+            { id: '4', name: 'bacterial digester', category: 'Chemicals', checked: false, note: '' },
+            { id: '5', name: 'D/E', category: 'Chemicals', checked: false, note: '' },
+            { id: '6', name: 'Roof vents (Top vented)', category: 'Vents', checked: false, note: '' },
+            { id: '7', name: 'Roof vents (Bottom Vented)', category: 'Vents', checked: false, note: '' },
+            { id: '8', name: 'Wall vents', category: 'Vents', checked: false, note: '' },
+            { id: '9', name: 'Sealant', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '10', name: 'Kopr-Lastic', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '11', name: 'Washer screws', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '12', name: 'Anchor screws', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '13', name: 'DSS screws', category: 'Fasteners & Sealants', checked: false, note: '' },
+            { id: '14', name: 'Foot Covers', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '15', name: 'Drop sheets', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '16', name: 'latex gloves', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '17', name: 'garbage bags', category: 'PPE & Safety', checked: false, note: '' },
+            { id: '18', name: 'Respirator Filters', category: 'PPE & Safety', checked: false, note: '' }
         ];
 
         const getRoundedTime = () => {
@@ -128,19 +141,21 @@
             let roundedMinutes;
             let hourAdjustment = 0;
 
-            if (minutes <= 7) roundedMinutes = 0;
-            else if (minutes <= 22) roundedMinutes = 15;
-            else if (minutes <= 37) roundedMinutes = 30;
-            else if (minutes <= 52) roundedMinutes = 45;
-            else {
+            if (minutes >= 53) {
                 roundedMinutes = 0;
                 hourAdjustment = 1;
+            } else if (minutes >= 38) {
+                roundedMinutes = 45;
+            } else if (minutes >= 23) {
+                roundedMinutes = 30;
+            } else if (minutes >= 8) {
+                roundedMinutes = 15;
+            } else {
+                roundedMinutes = 0;
             }
 
-            return {
-                hours: (now.getHours() + hourAdjustment) % 24,
-                minutes: roundedMinutes
-            };
+            const h = (now.getHours() + hourAdjustment) % 24;
+            return { hours: h, minutes: roundedMinutes };
         };
 
         const App = () => {
@@ -164,7 +179,9 @@
             const [accessToken, setAccessToken] = useState(null);
             const [tokenClient, setTokenClient] = useState(null);
 
+            const [supplies, setSupplies] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
+            const [newItemName, setNewItemName] = useState('');
             const [expandedCategories, setExpandedCategories] = useState(['Screens', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
             
             const [showTimePicker, setShowTimePicker] = useState(false);
@@ -216,12 +233,30 @@
             };
 
             useEffect(() => {
+                if (user) {
+                    const savedEmails = localStorage.getItem(`emails_${user.email}`);
+                    setRecipientEmails(savedEmails ? JSON.parse(savedEmails) : []);
+                    const savedSupplies = localStorage.getItem(`supplies_${user.email}`);
+                    setSupplies(savedSupplies ? JSON.parse(savedSupplies) : DEFAULT_SUPPLIES);
+                }
+            }, [user]);
+
+            useEffect(() => {
                 if (user) localStorage.setItem(`emails_${user.email}`, JSON.stringify(recipientEmails));
             }, [recipientEmails, user]);
 
             useEffect(() => {
-                initializeGsi();
-            }, []);
+                if (user && supplies.length > 0) localStorage.setItem(`supplies_${user.email}`, JSON.stringify(supplies));
+            }, [supplies, user]);
+
+            useEffect(() => { initializeGsi(); }, []);
+
+            const addRecipient = () => {
+                if (newEmailInput.includes('@')) {
+                    setRecipientEmails([...recipientEmails, newEmailInput.trim()]);
+                    setNewEmailInput("");
+                }
+            };
 
             const sendEmailAsUser = async (action, time, note) => {
                 const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -262,12 +297,38 @@
                 setShowTimePicker(true);
             };
 
-            const handleLogout = () => {
-                setUser(null);
-                setAccessToken(null);
-                localStorage.removeItem('skedaddle_user');
-                setActiveTab('clock');
+            const toggleSupply = (id) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
+            const updateSupplyNote = (id, note) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
+            const addSupply = () => {
+                if (!newItemName.trim()) return;
+                const newItem = { id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' };
+                setSupplies([newItem, ...supplies]);
+                setNewItemName('');
             };
+            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
+            const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
+            const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+
+            const copySuppliesList = () => {
+                const checkedItems = supplies.filter(s => s.checked);
+                if (checkedItems.length === 0) return;
+                let text = `SUPPLIES NEEDED (${new Date().toLocaleDateString()}):\n`;
+                checkedItems.forEach(item => { text += `- ${item.name}${item.note ? ` (${item.note})` : ''}\n`; });
+                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+            };
+
+            const categorizedSupplies = useMemo(() => {
+                const filtered = supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
+                const groups = {};
+                filtered.forEach(s => { if (!groups[s.category]) groups[s.category] = []; groups[s.category].push(s); });
+                Object.keys(groups).forEach(cat => groups[cat].sort((a, b) => a.name.localeCompare(b.name)));
+                return groups;
+            }, [supplies, supplySearch]);
+
+            const sortedCategoryNames = useMemo(() => Object.keys(categorizedSupplies).sort((a, b) => {
+                if (a === 'Custom') return 1; if (b === 'Custom') return -1;
+                return a.localeCompare(b);
+            }), [categorizedSupplies]);
 
             if (isInitializing) return <div className="min-h-screen flex items-center justify-center bg-white"><Icons.Loader className="w-10 h-10 text-orange-500" /></div>;
 
@@ -281,8 +342,8 @@
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {/* Email Setup / Settings Modal */}
-                            {(recipientEmails.length === 0 || showEmailSettings) && (
+                            {/* Full-Screen Settings Modal */}
+                            {showEmailSettings && (
                                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
                                     <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
                                         <div className="text-center mb-6">
@@ -297,15 +358,12 @@
                                                     <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
                                                 </div>
                                             ))}
-                                            {recipientEmails.length === 0 && <p className="text-center text-[10px] text-red-500 font-bold uppercase p-4 border-2 border-dashed border-red-100 rounded-2xl">No Emails Added</p>}
                                         </div>
                                         <div className="flex gap-2 mb-8">
-                                            <input type="email" placeholder="supervisor@skedaddle.com" className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none ring-orange-500/20" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (newEmailInput.includes('@') && setRecipientEmails([...recipientEmails, newEmailInput.trim()]), setNewEmailInput(""))} />
-                                            <button onClick={() => { if(newEmailInput.includes('@')) setRecipientEmails([...recipientEmails, newEmailInput.trim()]); setNewEmailInput(""); }} className="bg-slate-900 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                            <input type="email" placeholder="email@skedaddle.com" className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
+                                            <button onClick={addRecipient} className="bg-slate-900 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                         </div>
-                                        {recipientEmails.length > 0 && (
-                                            <button onClick={() => setShowEmailSettings(false)} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Save & Finish</button>
-                                        )}
+                                        <button onClick={() => setShowEmailSettings(false)} className="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Close Settings</button>
                                     </div>
                                 </div>
                             )}
@@ -349,13 +407,13 @@
                                             <span className="text-[9px] font-black uppercase tracking-widest">Reconnect</span>
                                         </button>
                                     )}
-                                    <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
+                                    <button onClick={() => { setUser(null); setAccessToken(null); localStorage.removeItem('skedaddle_user'); setActiveTab('clock'); }} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
                                 </div>
                             </div>
 
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[280px] mx-auto">
-                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white' : 'text-slate-500'}`}>Clock</button>
-                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white' : 'text-slate-500'}`}>Hub</button>
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
                             </div>
 
                             {activeTab === 'clock' && (
@@ -372,27 +430,39 @@
                                         <div className="p-6 md:p-8">
                                             {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase mb-6 tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
                                             
-                                            {(!accessToken || recipientEmails.length === 0) && (
-                                                <div className="p-6 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
-                                                    <Icons.Alert className="text-red-500 w-8 h-8 mx-auto mb-4" />
-                                                    <h3 className="text-red-900 font-black uppercase text-xs mb-2 tracking-tight">Setup Required</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] whitespace-pre-line uppercase tracking-widest font-bold">
-                                                        {!accessToken && "• Reconnect Gmail above\n"}
-                                                        {recipientEmails.length === 0 && "• Add supervisor emails via settings gear"}
-                                                    </p>
+                                            {recipientEmails.length === 0 ? (
+                                                <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                    <div className="p-4 bg-red-100 text-red-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
+                                                    <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Supervisor Emails</h3>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] mb-6 uppercase tracking-widest">Add emails to unlock clock in/out</p>
+                                                    <div className="space-y-3 mb-4">
+                                                        {recipientEmails.map((email, i) => (
+                                                            <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-red-100">
+                                                                <span className="text-[10px] font-bold text-slate-700">{email}</span>
+                                                                <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="flex gap-2 mb-6">
+                                                        <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-red-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
+                                                        <button onClick={addRecipient} className="bg-red-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                                    </div>
+                                                    {recipientEmails.length > 0 && (
+                                                        <button onClick={() => setShowEmailSettings(false)} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm & Unlock</button>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <button disabled={status !== 'idle' || isSyncing || !accessToken} onClick={() => handleClockTrigger('IN')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 group">
+                                                        <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
+                                                        <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
+                                                    </button>
+                                                    <button disabled={status === 'idle' || isSyncing || !accessToken} onClick={() => handleClockTrigger('OUT')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 group">
+                                                        <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
+                                                        <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
+                                                    </button>
                                                 </div>
                                             )}
-
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <button disabled={status !== 'idle' || isSyncing || !accessToken || recipientEmails.length === 0} onClick={() => handleClockTrigger('IN')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 disabled:grayscale group">
-                                                    <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
-                                                    <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
-                                                </button>
-                                                <button disabled={status === 'idle' || isSyncing || !accessToken || recipientEmails.length === 0} onClick={() => handleClockTrigger('OUT')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 disabled:grayscale group">
-                                                    <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
-                                                    <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
-                                                </button>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -414,38 +484,40 @@
                             {activeTab === 'hub' && (
                                 <div className="space-y-6 animate-slide-up">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                                        <div className="bg-white rounded-[2.5rem] p-6 shadow-md border border-slate-100">
+                                        <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100 flex flex-col h-full overflow-hidden">
                                             <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest">Needed Supplies</h3></div>
+                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3></div>
+                                                <div className="flex gap-2">
+                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl active:bg-red-50 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
+                                                    <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl active:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
+                                                </div>
                                             </div>
-                                            <div className="space-y-3">
-                                                {DEFAULT_SUPPLIES.map(s => (
-                                                    <div key={s.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-                                                        <div className="w-5 h-5 rounded border-2 border-slate-200"></div>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">{s.name}</span>
-                                                    </div>
-                                                ))}
+                                            <div className="space-y-4 mb-6">
+                                                <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add Custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl"><Icons.Plus className="w-5 h-5" /></button></div>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
+                                                {sortedCategoryNames.map(category => {
+                                                    const categoryItems = categorizedSupplies[category];
+                                                    const selectedInCat = categoryItems.filter(i => i.checked).length;
+                                                    return (
+                                                        <div key={category} className="space-y-2">
+                                                            <button onClick={() => toggleCategory(category)} className={`w-full flex items-center justify-between py-3 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}>
+                                                                <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">+ {selectedInCat}</span>}</div>
+                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
+                                                            </button>
+                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
-                                        <div className="bg-white rounded-[2.5rem] p-6 shadow-md border border-slate-100">
-                                            <div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest">Diagnostics</h3></div>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {Object.keys(SPECIES_DATA).map(s => (
-                                                    <button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100'}`}>
-                                                        <span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span>
-                                                        <span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            {selectedSpecies && (
-                                                <div className="mt-4 p-4 bg-blue-50 rounded-2xl border border-blue-100 animate-slide-up">
-                                                    <p className="font-black text-blue-600 uppercase text-[9px] mb-1">Diagnostic Signs</p>
-                                                    <p className="text-[11px] font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p>
-                                                </div>
-                                            )}
+                                        <div className="space-y-6">
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
                                         </div>
                                     </div>
-                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
                                 </div>
                             )}
                             
@@ -461,4 +533,3 @@
     </script>
 </body>
 </html>
-
