@@ -141,18 +141,11 @@
             let roundedMinutes;
             let hourAdjustment = 0;
 
-            if (minutes >= 53) {
-                roundedMinutes = 0;
-                hourAdjustment = 1;
-            } else if (minutes >= 38) {
-                roundedMinutes = 45;
-            } else if (minutes >= 23) {
-                roundedMinutes = 30;
-            } else if (minutes >= 8) {
-                roundedMinutes = 15;
-            } else {
-                roundedMinutes = 0;
-            }
+            if (minutes >= 53) { roundedMinutes = 0; hourAdjustment = 1; }
+            else if (minutes >= 38) { roundedMinutes = 45; }
+            else if (minutes >= 23) { roundedMinutes = 30; }
+            else if (minutes >= 8) { roundedMinutes = 15; }
+            else { roundedMinutes = 0; }
 
             const h = (now.getHours() + hourAdjustment) % 24;
             return { hours: h, minutes: roundedMinutes };
@@ -430,22 +423,33 @@
                                         <div className="p-6 md:p-8">
                                             {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase mb-6 tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
                                             
+                                            {/* Gmail Alert */}
+                                            {!accessToken && (
+                                                <div className="p-6 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                    <Icons.Alert className="text-red-500 w-8 h-8 mx-auto mb-4" />
+                                                    <h3 className="text-red-900 font-black uppercase text-xs mb-2 tracking-tight">Gmail Offline</h3>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
+                                                        Reconnect Gmail in the header to unlock clock buttons.
+                                                    </p>
+                                                </div>
+                                            )}
+
                                             {recipientEmails.length === 0 ? (
-                                                <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
-                                                    <div className="p-4 bg-red-100 text-red-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
-                                                    <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Supervisor Emails</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] mb-6 uppercase tracking-widest">Add emails to unlock clock in/out</p>
+                                                <div className="p-8 bg-orange-50 border-4 border-dashed border-orange-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                    <div className="p-4 bg-orange-100 text-orange-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
+                                                    <h3 className="text-orange-900 font-black uppercase text-lg mb-2 tracking-tight">Supervisor Emails</h3>
+                                                    <p className="text-orange-700 font-medium leading-relaxed text-[10px] mb-6 uppercase tracking-widest">Add emails to unlock clock in/out</p>
                                                     <div className="space-y-3 mb-4">
                                                         {recipientEmails.map((email, i) => (
-                                                            <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-red-100">
+                                                            <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-orange-100">
                                                                 <span className="text-[10px] font-bold text-slate-700">{email}</span>
                                                                 <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
                                                             </div>
                                                         ))}
                                                     </div>
                                                     <div className="flex gap-2 mb-6">
-                                                        <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-red-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
-                                                        <button onClick={addRecipient} className="bg-red-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                                        <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-orange-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
+                                                        <button onClick={addRecipient} className="bg-orange-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                                     </div>
                                                     {recipientEmails.length > 0 && (
                                                         <button onClick={() => setShowEmailSettings(false)} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm & Unlock</button>
@@ -514,7 +518,7 @@
                                         </div>
                                         <div className="space-y-6">
                                             <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
-                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
