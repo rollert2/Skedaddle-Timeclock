@@ -53,13 +53,6 @@
         }
         .google-btn:active { background: #357abd; transform: scale(0.98); }
 
-        .hub-card {
-            transition: all 0.2s ease-out;
-        }
-        .hub-card:active {
-            transform: scale(0.96);
-        }
-        
         .animate-slide-up {
             animation: slideUp 0.3s ease-out forwards;
         }
@@ -68,13 +61,8 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .supply-item {
-            transition: all 0.3s ease;
-        }
-
-        input, select, textarea {
-            font-size: 16px !important;
-        }
+        .supply-item { transition: all 0.3s ease; }
+        input, select, textarea { font-size: 16px !important; }
     </style>
 </head>
 <body>
@@ -87,26 +75,25 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-DhbESKUSJrOfYooCTZqXO5vySlaDVaoLQCHTT2AlI5zTv7i6tdzzX1f6xwzdHK4e4A/exec";
         const LOGO_URL = "https://www.skedaddlewildlife.com/wp-content/themes/salcode-bootstrap-genesis/images/logo_r.png";
         const MANUAL_FULL_URL = "https://drive.google.com/file/d/1iSar6lHhH5gNLbNj2RctD05ODisbSqE3/view?usp=sharing";
-        const SUPERVISOR_EMAIL = "time@humanewildlifecontrol.com, lukeharris@humanewildlifecontrol.com";
 
         const Icons = {
-            LogOut: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-            LogIn: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 5 12 10 7"/><line x1="15" y1="12" x2="5" y2="12"/></svg>,
-            UserCheck: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>,
-            Alert: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-            Calendar: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-            Loader: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`animate-spin ${props.className}`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
-            Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-            FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
-            ExternalLink: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
-            Plus: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-            Trash: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
-            Search: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-            Package: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/></svg>,
-            ChevronDown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
-            Copy: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-            RefreshCcw: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
-            Mail: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            LogOut: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+            LogIn: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 5 12 10 7"/><line x1="15" y1="12" x2="5" y2="12"/></svg>,
+            UserCheck: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>,
+            Alert: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+            Calendar: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+            Loader: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`animate-spin ${p.className}`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
+            FileText: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14.5 2 14.5 7 20 7"/></svg>,
+            ExternalLink: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+            Plus: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+            Trash: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+            Search: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+            Package: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/></svg>,
+            ChevronDown: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
+            Copy: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+            RefreshCcw: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+            Mail: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
+            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -148,18 +135,40 @@
             { id: '18', name: 'Respirator Filters', category: 'PPE & Safety', checked: false, note: '' }
         ];
 
+        const getRoundedTime = () => {
+            const now = new Date();
+            const minutes = now.getMinutes();
+            let roundedMinutes;
+            let hourAdjustment = 0;
+
+            if (minutes >= 53) { roundedMinutes = 0; hourAdjustment = 1; }
+            else if (minutes >= 38) { roundedMinutes = 45; }
+            else if (minutes >= 23) { roundedMinutes = 30; }
+            else if (minutes >= 8) { roundedMinutes = 15; }
+            else { roundedMinutes = 0; }
+
+            const h = (now.getHours() + hourAdjustment) % 24;
+            return { hours: h, minutes: roundedMinutes };
+        };
+
         const App = () => {
             const [user, setUser] = useState(() => {
                 const saved = localStorage.getItem('skedaddle_user');
                 return saved ? JSON.parse(saved) : null;
             });
+
+            const [recipientEmails, setRecipientEmails] = useState(() => {
+                if (!user) return [];
+                const saved = localStorage.getItem(`emails_${user.email}`);
+                return saved ? JSON.parse(saved) : [];
+            });
+
             const [activeTab, setActiveTab] = useState('clock');
             const [selectedSpecies, setSelectedSpecies] = useState(null);
             const [status, setStatus] = useState('idle');
             const [logs, setLogs] = useState([]);
             const [isInitializing, setIsInitializing] = useState(true);
             const [isSyncing, setIsSyncing] = useState(false);
-            const [rememberMe, setRememberMe] = useState(true);
             const [accessToken, setAccessToken] = useState(null);
             const [tokenClient, setTokenClient] = useState(null);
 
@@ -169,10 +178,14 @@
             const [expandedCategories, setExpandedCategories] = useState(['Screens', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
             
             const [showTimePicker, setShowTimePicker] = useState(false);
+            const [showEmailSettings, setShowEmailSettings] = useState(false);
+            const [isSetupConfirmed, setIsSetupConfirmed] = useState(false);
+            
             const [pendingAction, setPendingAction] = useState(null);
-            const [selHour, setSelHour] = useState(new Date().getHours());
+            const [selHour, setSelHour] = useState(0);
             const [selMin, setSelMin] = useState(0);
             const [actionNote, setActionNote] = useState("");
+            const [newEmailInput, setNewEmailInput] = useState("");
 
             const checkUserStatus = async (userObj) => {
                 if (!userObj) return;
@@ -204,7 +217,7 @@
                             const profile = await userInfoRes.json();
                             const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
                             setUser(newUser);
-                            if (rememberMe) localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
+                            localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
                             checkUserStatus(newUser);
                         } catch (e) { console.error("Profile fetch error", e); }
                     },
@@ -216,39 +229,36 @@
 
             useEffect(() => {
                 if (user) {
+                    const savedEmails = localStorage.getItem(`emails_${user.email}`);
+                    const parsedEmails = savedEmails ? JSON.parse(savedEmails) : [];
+                    setRecipientEmails(parsedEmails);
+                    setIsSetupConfirmed(parsedEmails.length > 0);
                     const savedSupplies = localStorage.getItem(`supplies_${user.email}`);
-                    if (savedSupplies) setSupplies(JSON.parse(savedSupplies));
-                    else setSupplies(DEFAULT_SUPPLIES);
+                    setSupplies(savedSupplies ? JSON.parse(savedSupplies) : DEFAULT_SUPPLIES);
                 }
             }, [user]);
 
             useEffect(() => {
-                if (user && supplies.length > 0) {
-                    localStorage.setItem(`supplies_${user.email}`, JSON.stringify(supplies));
-                }
-            }, [supplies, user]);
+                if (user) localStorage.setItem(`emails_${user.email}`, JSON.stringify(recipientEmails));
+            }, [recipientEmails, user]);
 
             useEffect(() => {
-                initializeGsi();
-            }, []);
+                if (user && supplies.length > 0) localStorage.setItem(`supplies_${user.email}`, JSON.stringify(supplies));
+            }, [supplies, user]);
 
-            const handleLogin = () => {
-                if (tokenClient) {
-                    tokenClient.requestAccessToken({ prompt: 'consent' });
+            useEffect(() => { initializeGsi(); }, []);
+
+            const addRecipient = () => {
+                if (newEmailInput.includes('@')) {
+                    setRecipientEmails([...recipientEmails, newEmailInput.trim()]);
+                    setNewEmailInput("");
                 }
-            };
-
-            const handleLogout = () => {
-                setUser(null);
-                setAccessToken(null);
-                localStorage.removeItem('skedaddle_user');
-                setActiveTab('clock');
             };
 
             const sendEmailAsUser = async (action, time, note) => {
                 const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
-                const message = `To: ${SUPERVISOR_EMAIL}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nAutomated via Hub`;
+                const message = `To: ${recipientEmails.join(', ')}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nSent via Timeclock App`;
                 const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
                 try {
                     const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
@@ -261,11 +271,9 @@
             };
 
             const confirmClockAction = async () => {
-                if (!accessToken) return;
                 const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-                
                 await sendEmailAsUser(pendingAction, decimalTime, actionNote);
                 try {
                     await fetch(APPS_SCRIPT_URL, {
@@ -276,6 +284,14 @@
                     });
                     setTimeout(() => { setActionNote(""); checkUserStatus(user); }, 2500);
                 } catch (err) { setIsSyncing(false); }
+            };
+
+            const handleClockTrigger = (action) => {
+                const rounded = getRoundedTime();
+                setSelHour(rounded.hours);
+                setSelMin(rounded.minutes);
+                setPendingAction(action);
+                setShowTimePicker(true);
             };
 
             const toggleSupply = (id) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
@@ -296,12 +312,6 @@
                 let text = `SUPPLIES NEEDED (${new Date().toLocaleDateString()}):\n`;
                 checkedItems.forEach(item => { text += `- ${item.name}${item.note ? ` (${item.note})` : ''}\n`; });
                 if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
-                else {
-                    const el = document.createElement('textarea');
-                    el.value = text; document.body.appendChild(el);
-                    el.select(); document.execCommand('copy');
-                    document.body.removeChild(el);
-                }
             };
 
             const categorizedSupplies = useMemo(() => {
@@ -317,28 +327,45 @@
                 return a.localeCompare(b);
             }), [categorizedSupplies]);
 
-            if (isInitializing) return (
-                <div className="min-h-screen flex items-center justify-center bg-white">
-                    <Icons.Loader className="w-10 h-10 text-orange-500" />
-                </div>
-            );
+            if (isInitializing) return <div className="min-h-screen flex items-center justify-center bg-white"><Icons.Loader className="w-10 h-10 text-orange-500" /></div>;
 
             return (
                 <div className="min-h-screen max-w-4xl mx-auto px-4 py-8">
                     {!user ? (
                         <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10">
-                            <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" alt="Logo" />
-                            <h1 className="text-3xl font-extrabold text-slate-800 mb-2 uppercase tracking-tight">Technician Portal</h1>
-                            <button onClick={handleLogin} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
-                            <div className="flex items-center justify-center gap-2 cursor-pointer p-4" onClick={() => setRememberMe(!rememberMe)}>
-                                <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${rememberMe ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
-                                    {rememberMe && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}
-                                </div>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Stay signed in</span>
-                            </div>
+                            <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" />
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-8 uppercase tracking-tight leading-none text-center">Technician Portal</h1>
+                            <button onClick={() => tokenClient.requestAccessToken({ prompt: 'consent' })} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                         </div>
                     ) : (
                         <div className="space-y-6">
+                            {/* Full-Screen Settings Modal */}
+                            {showEmailSettings && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
+                                    <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
+                                        <div className="text-center mb-6">
+                                            <div className="p-4 bg-orange-50 text-orange-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
+                                            <h2 className="text-2xl font-black uppercase tracking-tight">Supervisor Emails</h2>
+                                            <p className="text-slate-500 text-[10px] mt-1 font-medium uppercase tracking-widest">Recipients for your time logs</p>
+                                        </div>
+                                        <div className="space-y-3 mb-6 max-h-[200px] overflow-y-auto pr-1 no-scrollbar">
+                                            {recipientEmails.map((email, i) => (
+                                                <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                                    <span className="text-[10px] font-bold text-slate-700 truncate mr-2">{email}</span>
+                                                    <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-2 mb-8">
+                                            <input type="email" placeholder="email@skedaddle.com" className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
+                                            <button onClick={addRecipient} className="bg-slate-900 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                        </div>
+                                        <button onClick={() => { if(recipientEmails.length > 0) { setIsSetupConfirmed(true); setShowEmailSettings(false); } }} className="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Close & Save</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Time Picker Modal */}
                             {showTimePicker && (
                                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                                     <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
@@ -351,13 +378,14 @@
                                                 {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                             </select>
                                         </div>
-                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Enter details for the sheet..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
-                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs active:scale-95 transition-transform">Confirm Entry</button>
+                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Enter details..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
+                                        <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm Entry</button>
                                         <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px]">Cancel</button>
                                     </div>
                                 </div>
                             )}
 
+                            {/* User Bar */}
                             <div className="bg-white rounded-[2rem] p-4 md:p-6 shadow-md flex items-center justify-between border border-slate-100">
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
@@ -365,86 +393,97 @@
                                         <p className="font-extrabold text-slate-800 leading-none uppercase tracking-tight text-sm md:text-base">{user.name}</p>
                                         <div className="flex items-center gap-2 mt-1">
                                             <div className={`w-1.5 h-1.5 rounded-full ${accessToken ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                            <p className={`text-[9px] font-black uppercase tracking-widest ${accessToken ? 'text-green-600' : 'text-red-500'}`}>
-                                                Gmail {accessToken ? 'Synced' : 'Offline'}
-                                            </p>
+                                            <p className={`text-[9px] font-black uppercase tracking-widest ${accessToken ? 'text-green-600' : 'text-red-500'}`}>Gmail {accessToken ? 'Synced' : 'Offline'}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {!accessToken && (
-                                        <button onClick={handleLogin} className="p-2.5 bg-red-50 text-red-600 rounded-xl shadow-sm border border-red-100 active:scale-95 transition-transform flex items-center gap-2">
+                                        <button onClick={() => tokenClient.requestAccessToken({ prompt: 'consent' })} className="p-2.5 bg-red-50 text-red-600 rounded-xl shadow-sm border border-red-100 active:scale-95 transition-transform flex items-center gap-2">
                                             <Icons.Mail className="w-4 h-4" />
-                                            <span className="text-[9px] font-black uppercase">Reconnect</span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest">Reconnect</span>
                                         </button>
                                     )}
-                                    <button onClick={handleLogout} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
+                                    <button onClick={() => { setUser(null); setAccessToken(null); localStorage.removeItem('skedaddle_user'); setActiveTab('clock'); }} className="p-3 text-slate-300 hover:text-red-500 transition-colors"><Icons.LogOut className="w-5 h-5"/></button>
                                 </div>
                             </div>
 
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[280px] mx-auto">
-                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Time Clock</button>
-                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>The Hub</button>
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
                             </div>
 
                             {activeTab === 'clock' && (
                                 <div className="max-w-2xl mx-auto space-y-6">
-                                    {status === 'clocked_out' ? (
-                                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100 p-8 md:p-10 bg-red-50 border-4 border-dashed border-red-200 text-center animate-slide-up">
-                                            <Icons.Alert className="text-red-500 w-16 h-16 mx-auto mb-4" />
-                                            <h3 className="text-red-900 font-black uppercase text-2xl mb-4 tracking-tight">Shift Recorded</h3>
-                                            <p className="text-red-700 font-medium leading-relaxed max-w-md mx-auto text-sm">
-                                                Shift entries for today are complete. <br/>
-                                                <span className="font-black text-lg block mt-4">Contact office for manual adjustments.</span>
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
-                                            <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-slate-800 rounded-xl"><Icons.UserCheck className="w-6 h-6 text-orange-500" /></div>
-                                                    <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
-                                                </div>
-                                                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
+                                    <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
+                                        <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center relative">
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-3 bg-slate-800 rounded-xl text-orange-500"><Icons.UserCheck className="w-6 h-6" /></div>
+                                                <div><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p><p className="text-xl font-black">{status === 'clocked_in' ? 'SHIFT ACTIVE' : 'OFF DUTY'}</p></div>
                                             </div>
-                                            <div className="p-6 md:p-8">
-                                                {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mb-6"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
-                                                
-                                                {!accessToken ? (
-                                                    <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
-                                                        <Icons.Mail className="text-red-500 w-12 h-12 mx-auto mb-4" />
-                                                        <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Email Required</h3>
-                                                        <p className="text-red-700 font-medium leading-relaxed text-xs">
-                                                            To track your time, you must sync your Gmail account.
-                                                            <span className="font-black block mt-3 uppercase tracking-widest">Tap "Reconnect" in the header above</span>
-                                                        </p>
-                                                    </div>
-                                                ) : null}
+                                            <button onClick={() => setShowEmailSettings(true)} className="absolute top-4 right-4 p-2 text-slate-500 hover:text-white transition-colors"><Icons.Settings className="w-4 h-4" /></button>
+                                            <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest ${status === 'clocked_in' ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-500'}`}>{status === 'clocked_in' ? 'ONLINE' : 'OFFLINE'}</div>
+                                        </div>
+                                        <div className="p-6 md:p-8">
+                                            {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase mb-6 tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
+                                            
+                                            {/* Gmail Offline Alert */}
+                                            {!accessToken && (
+                                                <div className="p-6 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                    <Icons.Alert className="text-red-500 w-8 h-8 mx-auto mb-4" />
+                                                    <h3 className="text-red-900 font-black uppercase text-xs mb-2 tracking-tight">Gmail Offline</h3>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
+                                                        Reconnect Gmail in the header to unlock clock buttons.
+                                                    </p>
+                                                </div>
+                                            )}
 
+                                            {!isSetupConfirmed ? (
+                                                <div className="p-8 bg-orange-50 border-4 border-dashed border-orange-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                    <div className="p-4 bg-orange-100 text-orange-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
+                                                    <h3 className="text-orange-900 font-black uppercase text-lg mb-2 tracking-tight">Supervisor Emails</h3>
+                                                    <p className="text-orange-700 font-medium leading-relaxed text-[10px] mb-6 uppercase tracking-widest">Add emails to unlock clock in/out</p>
+                                                    <div className="space-y-3 mb-4">
+                                                        {recipientEmails.map((email, i) => (
+                                                            <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-orange-100">
+                                                                <span className="text-[10px] font-bold text-slate-700">{email}</span>
+                                                                <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="flex gap-2 mb-6">
+                                                        <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-orange-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
+                                                        <button onClick={addRecipient} className="bg-orange-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                                    </div>
+                                                    {recipientEmails.length > 0 && (
+                                                        <button onClick={() => setIsSetupConfirmed(true)} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm & Unlock</button>
+                                                    )}
+                                                </div>
+                                            ) : status === 'clocked_out' ? (
+                                                <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
+                                                    <Icons.Alert className="text-red-500 w-12 h-12 mx-auto mb-4" />
+                                                    <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Shift Recorded</h3>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
+                                                        Shift entries for today are complete.<br/>Contact supervisor for adjustments.
+                                                    </p>
+                                                </div>
+                                            ) : (
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <button 
-                                                        disabled={status !== 'idle' || isSyncing || !accessToken} 
-                                                        onClick={() => { setPendingAction('IN'); setShowTimePicker(true); }} 
-                                                        className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all group disabled:opacity-20 disabled:grayscale"
-                                                    >
+                                                    <button disabled={status !== 'idle' || isSyncing || !accessToken} onClick={() => handleClockTrigger('IN')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 group">
                                                         <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                     </button>
-                                                    <button 
-                                                        disabled={status === 'idle' || isSyncing || !accessToken} 
-                                                        onClick={() => { setPendingAction('OUT'); setShowTimePicker(true); }} 
-                                                        className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all group disabled:opacity-20 disabled:grayscale"
-                                                    >
+                                                    <button disabled={status === 'idle' || isSyncing || !accessToken} onClick={() => handleClockTrigger('OUT')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 group">
                                                         <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                     </button>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
-                                    )}
+                                    </div>
 
                                     <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-slate-100">
-                                        <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> 14-Day Cycle</div>
+                                        <div className="p-6 border-b border-slate-50 flex items-center gap-3 font-black text-xs uppercase tracking-widest text-slate-500"><Icons.Calendar className="w-4 h-4 text-orange-500"/> Activity Log</div>
                                         <div className="p-4 calendar-grid">
                                             {logs.map((day, idx) => (
                                                 <div key={idx} className={`p-3 rounded-2xl border flex flex-col items-center transition-all ${day.start || day.end ? 'bg-orange-50/50 border-orange-100' : 'bg-slate-50 border-slate-50 opacity-40'}`}>
@@ -465,13 +504,13 @@
                                             <div className="flex items-center justify-between mb-6">
                                                 <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3></div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl active:bg-red-50 active:text-red-500 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
+                                                    <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl active:bg-red-50 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
                                                     <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl active:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
                                                 </div>
                                             </div>
                                             <div className="space-y-4 mb-6">
-                                                <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
-                                                <div className="flex gap-2"><input type="text" placeholder="Add custom item..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button></div>
+                                                <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add Custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl"><Icons.Plus className="w-5 h-5" /></button></div>
                                             </div>
                                             <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
                                                 {sortedCategoryNames.map(category => {
@@ -481,17 +520,17 @@
                                                         <div key={category} className="space-y-2">
                                                             <button onClick={() => toggleCategory(category)} className={`w-full flex items-center justify-between py-3 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}>
                                                                 <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">+ {selectedInCat}</span>}</div>
-                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
+                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
                                                             </button>
-                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
+                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
                                                         </div>
                                                     );
                                                 })}
                                             </div>
                                         </div>
                                         <div className="space-y-6 h-full mt-6 md:mt-0">
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
-                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium leading-relaxed italic">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
@@ -510,4 +549,3 @@
     </script>
 </body>
 </html>
-
