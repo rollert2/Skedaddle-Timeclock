@@ -63,6 +63,33 @@
 
         .supply-item { transition: all 0.3s ease; }
         input, select, textarea { font-size: 16px !important; }
+
+        .stock-btn {
+            flex: 1;
+            padding: 10px 4px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .launcher-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            transition: all 0.2s;
+        }
+        .launcher-btn:active { transform: scale(0.95); background: #f8fafc; }
     </style>
 </head>
 <body>
@@ -93,7 +120,9 @@
             Copy: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
             RefreshCcw: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
             Mail: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
-            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+            Truck: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>,
+            Cloud: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19a5.5 5.5 0 0 0 0-11h-1.2l-.8-1.5A7 7 0 0 0 2 11.5 6.5 6.5 0 0 0 8.5 18H17.5Z"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -135,20 +164,31 @@
             { id: '18', name: 'Respirator Filters', category: 'PPE & Safety', checked: false, note: '' }
         ];
 
+        const TRUCK_STOCK_ITEMS = [
+            { id: 'ts1', name: '1" Screen Rolls', category: 'Hardware' },
+            { id: 'ts2', name: '1/4" Screen Rolls', category: 'Hardware' },
+            { id: 'ts3', name: 'Sealant Tubes', category: 'Hardware' },
+            { id: 'ts4', name: 'Kopr-Lastic', category: 'Hardware' },
+            { id: 'ts5', name: 'Raccoon OWD', category: 'Doors' },
+            { id: 'ts6', name: 'Squirrel OWD', category: 'Doors' },
+            { id: 'ts7', name: 'Bat Valves', category: 'Doors' },
+            { id: 'ts8', name: 'Traps (Raccoon)', category: 'Equipment' },
+            { id: 'ts9', name: 'Traps (Squirrel)', category: 'Equipment' },
+            { id: 'ts10', name: 'Respirator Filters', category: 'Safety' },
+            { id: 'ts11', name: 'Gloves (Latex)', category: 'Safety' },
+            { id: 'ts12', name: 'Cleaning Sprays', category: 'Sanitation' }
+        ];
+
         const getRoundedTime = () => {
             const now = new Date();
-            const minutes = now.getMinutes();
-            let roundedMinutes;
-            let hourAdjustment = 0;
-
-            if (minutes >= 53) { roundedMinutes = 0; hourAdjustment = 1; }
-            else if (minutes >= 38) { roundedMinutes = 45; }
-            else if (minutes >= 23) { roundedMinutes = 30; }
-            else if (minutes >= 8) { roundedMinutes = 15; }
-            else { roundedMinutes = 0; }
-
-            const h = (now.getHours() + hourAdjustment) % 24;
-            return { hours: h, minutes: roundedMinutes };
+            const min = now.getMinutes();
+            let roundedMin, hourAdj = 0;
+            if (min >= 53) { roundedMin = 0; hourAdj = 1; }
+            else if (min >= 38) { roundedMin = 45; }
+            else if (min >= 23) { roundedMin = 30; }
+            else if (min >= 8) { roundedMin = 15; }
+            else { roundedMin = 0; }
+            return { h: (now.getHours() + hourAdj) % 24, m: roundedMin };
         };
 
         const App = () => {
@@ -163,6 +203,12 @@
                 return saved ? JSON.parse(saved) : [];
             });
 
+            const [isSetupConfirmed, setIsSetupConfirmed] = useState(() => {
+                if (!user) return false;
+                const confirmed = localStorage.getItem(`setup_done_${user.email}`);
+                return confirmed === 'true';
+            });
+
             const [activeTab, setActiveTab] = useState('clock');
             const [selectedSpecies, setSelectedSpecies] = useState(null);
             const [status, setStatus] = useState('idle');
@@ -173,14 +219,13 @@
             const [tokenClient, setTokenClient] = useState(null);
 
             const [supplies, setSupplies] = useState([]);
+            const [truckStock, setTruckStock] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
             const [newItemName, setNewItemName] = useState('');
             const [expandedCategories, setExpandedCategories] = useState(['Screens', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
             
             const [showTimePicker, setShowTimePicker] = useState(false);
             const [showEmailSettings, setShowEmailSettings] = useState(false);
-            const [isSetupConfirmed, setIsSetupConfirmed] = useState(false);
-            
             const [pendingAction, setPendingAction] = useState(null);
             const [selHour, setSelHour] = useState(0);
             const [selMin, setSelMin] = useState(0);
@@ -195,31 +240,23 @@
                     const data = await response.json();
                     if (data.status) setStatus(data.status);
                     if (data.logs) setLogs(data.logs);
-                } catch (err) { console.error("Status error:", err); }
+                } catch (err) { console.error(err); }
                 setIsSyncing(false);
             };
 
             const initializeGsi = () => {
-                if (!window.google) {
-                    setTimeout(initializeGsi, 500);
-                    return;
-                }
+                if (!window.google) { setTimeout(initializeGsi, 500); return; }
                 const client = window.google.accounts.oauth2.initTokenClient({
                     client_id: CLIENT_ID,
                     scope: 'openid email profile https://www.googleapis.com/auth/gmail.send',
-                    callback: async (tokenResponse) => {
-                        if (tokenResponse.error) return;
-                        setAccessToken(tokenResponse.access_token);
-                        try {
-                            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                                headers: { 'Authorization': `Bearer ${tokenResponse.access_token}` }
-                            });
-                            const profile = await userInfoRes.json();
-                            const newUser = { email: profile.email, name: profile.name, picture: profile.picture };
-                            setUser(newUser);
-                            localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
-                            checkUserStatus(newUser);
-                        } catch (e) { console.error("Profile fetch error", e); }
+                    callback: async (res) => {
+                        if (res.error) return;
+                        setAccessToken(res.access_token);
+                        const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': `Bearer ${res.access_token}` } }).then(r => r.json());
+                        const newUser = { email: info.email, name: info.name, picture: info.picture };
+                        setUser(newUser);
+                        localStorage.setItem('skedaddle_user', JSON.stringify(newUser));
+                        checkUserStatus(newUser);
                     },
                 });
                 setTokenClient(client);
@@ -229,31 +266,24 @@
 
             useEffect(() => {
                 if (user) {
-                    const savedEmails = localStorage.getItem(`emails_${user.email}`);
-                    const parsedEmails = savedEmails ? JSON.parse(savedEmails) : [];
-                    setRecipientEmails(parsedEmails);
-                    setIsSetupConfirmed(parsedEmails.length > 0);
+                    localStorage.setItem(`emails_${user.email}`, JSON.stringify(recipientEmails));
+                    localStorage.setItem(`setup_done_${user.email}`, isSetupConfirmed.toString());
                     const savedSupplies = localStorage.getItem(`supplies_${user.email}`);
                     setSupplies(savedSupplies ? JSON.parse(savedSupplies) : DEFAULT_SUPPLIES);
+                    const savedStock = localStorage.getItem(`truck_${user.email}`);
+                    setTruckStock(savedStock ? JSON.parse(savedStock) : TRUCK_STOCK_ITEMS.map(i => ({...i, level: 'High'})));
                 }
-            }, [user]);
-
-            useEffect(() => {
-                if (user) localStorage.setItem(`emails_${user.email}`, JSON.stringify(recipientEmails));
-            }, [recipientEmails, user]);
+            }, [user, recipientEmails, isSetupConfirmed]);
 
             useEffect(() => {
                 if (user && supplies.length > 0) localStorage.setItem(`supplies_${user.email}`, JSON.stringify(supplies));
             }, [supplies, user]);
 
-            useEffect(() => { initializeGsi(); }, []);
+            useEffect(() => {
+                if (user && truckStock.length > 0) localStorage.setItem(`truck_${user.email}`, JSON.stringify(truckStock));
+            }, [truckStock, user]);
 
-            const addRecipient = () => {
-                if (newEmailInput.includes('@')) {
-                    setRecipientEmails([...recipientEmails, newEmailInput.trim()]);
-                    setNewEmailInput("");
-                }
-            };
+            useEffect(() => { initializeGsi(); }, []);
 
             const sendEmailAsUser = async (action, time, note) => {
                 const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -286,46 +316,36 @@
                 } catch (err) { setIsSyncing(false); }
             };
 
-            const handleClockTrigger = (action) => {
-                const rounded = getRoundedTime();
-                setSelHour(rounded.hours);
-                setSelMin(rounded.minutes);
-                setPendingAction(action);
-                setShowTimePicker(true);
-            };
-
+            const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+            const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
+            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
             const toggleSupply = (id) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
             const updateSupplyNote = (id, note) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
             const addSupply = () => {
                 if (!newItemName.trim()) return;
-                const newItem = { id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' };
-                setSupplies([newItem, ...supplies]);
+                setSupplies([{ id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' }, ...supplies]);
                 setNewItemName('');
             };
-            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
-            const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
-            const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
 
             const copySuppliesList = () => {
-                const checkedItems = supplies.filter(s => s.checked);
-                if (checkedItems.length === 0) return;
+                const checked = supplies.filter(s => s.checked);
+                if (checked.length === 0) return;
                 let text = `SUPPLIES NEEDED (${new Date().toLocaleDateString()}):\n`;
-                checkedItems.forEach(item => { text += `- ${item.name}${item.note ? ` (${item.note})` : ''}\n`; });
-                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+                checked.forEach(i => { text += `- ${i.name}${i.note ? ` (${i.note})` : ''}\n`; });
+                if (navigator.clipboard) navigator.clipboard.writeText(text);
             };
 
             const categorizedSupplies = useMemo(() => {
-                const filtered = supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase()));
                 const groups = {};
-                filtered.forEach(s => { if (!groups[s.category]) groups[s.category] = []; groups[s.category].push(s); });
-                Object.keys(groups).forEach(cat => groups[cat].sort((a, b) => a.name.localeCompare(b.name)));
+                supplies.filter(s => s.name.toLowerCase().includes(supplySearch.toLowerCase())).forEach(s => {
+                    if (!groups[s.category]) groups[s.category] = [];
+                    groups[s.category].push(s);
+                });
+                Object.keys(groups).forEach(k => groups[k].sort((a,b) => a.name.localeCompare(b.name)));
                 return groups;
             }, [supplies, supplySearch]);
 
-            const sortedCategoryNames = useMemo(() => Object.keys(categorizedSupplies).sort((a, b) => {
-                if (a === 'Custom') return 1; if (b === 'Custom') return -1;
-                return a.localeCompare(b);
-            }), [categorizedSupplies]);
+            const sortedCategoryNames = useMemo(() => Object.keys(categorizedSupplies).sort((a,b) => a === 'Custom' ? 1 : b === 'Custom' ? -1 : a.localeCompare(b)), [categorizedSupplies]);
 
             if (isInitializing) return <div className="min-h-screen flex items-center justify-center bg-white"><Icons.Loader className="w-10 h-10 text-orange-500" /></div>;
 
@@ -339,33 +359,30 @@
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {/* Full-Screen Settings Modal */}
+                            {/* Email Settings Modal */}
                             {showEmailSettings && (
                                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
-                                    <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
-                                        <div className="text-center mb-6">
-                                            <div className="p-4 bg-orange-50 text-orange-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
-                                            <h2 className="text-2xl font-black uppercase tracking-tight">Supervisor Emails</h2>
-                                            <p className="text-slate-500 text-[10px] mt-1 font-medium uppercase tracking-widest">Recipients for your time logs</p>
-                                        </div>
-                                        <div className="space-y-3 mb-6 max-h-[200px] overflow-y-auto pr-1 no-scrollbar">
+                                    <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up text-center">
+                                        <div className="p-4 bg-orange-50 text-orange-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight">Supervisor Emails</h2>
+                                        <div className="space-y-3 mb-6 max-h-[200px] overflow-y-auto no-scrollbar py-2">
                                             {recipientEmails.map((email, i) => (
                                                 <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                                    <span className="text-[10px] font-bold text-slate-700 truncate mr-2">{email}</span>
+                                                    <span className="text-[10px] font-bold text-slate-700 truncate">{email}</span>
                                                     <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
                                                 </div>
                                             ))}
                                         </div>
                                         <div className="flex gap-2 mb-8">
-                                            <input type="email" placeholder="email@skedaddle.com" className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
-                                            <button onClick={addRecipient} className="bg-slate-900 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                            <input type="email" placeholder="Email..." className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (newEmailInput.includes('@') && setRecipientEmails([...recipientEmails, newEmailInput.trim()]), setNewEmailInput(""))} />
+                                            <button onClick={() => { if(newEmailInput.includes('@')) { setRecipientEmails([...recipientEmails, newEmailInput.trim()]); setNewEmailInput(""); } }} className="bg-slate-900 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                         </div>
-                                        <button onClick={() => { if(recipientEmails.length > 0) { setIsSetupConfirmed(true); setShowEmailSettings(false); } }} className="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Close & Save</button>
+                                        <button onClick={() => setShowEmailSettings(false)} className="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Close Settings</button>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Time Picker Modal */}
+                            {/* Time Picker */}
                             {showTimePicker && (
                                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                                     <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
@@ -378,14 +395,14 @@
                                                 {[0, 15, 30, 45].map(m => <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>)}
                                             </select>
                                         </div>
-                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Enter details..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
+                                        <textarea value={actionNote} onChange={e => setActionNote(e.target.value)} placeholder="Notes..." className="w-full p-4 bg-slate-50 rounded-xl mb-6 text-sm outline-none border-2 border-slate-100" rows="3" />
                                         <button onClick={confirmClockAction} className="w-full py-4 bg-orange-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm Entry</button>
                                         <button onClick={() => setShowTimePicker(false)} className="w-full py-4 text-slate-400 font-bold text-sm uppercase tracking-widest text-[10px]">Cancel</button>
                                     </div>
                                 </div>
                             )}
 
-                            {/* User Bar */}
+                            {/* Header */}
                             <div className="bg-white rounded-[2rem] p-4 md:p-6 shadow-md flex items-center justify-between border border-slate-100">
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
@@ -408,13 +425,27 @@
                                 </div>
                             </div>
 
-                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[280px] mx-auto">
-                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
-                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
+                            {/* Navigation */}
+                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[400px] mx-auto overflow-x-auto no-scrollbar">
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
+                                <button onClick={() => setActiveTab('truck')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'truck' ? 'bg-green-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Truck Stock</button>
                             </div>
 
                             {activeTab === 'clock' && (
                                 <div className="max-w-2xl mx-auto space-y-6">
+                                    {/* App Launcher Row */}
+                                    <div className="flex gap-3 px-1">
+                                        <a href="https://secure.fleetio.com/" target="_blank" className="launcher-btn">
+                                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">Fleetio</span>
+                                        </a>
+                                        <a href="https://login.salesforce.com/" target="_blank" className="launcher-btn">
+                                            <div className="p-3 bg-sky-50 text-sky-500 rounded-2xl"><Icons.Cloud className="w-6 h-6"/></div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">Field Service</span>
+                                        </a>
+                                    </div>
+
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
                                         <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center relative">
                                             <div className="flex items-center gap-4">
@@ -432,9 +463,7 @@
                                                 <div className="p-6 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <Icons.Alert className="text-red-500 w-8 h-8 mx-auto mb-4" />
                                                     <h3 className="text-red-900 font-black uppercase text-xs mb-2 tracking-tight">Gmail Offline</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
-                                                        Reconnect Gmail in the header to unlock clock buttons.
-                                                    </p>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">Reconnect Gmail in the header to unlock clock buttons.</p>
                                                 </div>
                                             )}
 
@@ -446,34 +475,30 @@
                                                     <div className="space-y-3 mb-4">
                                                         {recipientEmails.map((email, i) => (
                                                             <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-orange-100">
-                                                                <span className="text-[10px] font-bold text-slate-700">{email}</span>
+                                                                <span className="text-[10px] font-bold text-slate-700 truncate mr-2">{email}</span>
                                                                 <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
                                                             </div>
                                                         ))}
                                                     </div>
                                                     <div className="flex gap-2 mb-6">
-                                                        <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-orange-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && addRecipient()} />
-                                                        <button onClick={addRecipient} className="bg-orange-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
+                                                        <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-orange-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (newEmailInput.includes('@') && setRecipientEmails([...recipientEmails, newEmailInput.trim()]), setNewEmailInput(""))} />
+                                                        <button onClick={() => { if(newEmailInput.includes('@')) { setRecipientEmails([...recipientEmails, newEmailInput.trim()]); setNewEmailInput(""); } }} className="bg-orange-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                                     </div>
-                                                    {recipientEmails.length > 0 && (
-                                                        <button onClick={() => setIsSetupConfirmed(true)} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs">Confirm & Unlock</button>
-                                                    )}
+                                                    <button onClick={() => { if(recipientEmails.length > 0) setIsSetupConfirmed(true); }} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs disabled:opacity-50" disabled={recipientEmails.length === 0}>Confirm & Unlock</button>
                                                 </div>
                                             ) : status === 'clocked_out' ? (
                                                 <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <Icons.Alert className="text-red-500 w-12 h-12 mx-auto mb-4" />
                                                     <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Shift Recorded</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
-                                                        Shift entries for today are complete.<br/>Contact supervisor for adjustments.
-                                                    </p>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">Shift entries for today are complete.<br/>Contact supervisor for adjustments.</p>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <button disabled={status !== 'idle' || isSyncing || !accessToken} onClick={() => handleClockTrigger('IN')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 group">
+                                                    <button disabled={status !== 'idle' || isSyncing || !accessToken} onClick={() => { const r = getRoundedTime(); setSelHour(r.h); setSelMin(r.m); setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 group">
                                                         <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                     </button>
-                                                    <button disabled={status === 'idle' || isSyncing || !accessToken} onClick={() => handleClockTrigger('OUT')} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 group">
+                                                    <button disabled={status === 'idle' || isSyncing || !accessToken} onClick={() => { const r = getRoundedTime(); setSelHour(r.h); setSelMin(r.m); setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 group">
                                                         <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                     </button>
@@ -510,7 +535,7 @@
                                             </div>
                                             <div className="space-y-4 mb-6">
                                                 <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
-                                                <div className="flex gap-2"><input type="text" placeholder="Add Custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl"><Icons.Plus className="w-5 h-5" /></button></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button></div>
                                             </div>
                                             <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
                                                 {sortedCategoryNames.map(category => {
@@ -519,21 +544,53 @@
                                                     return (
                                                         <div key={category} className="space-y-2">
                                                             <button onClick={() => toggleCategory(category)} className={`w-full flex items-center justify-between py-3 px-3 rounded-lg transition-colors ${selectedInCat > 0 ? 'bg-orange-100' : 'bg-slate-100 hover:bg-slate-200'}`}>
-                                                                <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">+ {selectedInCat}</span>}</div>
-                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
+                                                                <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">+ {selectedInCat}</span>}</div>
+                                                                <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
                                                             </button>
-                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
+                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none focus:border-orange-500 shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
                                                         </div>
                                                     );
                                                 })}
                                             </div>
                                         </div>
                                         <div className="space-y-6 h-full mt-6 md:mt-0">
-                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
-                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
+                                            <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
+                                </div>
+                            )}
+
+                            {activeTab === 'truck' && (
+                                <div className="space-y-6 animate-slide-up max-w-2xl mx-auto">
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100">
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
+                                            <div>
+                                                <h3 className="font-black uppercase text-xs tracking-widest text-slate-800 leading-none mb-1">Truck Inventory</h3>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Track your stock levels</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            {truckStock.map((item) => (
+                                                <div key={item.id} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col gap-3">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-[10px] font-black uppercase text-slate-800 tracking-tight">{item.name}</span>
+                                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                                            item.level === 'Low' ? 'bg-red-100 text-red-600' : 
+                                                            item.level === 'Med' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'
+                                                        }`}>{item.level} Stock</span>
+                                                    </div>
+                                                    <div className="flex gap-1 bg-slate-50 p-1 rounded-xl">
+                                                        {['Low', 'Med', 'High'].map(lv => (
+                                                            <button key={lv} onClick={() => setTruckStock(truckStock.map(i => i.id === item.id ? {...i, level: lv} : i))} className={`stock-btn ${item.level === lv ? (lv === 'Low' ? 'bg-red-500 text-white' : lv === 'Med' ? 'bg-orange-500 text-white' : 'bg-green-600 text-white') : 'text-slate-400'}`}>{lv}</button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                             
@@ -549,3 +606,4 @@
     </script>
 </body>
 </html>
+
