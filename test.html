@@ -63,6 +63,17 @@
 
         .supply-item { transition: all 0.3s ease; }
         input, select, textarea { font-size: 16px !important; }
+
+        .stock-btn {
+            flex: 1;
+            padding: 8px 4px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -93,7 +104,8 @@
             Copy: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
             RefreshCcw: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
             Mail: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
-            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+            Truck: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -135,6 +147,21 @@
             { id: '18', name: 'Respirator Filters', category: 'PPE & Safety', checked: false, note: '' }
         ];
 
+        const TRUCK_STOCK_ITEMS = [
+            { id: 'ts1', name: '1" Screen Rolls', category: 'Hardware' },
+            { id: 'ts2', name: '1/4" Screen Rolls', category: 'Hardware' },
+            { id: 'ts3', name: 'Sealant Tubes', category: 'Hardware' },
+            { id: 'ts4', name: 'Kopr-Lastic', category: 'Hardware' },
+            { id: 'ts5', name: 'Raccoon OWD', category: 'Doors' },
+            { id: 'ts6', name: 'Squirrel OWD', category: 'Doors' },
+            { id: 'ts7', name: 'Bat Valves', category: 'Doors' },
+            { id: 'ts8', name: 'Traps (Raccoon)', category: 'Equipment' },
+            { id: 'ts9', name: 'Traps (Squirrel)', category: 'Equipment' },
+            { id: 'ts10', name: 'Respirator Filters', category: 'Safety' },
+            { id: 'ts11', name: 'Gloves (Latex)', category: 'Safety' },
+            { id: 'ts12', name: 'Cleaning Sprays', category: 'Sanitation' }
+        ];
+
         const getRoundedTime = () => {
             const now = new Date();
             const minutes = now.getMinutes();
@@ -173,6 +200,7 @@
             const [tokenClient, setTokenClient] = useState(null);
 
             const [supplies, setSupplies] = useState([]);
+            const [truckStock, setTruckStock] = useState([]);
             const [supplySearch, setSupplySearch] = useState('');
             const [newItemName, setNewItemName] = useState('');
             const [expandedCategories, setExpandedCategories] = useState(['Screens', 'Fasteners & Sealants', 'PPE & Safety', 'Custom']);
@@ -233,8 +261,12 @@
                     const parsedEmails = savedEmails ? JSON.parse(savedEmails) : [];
                     setRecipientEmails(parsedEmails);
                     setIsSetupConfirmed(parsedEmails.length > 0);
+                    
                     const savedSupplies = localStorage.getItem(`supplies_${user.email}`);
                     setSupplies(savedSupplies ? JSON.parse(savedSupplies) : DEFAULT_SUPPLIES);
+
+                    const savedStock = localStorage.getItem(`truck_${user.email}`);
+                    setTruckStock(savedStock ? JSON.parse(savedStock) : TRUCK_STOCK_ITEMS.map(i => ({...i, level: 'High'})));
                 }
             }, [user]);
 
@@ -245,6 +277,10 @@
             useEffect(() => {
                 if (user && supplies.length > 0) localStorage.setItem(`supplies_${user.email}`, JSON.stringify(supplies));
             }, [supplies, user]);
+
+            useEffect(() => {
+                if (user && truckStock.length > 0) localStorage.setItem(`truck_${user.email}`, JSON.stringify(truckStock));
+            }, [truckStock, user]);
 
             useEffect(() => { initializeGsi(); }, []);
 
@@ -305,6 +341,10 @@
             const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
             const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
             const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+
+            const updateTruckStock = (id, level) => {
+                setTruckStock(prev => prev.map(item => item.id === id ? {...item, level} : item));
+            };
 
             const copySuppliesList = () => {
                 const checkedItems = supplies.filter(s => s.checked);
@@ -408,9 +448,10 @@
                                 </div>
                             </div>
 
-                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[280px] mx-auto">
-                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
-                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
+                            <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[400px] mx-auto overflow-x-auto no-scrollbar">
+                                <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
+                                <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
+                                <button onClick={() => setActiveTab('truck')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'truck' ? 'bg-green-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Truck Stock</button>
                             </div>
 
                             {activeTab === 'clock' && (
@@ -427,14 +468,11 @@
                                         <div className="p-6 md:p-8">
                                             {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase mb-6 tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
                                             
-                                            {/* Gmail Offline Alert */}
                                             {!accessToken && (
                                                 <div className="p-6 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <Icons.Alert className="text-red-500 w-8 h-8 mx-auto mb-4" />
                                                     <h3 className="text-red-900 font-black uppercase text-xs mb-2 tracking-tight">Gmail Offline</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
-                                                        Reconnect Gmail in the header to unlock clock buttons.
-                                                    </p>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">Reconnect Gmail in the header to unlock clock buttons.</p>
                                                 </div>
                                             )}
 
@@ -463,9 +501,7 @@
                                                 <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <Icons.Alert className="text-red-500 w-12 h-12 mx-auto mb-4" />
                                                     <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Shift Recorded</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">
-                                                        Shift entries for today are complete.<br/>Contact supervisor for adjustments.
-                                                    </p>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">Shift entries for today are complete.<br/>Contact supervisor for adjustments.</p>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-2 gap-4">
@@ -536,6 +572,48 @@
                                     <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
                                 </div>
                             )}
+
+                            {activeTab === 'truck' && (
+                                <div className="space-y-6 animate-slide-up max-w-2xl mx-auto">
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100">
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
+                                            <div>
+                                                <h3 className="font-black uppercase text-xs tracking-widest text-slate-800 leading-none mb-1">Truck Inventory</h3>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Track your stock levels</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            {truckStock.map((item) => (
+                                                <div key={item.id} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col gap-3">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-[10px] font-black uppercase text-slate-800 tracking-tight">{item.name}</span>
+                                                        <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                                            item.level === 'Low' ? 'bg-red-100 text-red-600' : 
+                                                            item.level === 'Med' ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'
+                                                        }`}>{item.level} Stock</span>
+                                                    </div>
+                                                    <div className="flex gap-1 bg-slate-50 p-1 rounded-xl">
+                                                        <button 
+                                                            onClick={() => updateTruckStock(item.id, 'Low')}
+                                                            className={`stock-btn ${item.level === 'Low' ? 'bg-red-500 text-white shadow-sm' : 'text-slate-400'}`}
+                                                        >Low</button>
+                                                        <button 
+                                                            onClick={() => updateTruckStock(item.id, 'Med')}
+                                                            className={`stock-btn ${item.level === 'Med' ? 'bg-orange-500 text-white shadow-sm' : 'text-slate-400'}`}
+                                                        >Med</button>
+                                                        <button 
+                                                            onClick={() => updateTruckStock(item.id, 'High')}
+                                                            className={`stock-btn ${item.level === 'High' ? 'bg-green-500 text-white shadow-sm' : 'text-slate-400'}`}
+                                                        >High</button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             
                             <div className="text-center pt-8 opacity-20"><p className="font-black uppercase tracking-[0.5em] text-[8px] text-slate-800">Skedaddle Wildlife Control</p></div>
                         </div>
@@ -549,3 +627,4 @@
     </script>
 </body>
 </html>
+
