@@ -88,6 +88,7 @@
             border: 1px solid #f1f5f9;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
             transition: all 0.2s;
+            cursor: pointer;
         }
         .launcher-btn:active { transform: scale(0.95); background: #f8fafc; }
     </style>
@@ -196,17 +197,14 @@
                 const saved = localStorage.getItem('skedaddle_user');
                 return saved ? JSON.parse(saved) : null;
             });
-
             const [recipientEmails, setRecipientEmails] = useState(() => {
                 if (!user) return [];
                 const saved = localStorage.getItem(`emails_${user.email}`);
                 return saved ? JSON.parse(saved) : [];
             });
-
             const [isSetupConfirmed, setIsSetupConfirmed] = useState(() => {
                 if (!user) return false;
-                const confirmed = localStorage.getItem(`setup_done_${user.email}`);
-                return confirmed === 'true';
+                return localStorage.getItem(`setup_done_${user.email}`) === 'true';
             });
 
             const [activeTab, setActiveTab] = useState('clock');
@@ -275,37 +273,30 @@
                 }
             }, [user, recipientEmails, isSetupConfirmed]);
 
-            useEffect(() => {
-                if (user && supplies.length > 0) localStorage.setItem(`supplies_${user.email}`, JSON.stringify(supplies));
-            }, [supplies, user]);
-
-            useEffect(() => {
-                if (user && truckStock.length > 0) localStorage.setItem(`truck_${user.email}`, JSON.stringify(truckStock));
-            }, [truckStock, user]);
-
             useEffect(() => { initializeGsi(); }, []);
 
-            const sendEmailAsUser = async (action, time, note) => {
-                const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
-                const message = `To: ${recipientEmails.join(', ')}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nSent via Timeclock App`;
-                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-                try {
-                    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ raw: encodedEmail })
-                    });
-                    return res.ok;
-                } catch (err) { return false; }
+            const tryLaunchApp = (scheme, webUrl) => {
+                const start = Date.now();
+                window.location.href = scheme;
+                setTimeout(() => {
+                    if (Date.now() - start < 1500) {
+                        window.open(webUrl, '_blank');
+                    }
+                }, 1000);
             };
 
             const confirmClockAction = async () => {
                 const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-                await sendEmailAsUser(pendingAction, decimalTime, actionNote);
+                const message = `To: ${recipientEmails.join(', ')}\nSubject: ${user.name} - ${pendingAction === "IN" ? "Start" : "End"} Time\n\n${pendingAction === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${decimalTime}\nNotes - ${actionNote || "None"}\n\nSent via Timeclock App`;
+                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
                 try {
+                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ raw: encodedEmail })
+                    });
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -318,9 +309,7 @@
 
             const toggleCategory = (cat) => setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
             const deselectAllSupplies = () => setSupplies(prev => prev.map(s => ({ ...s, checked: false, note: '' })));
-            const deleteSupply = (id) => setSupplies(prev => prev.filter(s => s.id !== id));
             const toggleSupply = (id) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, checked: !s.checked } : s));
-            const updateSupplyNote = (id, note) => setSupplies(prev => prev.map(s => s.id === id ? { ...s, note } : s));
             const addSupply = () => {
                 if (!newItemName.trim()) return;
                 setSupplies([{ id: Date.now().toString(), name: newItemName, category: 'Custom', checked: true, note: '' }, ...supplies]);
@@ -341,7 +330,6 @@
                     if (!groups[s.category]) groups[s.category] = [];
                     groups[s.category].push(s);
                 });
-                Object.keys(groups).forEach(k => groups[k].sort((a,b) => a.name.localeCompare(b.name)));
                 return groups;
             }, [supplies, supplySearch]);
 
@@ -352,14 +340,13 @@
             return (
                 <div className="min-h-screen max-w-4xl mx-auto px-4 py-8">
                     {!user ? (
-                        <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10">
+                        <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10 text-center">
                             <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" />
-                            <h1 className="text-3xl font-extrabold text-slate-800 mb-8 uppercase tracking-tight leading-none text-center">Technician Portal</h1>
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-8 uppercase tracking-tight leading-none">Technician Portal</h1>
                             <button onClick={() => tokenClient.requestAccessToken({ prompt: 'consent' })} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {/* Email Settings Modal */}
                             {showEmailSettings && (
                                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
                                     <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up text-center">
@@ -377,12 +364,11 @@
                                             <input type="email" placeholder="Email..." className="flex-1 bg-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (newEmailInput.includes('@') && setRecipientEmails([...recipientEmails, newEmailInput.trim()]), setNewEmailInput(""))} />
                                             <button onClick={() => { if(newEmailInput.includes('@')) { setRecipientEmails([...recipientEmails, newEmailInput.trim()]); setNewEmailInput(""); } }} className="bg-slate-900 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                         </div>
-                                        <button onClick={() => setShowEmailSettings(false)} className="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Close Settings</button>
+                                        <button onClick={() => { if(recipientEmails.length > 0) { setIsSetupConfirmed(true); setShowEmailSettings(false); } }} className="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px]">Close Settings</button>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Time Picker */}
                             {showTimePicker && (
                                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                                     <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
@@ -402,7 +388,6 @@
                                 </div>
                             )}
 
-                            {/* Header */}
                             <div className="bg-white rounded-[2rem] p-4 md:p-6 shadow-md flex items-center justify-between border border-slate-100">
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
@@ -425,7 +410,6 @@
                                 </div>
                             </div>
 
-                            {/* Navigation */}
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[400px] mx-auto overflow-x-auto no-scrollbar">
                                 <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
                                 <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
@@ -434,16 +418,15 @@
 
                             {activeTab === 'clock' && (
                                 <div className="max-w-2xl mx-auto space-y-6">
-                                    {/* App Launcher Row */}
                                     <div className="flex gap-3 px-1">
-                                        <a href="https://secure.fleetio.com/" target="_blank" className="launcher-btn">
+                                        <div onClick={() => tryLaunchApp('fleetio://', 'https://secure.fleetio.com/')} className="launcher-btn">
                                             <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">Fleetio</span>
-                                        </a>
-                                        <a href="https://login.salesforce.com/" target="_blank" className="launcher-btn">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Fleetio</span>
+                                        </div>
+                                        <div onClick={() => tryLaunchApp('com.salesforce.fieldservice://', 'https://login.salesforce.com/')} className="launcher-btn">
                                             <div className="p-3 bg-sky-50 text-sky-500 rounded-2xl"><Icons.Cloud className="w-6 h-6"/></div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">Field Service</span>
-                                        </a>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Field Service</span>
+                                        </div>
                                     </div>
 
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
@@ -458,7 +441,6 @@
                                         <div className="p-6 md:p-8">
                                             {isSyncing && <div className="flex items-center justify-center gap-2 text-orange-500 text-[10px] font-black uppercase mb-6 tracking-widest"><Icons.Loader className="w-4 h-4"/>Syncing...</div>}
                                             
-                                            {/* Gmail Offline Alert */}
                                             {!accessToken && (
                                                 <div className="p-6 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <Icons.Alert className="text-red-500 w-8 h-8 mx-auto mb-4" />
@@ -475,7 +457,7 @@
                                                     <div className="space-y-3 mb-4">
                                                         {recipientEmails.map((email, i) => (
                                                             <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-orange-100">
-                                                                <span className="text-[10px] font-bold text-slate-700 truncate mr-2">{email}</span>
+                                                                <span className="text-[10px] font-bold text-slate-700 truncate">{email}</span>
                                                                 <button onClick={() => setRecipientEmails(recipientEmails.filter((_, idx) => idx !== i))} className="text-red-400"><Icons.Trash className="w-4 h-4"/></button>
                                                             </div>
                                                         ))}
@@ -484,21 +466,21 @@
                                                         <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-orange-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (newEmailInput.includes('@') && setRecipientEmails([...recipientEmails, newEmailInput.trim()]), setNewEmailInput(""))} />
                                                         <button onClick={() => { if(newEmailInput.includes('@')) { setRecipientEmails([...recipientEmails, newEmailInput.trim()]); setNewEmailInput(""); } }} className="bg-orange-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                                     </div>
-                                                    <button onClick={() => { if(recipientEmails.length > 0) setIsSetupConfirmed(true); }} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs disabled:opacity-50" disabled={recipientEmails.length === 0}>Confirm & Unlock</button>
+                                                    <button onClick={() => { if(recipientEmails.length > 0) setIsSetupConfirmed(true); }} className="w-full py-4 bg-green-600 text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-xs" disabled={recipientEmails.length === 0}>Confirm & Unlock</button>
                                                 </div>
                                             ) : status === 'clocked_out' ? (
                                                 <div className="p-8 bg-red-50 border-4 border-dashed border-red-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <Icons.Alert className="text-red-500 w-12 h-12 mx-auto mb-4" />
                                                     <h3 className="text-red-900 font-black uppercase text-lg mb-2 tracking-tight">Shift Recorded</h3>
-                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold">Shift entries for today are complete.<br/>Contact supervisor for adjustments.</p>
+                                                    <p className="text-red-700 font-medium leading-relaxed text-[10px] uppercase tracking-widest font-bold text-center">Shift entries for today are complete.<br/>Contact supervisor for adjustments.</p>
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <button disabled={status !== 'idle' || isSyncing || !accessToken} onClick={() => { const r = getRoundedTime(); setSelHour(r.h); setSelMin(r.m); setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 group">
+                                                    <button disabled={status !== 'idle' || isSyncing || !accessToken} onClick={() => { const r = getRoundedTime(); setSelHour(r.h); setSelMin(r.m); setPendingAction('IN'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-green-50 active:border-green-200 transition-all disabled:opacity-20 group text-center">
                                                         <Icons.LogIn className="w-8 h-8 text-green-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-green-700 tracking-widest">Clock In</span>
                                                     </button>
-                                                    <button disabled={status === 'idle' || isSyncing || !accessToken} onClick={() => { const r = getRoundedTime(); setSelHour(r.h); setSelMin(r.m); setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 group">
+                                                    <button disabled={status === 'idle' || isSyncing || !accessToken} onClick={() => { const r = getRoundedTime(); setSelHour(r.h); setSelMin(r.m); setPendingAction('OUT'); setShowTimePicker(true); }} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50 active:bg-red-50 active:border-red-200 transition-all disabled:opacity-20 group text-center">
                                                         <Icons.LogOut className="w-8 h-8 text-red-600 mb-2 mx-auto" />
                                                         <span className="block font-black text-[10px] uppercase text-slate-600 group-hover:text-red-700 tracking-widest">Clock Out</span>
                                                     </button>
@@ -527,7 +509,7 @@
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                         <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100 flex flex-col h-full overflow-hidden">
                                             <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Needed Supplies</h3></div>
+                                                <div className="flex items-center gap-3"><div className="p-3 bg-orange-50 text-orange-600 rounded-2xl"><Icons.Package className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800 text-center leading-none">Needed Supplies</h3></div>
                                                 <div className="flex gap-2">
                                                     <button onClick={deselectAllSupplies} className="p-2.5 bg-slate-100 text-slate-400 rounded-xl active:bg-red-50 transition-colors"><Icons.RefreshCcw className="w-4 h-4" /></button>
                                                     <button onClick={copySuppliesList} className="p-2.5 bg-slate-900 text-white rounded-xl active:bg-orange-600 transition-colors"><Icons.Copy className="w-4 h-4" /></button>
@@ -535,7 +517,7 @@
                                             </div>
                                             <div className="space-y-4 mb-6">
                                                 <div className="relative"><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" placeholder="Search..." className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={supplySearch} onChange={e => setSupplySearch(e.target.value)} /></div>
-                                                <div className="flex gap-2"><input type="text" placeholder="Add custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl shadow-lg active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button></div>
+                                                <div className="flex gap-2"><input type="text" placeholder="Add custom..." className="flex-1 px-4 py-3 bg-slate-50 rounded-xl text-xs font-bold border-2 border-slate-100 outline-none focus:border-orange-500" value={newItemName} onChange={e => setNewItemName(e.target.value)} onKeyPress={e => e.key === 'Enter' && addSupply()} /><button onClick={addSupply} className="p-3 bg-orange-600 text-white rounded-xl active:scale-95 transition-transform"><Icons.Plus className="w-5 h-5" /></button></div>
                                             </div>
                                             <div className="flex-1 overflow-y-auto max-h-[500px] no-scrollbar space-y-4">
                                                 {sortedCategoryNames.map(category => {
@@ -547,7 +529,7 @@
                                                                 <div className="flex items-center gap-2"><span className={`text-[10px] font-black uppercase tracking-widest ${selectedInCat > 0 ? 'text-orange-700' : 'text-slate-500'}`}>{category}</span>{selectedInCat > 0 && <span className="bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">+ {selectedInCat}</span>}</div>
                                                                 <Icons.ChevronDown className={`w-4 h-4 transition-transform ${selectedInCat > 0 ? 'text-orange-500' : 'text-slate-400'} ${expandedCategories.includes(category) ? 'rotate-180' : ''}`} />
                                                             </button>
-                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => deleteSupply(item.id)} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none focus:border-orange-500 shadow-inner" value={item.note} onChange={e => updateSupplyNote(item.id, e.target.value)} />}</div>))}</div>)}
+                                                            {expandedCategories.includes(category) && (<div className="space-y-3 animate-slide-up px-1">{categoryItems.map(item => (<div key={item.id} className={`p-4 rounded-2xl border-2 supply-item ${item.checked ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-50 shadow-sm'}`}><div className="flex items-center gap-3"><div onClick={() => toggleSupply(item.id)} className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-colors ${item.checked ? 'bg-orange-600 border-orange-600' : 'border-slate-200'}`}>{item.checked && <div className="w-2.5 h-2.5 bg-white rounded-full"></div>}</div><div className="flex-1"><p className={`text-xs font-black uppercase tracking-tight ${item.checked ? 'text-orange-900' : 'text-slate-700'}`}>{item.name}</p></div>{item.category === 'Custom' && <button onClick={() => setSupplies(supplies.filter(s => s.id !== item.id))} className="p-2 text-slate-300 active:text-red-500"><Icons.Trash className="w-4 h-4"/></button>}</div>{item.checked && <input type="text" placeholder="Add a note..." className="w-full mt-3 px-3 py-3 bg-white rounded-lg text-xs font-bold border border-orange-100 outline-none focus:border-orange-500 shadow-inner" value={item.note} onChange={e => setSupplies(supplies.map(s => s.id === item.id ? {...s, note: e.target.value} : s))} />}</div>))}</div>)}
                                                         </div>
                                                     );
                                                 })}
@@ -569,7 +551,7 @@
                                             <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
                                             <div>
                                                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-800 leading-none mb-1">Truck Inventory</h3>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Track your stock levels</p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Track your stock levels</p>
                                             </div>
                                         </div>
                                         <div className="space-y-4">
