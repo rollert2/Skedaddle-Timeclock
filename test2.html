@@ -74,23 +74,6 @@
             border-radius: 10px;
             transition: all 0.2s;
         }
-
-        .launcher-btn {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 16px;
-            border-radius: 20px;
-            background: white;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .launcher-btn:active { transform: scale(0.95); background: #f8fafc; }
     </style>
 </head>
 <body>
@@ -122,8 +105,7 @@
             RefreshCcw: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
             Mail: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
             Settings: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
-            Truck: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>,
-            Cloud: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19a5.5 5.5 0 0 0 0-11h-1.2l-.8-1.5A7 7 0 0 0 2 11.5 6.5 6.5 0 0 0 8.5 18H17.5Z"/></svg>
+            Truck: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         };
 
         const SPECIES_DATA = {
@@ -275,28 +257,27 @@
 
             useEffect(() => { initializeGsi(); }, []);
 
-            const tryLaunchApp = (scheme, webUrl) => {
-                const start = Date.now();
-                window.location.href = scheme;
-                setTimeout(() => {
-                    if (Date.now() - start < 1500) {
-                        window.open(webUrl, '_blank');
-                    }
-                }, 1000);
+            const sendEmailAsUser = async (action, time, note) => {
+                const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const subject = `${user.name} - ${action === "IN" ? "Start Time" : "End Time"} - ${dateStr}`;
+                const message = `To: ${recipientEmails.join(', ')}\nSubject: ${subject}\n\n${action === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${time}\nNotes - ${note || "None"}\n\nSent via Timeclock App`;
+                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                try {
+                    const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ raw: encodedEmail })
+                    });
+                    return res.ok;
+                } catch (err) { return false; }
             };
 
             const confirmClockAction = async () => {
                 const decimalTime = (selHour + (selMin / 60)).toFixed(2).padStart(5, '0');
                 setShowTimePicker(false);
                 setIsSyncing(true);
-                const message = `To: ${recipientEmails.join(', ')}\nSubject: ${user.name} - ${pendingAction === "IN" ? "Start" : "End"} Time\n\n${pendingAction === "IN" ? "CLOCK IN" : "CLOCK OUT"}\nTime - ${decimalTime}\nNotes - ${actionNote || "None"}\n\nSent via Timeclock App`;
-                const encodedEmail = btoa(unescape(encodeURIComponent(message))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                await sendEmailAsUser(pendingAction, decimalTime, actionNote);
                 try {
-                    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ raw: encodedEmail })
-                    });
                     await fetch(APPS_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -330,6 +311,7 @@
                     if (!groups[s.category]) groups[s.category] = [];
                     groups[s.category].push(s);
                 });
+                Object.keys(groups).forEach(k => groups[k].sort((a,b) => a.name.localeCompare(b.name)));
                 return groups;
             }, [supplies, supplySearch]);
 
@@ -340,13 +322,14 @@
             return (
                 <div className="min-h-screen max-w-4xl mx-auto px-4 py-8">
                     {!user ? (
-                        <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10 text-center">
+                        <div className="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-xl p-10 text-center border border-slate-100 mt-10">
                             <img src={LOGO_URL} className="h-24 mx-auto mb-8 object-contain" />
-                            <h1 className="text-3xl font-extrabold text-slate-800 mb-8 uppercase tracking-tight leading-none">Technician Portal</h1>
+                            <h1 className="text-3xl font-extrabold text-slate-800 mb-8 uppercase tracking-tight leading-none text-center">Technician Portal</h1>
                             <button onClick={() => tokenClient.requestAccessToken({ prompt: 'consent' })} className="google-btn mb-6 font-bold uppercase tracking-widest text-xs">Sign in with Google</button>
                         </div>
                     ) : (
                         <div className="space-y-6">
+                            {/* Email Settings Modal */}
                             {showEmailSettings && (
                                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
                                     <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up text-center">
@@ -369,6 +352,7 @@
                                 </div>
                             )}
 
+                            {/* Time Picker Modal */}
                             {showTimePicker && (
                                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                                     <div className="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-slide-up">
@@ -388,6 +372,7 @@
                                 </div>
                             )}
 
+                            {/* Header */}
                             <div className="bg-white rounded-[2rem] p-4 md:p-6 shadow-md flex items-center justify-between border border-slate-100">
                                 <div className="flex items-center gap-4">
                                     <img src={user.picture} className="w-12 h-12 rounded-xl border-2 border-slate-50" referrerPolicy="no-referrer" />
@@ -410,6 +395,7 @@
                                 </div>
                             </div>
 
+                            {/* Navigation */}
                             <div className="flex bg-slate-900 rounded-full p-1.5 shadow-lg border border-slate-800 max-w-[400px] mx-auto overflow-x-auto no-scrollbar">
                                 <button onClick={() => setActiveTab('clock')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'clock' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Clock</button>
                                 <button onClick={() => setActiveTab('hub')} className={`flex-1 py-3 px-4 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 ${activeTab === 'hub' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-white'}`}>Hub</button>
@@ -418,17 +404,6 @@
 
                             {activeTab === 'clock' && (
                                 <div className="max-w-2xl mx-auto space-y-6">
-                                    <div className="flex gap-3 px-1">
-                                        <div onClick={() => tryLaunchApp('fleetio://', 'https://secure.fleetio.com/')} className="launcher-btn">
-                                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Fleetio</span>
-                                        </div>
-                                        <div onClick={() => tryLaunchApp('com.salesforce.fieldservice://', 'https://login.salesforce.com/')} className="launcher-btn">
-                                            <div className="p-3 bg-sky-50 text-sky-500 rounded-2xl"><Icons.Cloud className="w-6 h-6"/></div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Field Service</span>
-                                        </div>
-                                    </div>
-
                                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-slate-100">
                                         <div className="p-6 md:p-8 bg-slate-900 text-white flex justify-between items-center relative">
                                             <div className="flex items-center gap-4">
@@ -453,7 +428,7 @@
                                                 <div className="p-8 bg-orange-50 border-4 border-dashed border-orange-200 rounded-[3rem] text-center animate-slide-up mb-6">
                                                     <div className="p-4 bg-orange-100 text-orange-600 rounded-full w-fit mx-auto mb-4"><Icons.Mail className="w-8 h-8"/></div>
                                                     <h3 className="text-orange-900 font-black uppercase text-lg mb-2 tracking-tight">Supervisor Emails</h3>
-                                                    <p className="text-orange-700 font-medium leading-relaxed text-[10px] mb-6 uppercase tracking-widest">Add emails to unlock clock in/out</p>
+                                                    <p className="text-orange-700 font-medium leading-relaxed text-[10px] mb-6 uppercase tracking-widest text-center">Add emails to unlock clock in/out</p>
                                                     <div className="space-y-3 mb-4">
                                                         {recipientEmails.map((email, i) => (
                                                             <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl border border-orange-100">
@@ -462,7 +437,7 @@
                                                             </div>
                                                         ))}
                                                     </div>
-                                                    <div className="flex gap-2 mb-6">
+                                                    <div className="flex gap-2 mb-6 text-center">
                                                         <input type="email" placeholder="Add Email..." className="flex-1 bg-white rounded-xl px-4 py-3 text-xs font-bold outline-none border border-orange-100" value={newEmailInput} onChange={e => setNewEmailInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (newEmailInput.includes('@') && setRecipientEmails([...recipientEmails, newEmailInput.trim()]), setNewEmailInput(""))} />
                                                         <button onClick={() => { if(newEmailInput.includes('@')) { setRecipientEmails([...recipientEmails, newEmailInput.trim()]); setNewEmailInput(""); } }} className="bg-orange-600 text-white p-3 rounded-xl"><Icons.Plus className="w-5 h-5"/></button>
                                                     </div>
@@ -535,23 +510,23 @@
                                                 })}
                                             </div>
                                         </div>
-                                        <div className="space-y-6 h-full mt-6 md:mt-0">
+                                        <div className="space-y-6 h-full mt-6 md:mt-0 text-center">
                                             <div className="bg-white rounded-[2.5rem] p-8 shadow-md border border-slate-100 hub-card"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-slate-900 text-white rounded-2xl"><Icons.FileText className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Manuals</h3></div><div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 text-center"><Icons.FileText className="w-10 h-10 text-orange-500 mx-auto mb-4" /><h4 className="font-black text-slate-800 text-sm mb-4">Technical Manual</h4><a href={MANUAL_FULL_URL} target="_blank" className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase active:bg-orange-600 transition-all shadow-lg">Open <Icons.ExternalLink className="w-4 h-4"/></a></div></div>
-                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
+                                            <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Icons.Search className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Diagnostics</h3></div><div className="grid grid-cols-2 gap-2 mb-4">{Object.keys(SPECIES_DATA).map(s => (<button key={s} onClick={() => setSelectedSpecies(s === selectedSpecies ? null : s)} className={`p-4 rounded-2xl transition-all text-left border-2 ${selectedSpecies === s ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-slate-50 border-slate-100 active:border-blue-200'}`}><span className="text-xl block mb-1">{SPECIES_DATA[s].icon}</span><span className="font-black text-[9px] uppercase tracking-tighter leading-tight text-center">{s}</span></button>))}</div>{selectedSpecies && (<div className="space-y-3 animate-slide-up"><div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs"><p className="font-black text-blue-600 uppercase mb-1">Diagnostic Signs</p><p className="font-medium text-slate-700 leading-relaxed text-center">{SPECIES_DATA[selectedSpecies].signs}</p></div><div className="p-4 bg-slate-900 rounded-2xl text-white text-xs"><p className="font-black text-slate-400 uppercase mb-1">Method</p><p className="font-medium italic leading-relaxed text-center">"{SPECIES_DATA[selectedSpecies].method}"</p></div></div>)}</div>
                                         </div>
                                     </div>
-                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100"><div className="flex items-center gap-3 mb-6"><div className="p-3 bg-red-50 text-red-600 rounded-2xl"><Icons.Calendar className="w-5 h-5"/></div><h3 className="font-black uppercase text-xs tracking-widest text-slate-800">Birthing Calendar</h3></div><div className="space-y-4 overflow-x-auto no-scrollbar"><div className="min-w-[400px]"><div className="flex mb-2 text-[8px] font-black uppercase text-slate-300 tracking-widest border-b border-slate-50 pb-1 text-center"><div className="w-20 shrink-0">Species</div>{['J','F','M','A','M','J','J','A','S','O','N','D'].map((m, i) => (<div key={i} className="flex-1 text-center">{m}</div>))}</div>{BIRTHING_CALENDAR.map(species => (<div key={species.name} className="flex items-center h-8 group active:bg-slate-50 rounded-lg transition-colors"><div className="w-20 shrink-0 text-[10px] font-black text-slate-600">{species.name}</div>{Array.from({length: 12}).map((_, i) => (<div key={i} className="flex-1 h-full px-0.5 py-2 text-center"><div className={`h-full w-full rounded-sm ${species.months.includes(i) ? species.color : 'bg-slate-100 opacity-20'}`}></div></div>))}</div>))}</div></div></div>
                                 </div>
                             )}
 
                             {activeTab === 'truck' && (
                                 <div className="space-y-6 animate-slide-up max-w-2xl mx-auto">
-                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100">
-                                        <div className="flex items-center gap-3 mb-8">
+                                    <div className="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100 text-center">
+                                        <div className="flex items-center gap-3 mb-8 justify-center">
                                             <div className="p-3 bg-green-50 text-green-600 rounded-2xl"><Icons.Truck className="w-6 h-6"/></div>
                                             <div>
                                                 <h3 className="font-black uppercase text-xs tracking-widest text-slate-800 leading-none mb-1">Truck Inventory</h3>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Track your stock levels</p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Track your stock levels</p>
                                             </div>
                                         </div>
                                         <div className="space-y-4">
@@ -588,4 +563,3 @@
     </script>
 </body>
 </html>
-
